@@ -1,0 +1,117 @@
+# Table 4a,,,,,,,,,,,
+# System code,System Type,System effy,System effy - HETAS approved,System effy - gas,System effy - lpg,Responsiveness,Table 2b row for stored water systems,Fraction of heat from secondary (table 11),Fan-assisted flue,Warm air system,Water effy
+151,Manual feed independent boiler in heated space a),60,,,,0.75,2,0.1,,,same
+152,Manual feed independent boiler in unheated space a),55,,,,0.75,2,0.1,,,same
+153,Auto (gravity) feed independent boiler in heated space a),65,,,,0.75,2,0.1,,,same
+154,Auto (gravity) feed independent boiler in unheated space a),60,,,,0.75,2,0.1,,,same
+155,Wood chip/pellet independent boiler,63,,,,0.75,2,0.1,,,same
+156,Open fire with back boiler to radiators,55,,,,0.5,2,0.1,,,same
+158,Closed roomheater with boiler to radiators,65,,,,0.5,2,0.1,,,same
+159,Stove (pellet-fired) with boiler to radiators,63,,,,0.75,2,0.1,,,same
+160,Range cooker boiler (integral oven and boiler),45,,,,0.5,2,0.1,,,same
+161,Range cooker boiler (independent oven and boiler),55,,,,0.5,2,0.1,,,same
+191,Direct acting electric boiler,100,,,,emitter,1,0.1,,,same
+192,Electric CPSU in heated space a) - radiators or underfloor,100,,,,0.75,8,0.1,,,same
+193,Electric dry core storage boiler in heated space a) b),100,,,,0.75,,0.1,,,same
+194,Electric dry core storage boiler in unheated space a) b),85,,,,0.75,,0.1,,,same
+195,Electric water storage boiler in heated space a) b),100,,,,0.75,,0.1,,,same
+196,Electric water storage boiler in unheated space a) b),85,,,,0.75,,0.1,,,same
+201,Ground-to-water heat pump (electric),320,,,,emitter,2,0.1,,,same
+202,Ground-to-water heat pump with auxiliary heater (electric),300,,,,emitter,2,0.1,,,same
+203,Water-to-water heat pump (electric),300,,,,emitter,2,0.1,,,same
+204,Air-to-water heat pump (electric),250,,,,emitter,2,0.1,,,same
+205,"Gas-fired, ground source",120,,,,emitter,2,0.1,TRUE,,same
+206,"Gas-fired, water source",120,,,,emitter,2,0.1,TRUE,,same
+207,"Gas-fired, air source",110,,,,emitter,2,0.1,TRUE,,same
+306,Community boilers,75,,,,1,,0.1,,,same
+307,Community CHP,75,,,,1,,0.1,,,same
+308,Community waste heat from power station,100,,,,1,,0.1,,,same
+309,Community heat pump,300,,,,1,,0.1,,,same
+310,Community geothermal heat source,100,,,,1,,0.1,,,same
+401,Old (large volume) storage heaters,100,,,,0,,0.15,,,same
+402,Modern (slimline) storage heaters,100,,,,0.25,,0.15,,,same
+403,Convector storage heaters,100,,,,0.25,,0.15,,,same
+404,Fan storage heaters,100,,,,0.5,,0.1,,,same
+405,Modern (slimline) storage heaters with Celect-type control,100,,,,0.5,,0.15,,,same
+406,Convector storage heaters with Celect-type control,100,,,,0.5,,0.15,,,same
+407,Fan storage heaters with Celect-type control,100,,,,0.75,,0.1,,,same
+408,Integrated storage+direct-acting heater,100,,,,0.75,,0.1,,,same
+402,Modern (slimline) storage heaters,100,,,,0.5,,0.15,,,same
+403,Convector storage heaters,100,,,,0.5,,0.15,,,same
+404,Fan storage heaters,100,,,,0.5,,0.1,,,same
+405,Modern (slimline) storage heaters with Celect-type control,100,,,,0.75,,0.15,,,same
+406,Convector storage heaters with Celect-type control,100,,,,0.75,,0.15,,,same
+407,Fan storage heaters with Celect-type control,100,,,,0.75,,0.1,,,same
+421,In concrete slab (off-peak only),100,,,,0,,0.1,,,same
+422,Integrated (storage+direct-acting),100,,,,0.25,,0.1,,,same
+423,Integrated (storage+direct-acting) with low (off-peak) tariff control,100,,,,0.5,,0.1,,,same
+424,In screed above insulation,100,,,,0.75,,0.1,,,same
+425,"In timber floor, or immediately below floor covering",100,,,,1,,0.1,,,same
+501,"Gas-fired warm air with fan-assisted flue, Ducted, on-off control, pre 1998",70,,,,1,2,0.1,TRUE,TRUE,65
+502,"Gas-fired warm air with fan-assisted flue, Ducted, on-off control, 1998 or later",76,,,,1,2,0.1,TRUE,TRUE,73
+503,"Gas-fired warm air with fan-assisted flue, Ducted, modulating control, pre 1998",72,,,,1,2,0.1,TRUE,TRUE,65
+504,"Gas-fired warm air with fan-assisted flue, Ducted, modulating control, 1998 or later",78,,,,1,2,0.1,TRUE,TRUE,73
+505,"Gas-fired warm air with fan-assisted flue, Roomheater with in-floor ducts",69,,,,1,2,0.1,TRUE,TRUE,same
+506,"Gas fired warm air with balanced or open flue, Ducted or stub-ducted, on-off control, pre 1998",70,,,,1,2,0.1,,TRUE,65
+507,"Gas fired warm air with balanced or open flue, Ducted or stub-ducted, on-off control, 1998 or later",76,,,,1,2,0.1,,TRUE,73
+508,"Gas fired warm air with balanced or open flue, Ducted or stub-ducted, modulating control, pre 1998",72,,,,1,2,0.1,,TRUE,65
+509,"Gas fired warm air with balanced or open flue, Ducted or stub-ducted, modulating control, 1998 or later",78,,,,1,2,0.1,,TRUE,73
+510,"Gas fired warm air with balanced or open flue, Ducted or stub-ducted with flue heat recovery",85,,,,1,2,0.1,,TRUE,same
+511,"Gas fired warm air with balanced or open flue, Condensing",81,,,,1,2,0.1,,TRUE,same
+512,"Oil-fired warm air, Ducted output (on/off control)",70,,,,1,2,0.1,,TRUE,same
+513,"Oil-fired warm air, Ducted output (modulating control)",72,,,,1,2,0.1,,TRUE,same
+514,"Oil-fired warm air, Stub duct system",70,,,,1,2,0.1,,TRUE,same
+515,"Electric warm air, Electricaire system",100,,,,0.75,,0.1,,TRUE,same
+521,Ground-to-air heat pump (electric),320,,,,1,2,0.1,,TRUE,same
+522,Ground-to-air heat pump with auxiliary heater (electric),300,,,,1,2,0.1,,TRUE,same
+523,Water-to-air heat pump (electric),300,,,,1,2,0.1,,TRUE,same
+524,Air-to-air heat pump (electric),250,,,,1,2,0.1,,TRUE,same
+525,"Gas-fired, ground source",120,,,,1,2,0.1,,TRUE,same
+526,"Gas-fired, water source",120,,,,1,2,0.1,,TRUE,same
+527,"Gas-fired, air source",110,,,,1,2,0.1,,TRUE,same
+601,"Gas fire, open flue, pre- 1980 (open fronted) OF",,,50,50,1,,0.1,,,same
+602,"Gas fire, open flue, pre- 1980 (open fronted), with back boiler unit OF",,,50,50,1,2,0.1,,,65
+603,"Gas fire, open flue, 1980 or later (open fronted), sitting proud of, and sealed to, fireplace opening OF",,,63,64,1,,0.1,,,same
+604,"Gas fire, open flue, 1980 or later (open fronted), sitting proud of, and sealed to, fireplace opening, with back boiler unit OF",,,63,64,1,2,0.1,,,65
+605,"Flush fitting Live Fuel Effect gas fire (open fronted), sealed to fireplace opening OF",,,40,41,1,,0.1,,,same
+606,"Flush fitting Live Fuel Effect gas fire (open fronted), sealed to fireplace opening, with back boiler unit OF",,,40,41,1,2,0.1,,,65
+607,"Flush fitting Live Fuel Effect gas fire (open fronted), fan assisted, sealed to fireplace opening OF",,,45,46,1,,0.1,,,same
+609,"Gas fire or wall heater, balanced flue BF",,,58,60,1,,0.1,,,same
+610,"Gas fire, closed fronted, fan assisted BF",,,72,73,1,,0.1,,,same
+611,Condensing gas fire BF,,,85,85,1,,0.1,,,same
+612,"Decorative Fuel Effect gas fire, open to chimney C",,,20,20,1,,0.1,,,same
+613,"Flueless gas fire, secondary heating only none",,,90,92,1,,0.1,,,same
+621,"Room heater, pre 2000 OF",55,,,,1,,0.1,,,same
+622,"Room heater, pre 2000 , with boiler (no radiators) OF",65,,,,1,2,0.1,,,same
+623,"Room heater, 2000 or later OF",60,,,,1,,0.1,,,same
+624,"Room heater, 2000 or later with boiler (no radiators) OF",70,,,,1,2,0.1,,,same
+625,Bioethanol heater (see SAP test case 20),94,,,,-1,,-1,,,
+631,Open fire in grate C,32,37,,,0.5,,0.1,,,same
+632,Open fire with back boiler (no radiators) C,50,50,,,0.5,2,0.1,,,same
+633,Closed room heater OF,60,65,,,0.5,,0.1,,,same
+634,Closed room heater with boiler (no radiators) OF,65,67,,,0.5,2,0.1,,,same
+635,Stove (pellet fired) OF,63,65,,,0.75,,0.1,,,same
+636,Stove (pellet fired) with boiler (no radiators) OF,63,65,,,0.75,2,0.1,,,same
+691,"Panel, convector or radiant heaters",100,,,,1,,0.2,,,same
+694,Water- or oil-filled radiators,100,,,,1,,0.2,,,same
+692,Fan heaters,100,,,,1,,0.2,,,same
+693,Portable electric heaters,100,,,,1,,0.2,,,same
+701,Electric ceiling heating,100,,,,0.75,,0.1,,,same
+903,Electric immersion,100,,,,n/a,1,,,,same
+907,Single-point gas water heater (instantaneous at point of use),70,,,,n/a,,,,,same
+908,Multi-point gas water heater (instantaneous serving several taps),65,,,,n/a,,,,,same
+909,Electric instantaneous at point of use,100,,,,n/a,,,,,same
+911,Gas boiler/circulator for water heating only,65,,,,n/a,2,,,,same
+912,Oil boiler/circulator for water heating only,70,,,,n/a,,,,,same
+913,Solid fuel boiler/circulator for water heating only,55,,,,n/a,,,,,same
+921,"Range cooker with boiler for water heating only, Gas, single burner with permanent pilot",46,,,,n/a,2,,,,same
+922,"Range cooker with boiler for water heating only, Gas, single burner with automatic ignition",50,,,,n/a,2,,,,same
+923,"Range cooker with boiler for water heating only, Gas, twin burner with permanent pilot pre 1998",60,,,,n/a,2,,,,same
+924,"Range cooker with boiler for water heating only, Gas, twin burner with automatic ignition pre 1998",65,,,,n/a,2,,,,same
+925,"Range cooker with boiler for water heating only, Gas, twin burner with permanent pilot 1998 or later",65,,,,n/a,2,,,,same
+926,"Range cooker with boiler for water heating only, Gas, twin burner with automatic ignition 1998 or later",70,,,,n/a,2,,,,same
+927,"Range cooker with boiler for water heating only, Oil, single burner",60,,,,n/a,2,,,,same
+928,"Range cooker with boiler for water heating only, Oil, twin burner pre 1998",70,,,,n/a,2,,,,same
+929,"Range cooker with boiler for water heating only, Oil, twin burner 1998 or later",75,,,,n/a,2,,,,same
+930,"Range cooker with boiler for water heating only, Solid fuel, integral oven and boiler",45,,,,n/a,2,,,,same
+931,"Range cooker with boiler for water heating only, Solid fuel, independent oven and boiler",55,,,,n/a,2,,,,same

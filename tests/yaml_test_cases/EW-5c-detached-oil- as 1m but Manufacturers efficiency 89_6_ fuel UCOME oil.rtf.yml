@@ -1,0 +1,82 @@
+wind_speed: !Array [5.4, 5.1, 5.1, 4.5, 4.1, 3.9, 3.7, 3.7, 4.2, 4.5, 4.8, 5.1]
+Texternal_heating: !Array [4.5, 5.0, 6.8, 8.7, 11.7, 14.6, 16.9, 16.9, 14.3, 10.8, 7.0, 4.9]
+Igh_heating: !Array [26.0, 54.0, 94.0, 150.0, 190.0, 201.0, 194.0, 164.0, 116.0, 68.0, 33.0, 21.0]
+sap_region: 8
+is_flat: false
+GFA: 100.0
+volume: 250.0
+Nstoreys: 2
+living_area: 45.0
+opening_types:
+  Windows (1): &id001 !OpeningType {Uvalue: 1.6791044776119401, bfrc_data: false, frame_factor: 0.7, glazing_type: 2, gvalue: 0.63, roof_window: false}
+openings:
+- !Opening
+  area: 10.6
+  name: Windows (1)
+  opening_type: *id001
+  orientation_degrees: 90
+- !Opening
+  area: 1.95
+  name: Windows (1)
+  opening_type: *id001
+  orientation_degrees: 180
+- !Opening
+  area: 10.6
+  name: Windows (1)
+  opening_type: *id001
+  orientation_degrees: 270
+overshading: 2
+heat_loss_elements:
+- !HeatLossElement {Uvalue: 1.8, area: 1.85, element_type: 5, is_external: true, name: Doors}
+- !HeatLossElement {Uvalue: 1.6791044776119401, area: 23.15, element_type: 6, is_external: true, name: Windows (1)}
+- !HeatLossElement {Uvalue: 0.2, area: 50.0, element_type: 3, is_external: true, name: Ground floor}
+- !HeatLossElement {Uvalue: 0.3, area: 125.0, element_type: 1, is_external: true, name: Walls (1)}
+- !HeatLossElement {Uvalue: 0.16, area: 50.0, element_type: 4, is_external: true, name: Roof (1)}
+thermal_mass_elements: []
+Uthermalbridges: 0.045
+thermal_mass_parameter: 250.0
+ventilation_type: 2
+mev_fan_room_kitchen_count: 1
+mev_fan_room_kitchen_sfp: 0.27
+mev_fan_duct_other_count: 1
+mev_fan_duct_other_sfp: 0.29
+mev_fan_wall_other_count: 1
+mev_fan_wall_other_sfp: 0.23
+mv_ducttype: 2
+mv_approved: false
+Nchimneys: 0.0
+Nflues: 0.0
+Nintermittentfans: 0.0
+Npassivestacks: 0.0
+Nshelteredsides: 2.0
+pressurisation_test_result: 5.5
+main_sys_fuel: !fuel {fuel_code: 72}
+sys1_sedbuk_2009_effy: 89.6
+sys1_sedbuk_type: 6
+sys1_sedbuk_fan_assisted: true
+heating_emitter_type: 5
+central_heating_pump_in_heated_space: true
+main_heating_oil_pump_inside_dwelling: true
+control_type_code: 2106
+sys1_has_boiler_interlock: true
+secondary_heating_type_code: 692
+secondary_sys_fuel: !fuel {fuel_code: 30}
+has_hw_cylinder: true
+water_heating_type_code: 901
+has_hw_time_control: true
+hw_cylinder_volume: 150.0
+hw_cylinder_insulation: 25.0
+hw_cylinder_insulation_type: 1
+cylinder_in_heated_space: true
+primary_pipework_insulated: true
+has_cylinderstat: true
+hwsys_has_boiler_interlock: true
+low_water_use: false
+electricity_tariff: !fuel {fuel_code: 30}
+photovoltaic_systems: []
+terrain_type: 3
+N_wind_turbines: 1.0
+wind_turbine_rotor_diameter: 1.7
+wind_turbine_hub_height: 3.0
+lighting_outlets_total: 10.0
+lighting_outlets_low_energy: 3.0

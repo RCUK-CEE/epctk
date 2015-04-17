@@ -1,0 +1,130 @@
+wind_speed: !Array [5.4, 5.1, 5.1, 4.5, 4.1, 3.9, 3.7, 3.7, 4.2, 4.5, 4.8, 5.1]
+Texternal_heating: !Array [4.5, 5.0, 6.8, 8.7, 11.7, 14.6, 16.9, 16.9, 14.3, 10.8, 7.0, 4.9]
+Igh_heating: !Array [26.0, 54.0, 94.0, 150.0, 190.0, 201.0, 194.0, 164.0, 116.0, 68.0, 33.0, 21.0]
+sap_region: 11
+is_flat: false
+GFA: 62.0
+volume: 156.8
+Nstoreys: 2
+living_area: 18.6
+opening_types:
+  Windows (1): &id001 !OpeningType {Uvalue: 1.6791044776119401, bfrc_data: false, frame_factor: 0.7, glazing_type: 2, gvalue: 0.63, roof_window: false}
+  Windows (2): &id002 !OpeningType {Uvalue: 1.7657992565055762, bfrc_data: false, frame_factor: 0.7, glazing_type: 2, gvalue: 0.63, roof_window: false}
+openings:
+- !Opening
+  area: 1.44
+  name: Windows (1)
+  opening_type: *id001
+  orientation_degrees: 90
+- !Opening
+  area: 1.44
+  name: Windows (1)
+  opening_type: *id001
+  orientation_degrees: 90
+- !Opening
+  area: 1.08
+  name: Windows (1)
+  opening_type: *id001
+  orientation_degrees: 90
+- !Opening
+  area: 0.48
+  name: Windows (1)
+  opening_type: *id001
+  orientation_degrees: 90
+- !Opening
+  area: 1.44
+  name: Windows (2)
+  opening_type: *id002
+  orientation_degrees: 270
+- !Opening
+  area: 1.44
+  name: Windows (2)
+  opening_type: *id002
+  orientation_degrees: 270
+- !Opening
+  area: 1.44
+  name: Windows (2)
+  opening_type: *id002
+  orientation_degrees: 270
+- !Opening
+  area: 0.48
+  name: Windows (2)
+  opening_type: *id002
+  orientation_degrees: 180
+overshading: 2
+heat_loss_elements:
+- !HeatLossElement {Uvalue: 1.8, area: 1.8, element_type: 5, is_external: true, name: Doors}
+- !HeatLossElement {Uvalue: 1.6791044776119401, area: 4.44, element_type: 6, is_external: true, name: Windows (1)}
+- !HeatLossElement {Uvalue: 1.7657992565055762, area: 4.8, element_type: 6, is_external: true, name: Windows (2)}
+- !HeatLossElement {Uvalue: 0.18, area: 22.0, element_type: 3, is_external: true, name: Ground floor}
+- !HeatLossElement {Uvalue: 0.12, area: 18.0, element_type: 3, is_external: true, name: Exposed floor}
+- !HeatLossElement {Uvalue: 0.18, area: 21.76, element_type: 1, is_external: true, name: Walls (1)}
+- !HeatLossElement {Uvalue: 0.2, area: 21.6, element_type: 1, is_external: true, name: Walls (2)}
+- !HeatLossElement {Uvalue: 0.3, area: 10.0, element_type: 1, is_external: true, name: Walls (3)}
+- !HeatLossElement {Uvalue: 0.13, area: 40.0, element_type: 4, is_external: true, name: Roof (1)}
+- !HeatLossElement {Uvalue: 0.2, area: 80.0, element_type: 2, is_external: false, name: Party wall}
+thermal_mass_elements:
+- !ThermalMassElement {area: 22.0, kvalue: 20.0, name: Ground floor}
+- !ThermalMassElement {area: 21.76, kvalue: 150.0, name: Walls (1)}
+- !ThermalMassElement {area: 21.6, kvalue: 110.0, name: Walls (2)}
+- !ThermalMassElement {area: 10.0, kvalue: 190.0, name: Walls (3)}
+- !ThermalMassElement {area: 40.0, kvalue: 9.0, name: Roof (1)}
+- !ThermalMassElement {area: 80.0, kvalue: 180.0, name: Party wall}
+- !ThermalMassElement {area: 80.0, kvalue: 9.0, name: Internal wall (1)}
+- !ThermalMassElement {area: 20.0, kvalue: 75.0, name: Internal wall (2)}
+- !ThermalMassElement {area: 70.0, kvalue: 100.0, name: Internal wall (3)}
+- !ThermalMassElement {area: 22.0, kvalue: 9.0, name: 'Internal floor level 1 from below   '}
+- !ThermalMassElement {area: 40.0, kvalue: 18.0, name: 'Internal floor level 1 from above   '}
+y_values:
+- {length: 11.4, y: 0.07}
+- {length: 11.4, y: 0.04}
+- {length: 25.6, y: 0.05}
+- {length: 10.0, y: 0.07}
+- {length: 10.0, y: 0.07}
+- {length: 10.0, y: 0.06}
+- {length: 16.0, y: 0.24}
+- {length: 20.0, y: 0.06}
+- {length: 16.0, y: 0.08}
+- {length: 16.0, y: 0.0}
+- {length: 16.0, y: 0.12}
+ventilation_type: 3
+mvhr_effy: 90.0
+mvhr_sfp: 0.7
+mv_ducttype: 4
+mv_approved: true
+Nchimneys: 0.0
+Nflues: 1.0
+Nintermittentfans: 0.0
+Npassivestacks: 0.0
+Nshelteredsides: 2.0
+pressurisation_test_result: 0.66
+main_sys_fuel: !fuel {fuel_code: 23}
+main_heating_type_code: 636
+control_type_code: 2605
+has_hw_cylinder: true
+water_heating_type_code: 901
+use_immersion_heater_summer: true
+hw_cylinder_volume: 160.0
+hw_cylinder_insulation: 80.0
+hw_cylinder_insulation_type: 1
+cylinder_in_heated_space: true
+immersion_type: 1
+primary_pipework_insulated: true
+has_cylinderstat: true
+solar_collector_aperture: 4.0
+collector_type: 3
+collector_zero_loss_effy: 0.8
+collector_heat_loss_coeff: 20.0
+collector_orientation: 180
+collector_pitch: 30
+collector_overshading: 3
+solar_dedicated_storage_volume: 60.0
+solar_storage_combined_cylinder: false
+has_electric_shw_pump: false
+low_water_use: false
+electricity_tariff: !fuel {fuel_code: 30}
+photovoltaic_systems:
+- {kWp: 2.0, overshading_category: 4, pitch: Horizontal}
+terrain_type: 3
+lighting_outlets_total: 10.0
+lighting_outlets_low_energy: 3.0

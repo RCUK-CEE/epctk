@@ -1,0 +1,50 @@
+# Table 4e,,,,,,
+# Code,Control type,Temperature adjustment,Has room thermostat,Has TRVs,Other adjustments,Description
+2101,1,0.6,FALSE,FALSE,Table 4c(2),No time or thermostatic control of room temperature
+2102,1,0.6,FALSE,FALSE,Table 4c(2),"Programmer, no room thermostat"
+2103,1,0,TRUE,FALSE,Table 4c(2),Room thermostat only
+2104,1,0,TRUE,FALSE,Table 4c(2),Programmer and room thermostat
+2105,2,0,TRUE,FALSE,Table 4c(2),Programmer and at least two room thermostats
+2106,2,0,TRUE,TRUE,Table 4c(2),"Programmer, room thermostat and TRVs"
+2111,2,0,FALSE,TRUE,Table 4c(2),TRVs and bypass
+2107,2,0,FALSE,TRUE,Table 4c(2),"Programmer, TRVs and bypass"
+2108,2,0,TRUE,TRUE,Table 4c(2),"Programmer, TRVs and flow switch"
+2109,2,0,TRUE,TRUE,Table 4c(2),"Programmer, TRVs and boiler energy manager"
+2110,3,0,TRUE,FALSE,Table 4c(2),Time and temperature zone control
+2201,1,0.3,FALSE,FALSE,Table 4c(4),No time or thermostatic control of room temperature
+2202,1,0.3,FALSE,FALSE,Table 4c(4),"Programmer, no room thermostat"
+2203,1,0,TRUE,FALSE,Table 4c(4),Room thermostat only
+2204,1,0,TRUE,FALSE,Table 4c(4),Programmer and room thermostat
+2205,2,0,TRUE,FALSE,Table 4c(4),Programmer and at least two room thermostats
+2206,2,0,unknown,TRUE,Table 4c(4),"Programmer, TRVs and bypass"
+2207,3,0,TRUE,FALSE,Table 4c(4),Time and temperature zone control
+2301,1,0.3,FALSE,n/a,Table 4c(3),"Flat rate charging, no thermostatic control of room temperature"
+2302,1,0.3,FALSE,n/a,Table 4c(3),"Flat rate charging, programmer, no room thermostat"
+2303,1,0,TRUE,n/a,Table 4c(3),"Flat rate charging, room thermostat only"
+2304,1,0,TRUE,n/a,Table 4c(3),"Flat rate charging, programmer and room thermostat"
+2307,2,0,unknown,n/a,Table 4c(3),"Flat rate charging, TRVs"
+2305,2,0,unknown,n/a,Table 4c(3),"Flat rate charging, programmer and TRVs"
+2308,2,0,TRUE,n/a,Table 4c(3),"Charging system linked to use of community heating, room thermostat only"
+2309,2,0,TRUE,n/a,Table 4c(3),"Charging system linked to use of community heating, programmer and room thermostat"
+2310,3,0,unknown,n/a,Table 4c(3),"Charging system linked to use of community heating, TRVs"
+2306,3,0,unknown,n/a,Table 4c(3),"Charging system linked to use of community heating, programmer and TRVs"
+2401,3,0.3,n/a,n/a,n/a,Manual charge control
+2402,3,0,n/a,n/a,n/a,Automatic charge control
+2403,3,0,n/a,n/a,n/a,Celect-type controls
+2501,1,0.3,FALSE,n/a,n/a,No thermostatic control of room temperature
+2502,1,0.3,FALSE,n/a,n/a,"Programmer, no room thermostat"
+2503,1,0,TRUE,n/a,n/a,Room thermostat only
+2504,1,0,TRUE,n/a,n/a,Programmer and room thermostat
+2505,2,0,TRUE,n/a,n/a,Programmer and at least two room thermostats
+2506,3,0,TRUE,n/a,n/a,Time and temperature zone control
+2601,2,0.3,n/a,n/a,n/a,No thermostatic control of room temperature
+2602,3,0,n/a,n/a,n/a,Appliance thermostats
+2603,3,0,n/a,n/a,n/a,Programmer and appliance thermostats
+2604,3,0,n/a,n/a,n/a,Room thermostats only
+2605,3,0,n/a,n/a,n/a,Programmer and room thermostats
+2701,1,0.3,FALSE,n/a,n/a,No thermostatic control of room temperature
+2702,1,0.3,FALSE,n/a,n/a,"Programmer, no room thermostat"
+2703,1,0,TRUE,n/a,n/a,Room thermostat only
+2704,1,0,TRUE,n/a,n/a,Programmer and room thermostat
+2705,2,0,TRUE,n/a,n/a,Temperature zone control
+2706,3,0,TRUE,n/a,n/a,Time and temperature zone control

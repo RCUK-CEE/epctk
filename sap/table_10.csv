@@ -1,0 +1,23 @@
+# Table 10,,,,,,,,
+# Region id,Region,Latitude,Solar rad June,Solar rad Jul,Solar rad Aug,External temp Jun,External temp Jul,External Temp Aug
+1,Thames,51.5,214,204,177,15.4,17.8,17.8
+2,South East England,51,225,213,186,15.2,17.6,17.8
+3,Southern England,50.8,225,213,190,15.2,17.4,17.6
+4,South West England,50.6,218,208,186,14.7,16.8,17
+5,Severn,51.5,218,208,184,15.2,17.4,17.3
+6,Midlands,52.7,204,194,168,14.9,17.2,17.1
+7,West Penines,53.4,196,186,159,14.5,16.6,16.5
+8,North West England/South West Scotland,54.8,192,187,156,13.5,15.5,15.4
+9,Borders,55.5,186,178,149,13.4,15.5,15.4
+10,North East England,54.5,188,183,154,14,16.2,16.1
+11,East Penines,53.4,201,194,164,14.6,16.9,16.9
+12,East Anglia,52.3,212,203,173,15,17.5,17.6
+13,Wales,52.5,209,198,172,14.3,16.4,16.3
+14,West Scotland,55.8,186,183,154,13.1,14.9,14.8
+15,East Scotland,56.4,187,177,146,13.2,15.2,15
+16,North East Scotland,57.2,187,170,142,12.8,14.9,14.7
+17,Highland,57.5,181,163,140,12.5,14.5,14.4
+18,Western Isles,58,189,175,147,11.7,13.7,13.7
+19,Orkney,59,199,178,141,11.2,13.3,13.6
+20,Shetland,60.2,183,163,138,10.6,12.7,13
+21,Northern Ireland,54.7,188,175,152,13.4,15.4,15.2

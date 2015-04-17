@@ -1,0 +1,44 @@
+# Table 12,,,,,,,,,
+# Name,fuel code,CO2 factor,Fuel Factor,Emission Factor adjustment numerator,Emission Factor adjustment denominator,Price,Standing Charge,Primary Energy Factor,Fuel Type
+mains gas,1,0.198,1,0.198,0.194,3.1,106,1.02,GAS
+LNG,8,0.198,1,0.198,0.194,3.1,106,1.02,GAS
+bulk LPG,2,0.245,1.1,0.245,0.234,5.73,70,1.06,GAS
+bottled LPG,3,0.245,1.1,0.245,0.234,8.34,0,1.06,GAS
+LPG subject to Special Condition 18,9,0.245,1.1,0.245,0.234,3.1,106,1.06,GAS
+heating oil,4,0.274,1.17,0.274,0.265,4.06,0,1.06,OIL
+biodiesel from any biomass source,71,0.047,1,0.198,0.194,5.7,0,1.3,OIL
+biodiesel from used cooking oil only,72,0.004,1,0.198,0.194,5.7,0,1.08,OIL
+rapeseed oil,73,0.009,1,0.198,0.194,5.7,0,1.12,OIL
+appliances able to use mineral oil or liquid biofuel,74,0.274,1.17,0.274,0.265,4.06,0,1.06,OIL
+B30K,75,0.193,1,0.198,0.194,4.6,0,1.06,OIL
+bioethanal from any biomass source,76,0.064,1,0.198,0.194,42,0,1.34,OIL
+house coal,11,0.301,1.28,0.301,0.291,2.97,0,1.02,SOLID
+anthracite,15,0.318,1.28,0.318,0.317,2.86,0,1.02,SOLID
+manufactured smokeless fuel,12,0.347,1.28,0.347,0.392,3.73,0,1.08,SOLID
+wood logs,20,0.008,1,0.198,0.194,3.42,0,1.05,SOLID
+wood pellets (in bags for secondary heating),22,0.028,1,0.198,0.194,5.45,0,1.2,SOLID
+wood pellets (bulk supply for main heating),23,0.028,1,0.198,0.194,4.93,0,1.2,SOLID
+wood chips,21,0.009,1,0.198,0.194,2.49,0,1.07,SOLID
+dual fuel appliance (mineral and wood),10,0.206,1,0.198,0.194,3.21,0,1.04,SOLID
+# !!! What should EFA and FF be?,,,,,,,,,
+HEAT_FROM_BOILERS_MAINS_GAS,51,0.198,1,0.198,0.194,3.78,106,1.02,COMMUNAL
+HEAT_FROM_BOILERS_LPG,52,0.245,1.1,0.198,0.194,3.78,106,1.06,COMMUNAL
+# !!! What are the emission factors for these fuels?,,,,,,,,,
+HEAT_FROM_BOILERS_OIL,53,0.297,1.17,,,3.78,106,1.06,COMMUNAL
+HEAT_FROM_BOILERS_B30D,55,0.199,1.17,,,3.78,106,1.06,COMMUNAL
+HEAT_FROM_BOILERS_COAL,54,0.35,1.28,,,3.78,106,1.02,COMMUNAL
+HEAT_FROM_ELECTRIC_HEAT_PUMP,41,0.517,1.47,0.517,0.422,3.78,106,2.92,COMMUNAL
+HEAT_FROM_BOILERS_WASTE_COMBUSTION,42,0.04,1,0.198,0.194,3.78,106,1.28,COMMUNAL
+HEAT_FROM_BOILERS_WASTE_BIOMASS,43,0.013,1,0.198,0.194,3.78,106,1.07,COMMUNAL
+HEAT_FROM_BOILERS_WASTE_BIOGAS,44,0.018,1,0.198,0.194,3.78,106,1.1,COMMUNAL
+WASTE_FROM_POWER_STATION,45,0.058,1,0.198,0.194,2.65,106,1.2,COMMUNAL
+GEOTHERMAL,46,0.036,1,0.198,0.194,2.65,106,1.16,COMMUNAL
+standard tariff,30,0.517,1.47,0.517,0.422,11.46,0,2.92,ELECTRIC
+7-hour tariff (high rate),32,0.517,1.47,0.517,0.422,12.82,27,2.92,ELECTRIC
+7-hour tariff (low rate),31,0.517,1.47,0.517,0.422,4.78,27,2.92,ELECTRIC
+10-hour tariff (high rate),34,0.517,1.47,0.517,0.422,11.83,18,2.92,ELECTRIC
+10-hour tariff (low rate),33,0.517,1.47,0.517,0.422,6.17,18,2.92,ELECTRIC
+24-hour heating tariff,35,0.517,1.47,0.517,0.422,4.64,57,2.92,ELECTRIC
+Electric sold to grid,36,,,,,11.46,,,ELECTRIC
+Electric displaced from grid,37,0.529,,,,,,2.92,ELECTRIC
+Heat from chp,48,,,,,2.65,,,COMMUNAL
