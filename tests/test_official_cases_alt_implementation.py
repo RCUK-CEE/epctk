@@ -10,7 +10,7 @@ import input_conversion_rules
 import output_checker
 import yaml_io
 from sap import pcdf
-from sap import sap_runner
+from sap import runner
 from utils import *
 
 
@@ -113,11 +113,11 @@ def add_sap_region(dwelling, fname):
 
 
 def run_dwelling(dwelling):
-    sap_runner.run_sap(dwelling)
-    sap_runner.run_improvements(dwelling)
-    sap_runner.run_fee(dwelling)
-    sap_runner.run_der(dwelling)
-    sap_runner.run_ter(dwelling)
+    runner.run_sap(dwelling)
+    runner.run_improvements(dwelling)
+    runner.run_fee(dwelling)
+    runner.run_der(dwelling)
+    runner.run_ter(dwelling)
 
 
 def get_dwelling(fname, force_reparse):

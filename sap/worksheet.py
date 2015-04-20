@@ -7,7 +7,6 @@ from sap import tables
 
 from sap.tables import DAYS_PER_MONTH, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE, GlazingTypes
 
-
 # REPLACE THIS with collections.orderedict
 # class ordered_dict(dict):
 #
@@ -37,31 +36,40 @@ from sap.tables import DAYS_PER_MONTH, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WA
 #         return new
 
 
-class CalculationReport(object):
+class Dwelling():
 
     def __init__(self):
-        self.txt = ""
+        # allow attributes to be sorted
+        self._attrs = collections.OrderedDict()
+        self.wind_speed = tables.WIND_SPEED
 
-    def start_section(self, number, title):
-        title_str = "%s %s\n" % (number, title)
-        self.txt += "\n"
-        self.txt += title_str
-        self.txt += "=" * len(title_str) + "\n"
+        # apply_sap_hardcoded_values here t avoid setting attrs outside of __init__
+        self.Texternal_heating = tables.T_EXTERNAL_HEATING
+        self.Igh_heating = tables.IGH_HEATING
+        self.living_area_Theating = 21
+        self.Tcooling = 24
+        # self.apply_sap_hardcoded_values()
 
-    def add_annotation(self, label):
-        self.txt += "%s\n" % (label,)
+    def __getattr__(self, name):
+        try:
+            return self._attrs[name]
+        except KeyError:
+            raise AttributeError(name)
 
-    def add_single_result(self, label, code, values):
-        self.add_monthly_result(label, code, values)
+    def __setattr__(self, name, value):
+        # exclude _attrs so that we acan acually set it during init
+        if name == '_attrs':
+            return super().__setattr__(name, value)
+        self._attrs[name] = value
 
-    def add_monthly_result(self, label, code, values):
-        if code != None:
-            self.txt += "%s %s (%s)\n" % (label, values, code)
-        else:
-            self.txt += "%s %s\n" % (label, values)
+    def __str__(self):
+        s = ''
+        for k, v in self._attrs.items():
+            s += '{} - {} \n'.format(k, v)
+        return s
 
-    def print_report(self):
-        return self.txt
+    def __repr__(self):
+        return self.__str__()
 
 
 class HeatLossElementTypes:
@@ -125,41 +133,6 @@ class Opening:
         self.opening_type = opening_type
         self.name = name
 
-
-class Dwelling():
-
-    def __init__(self):
-        self.ordered_attrs = collections.OrderedDict()
-        self.wind_speed = tables.wind_speed
-
-        # apply_sap_hardcoded_values here t avoid setting attrs outside of __init__
-        self.Texternal_heating = tables.Texternal_heating
-        self.Igh_heating = tables.Igh_heating
-        self.living_area_Theating = 21
-        self.Tcooling = 24
-        # self.apply_sap_hardcoded_values()
-
-     # Uncomment this function to maintain the order of the parameters added
-     # to the dwelling - this is useful for debugging but slows down executation
-     # enough that you don't want to do it unless you really need things
-     # sorted
-    # def __setattr__(self, k, v):
-    #     super().__setattr__(k, v)
-    #     if k != 'ordered_attrs':
-    #         self.ordered_attrs[k] = v
-
-    def apply_sap_hardcoded_values(self):
-        self.wind_speed = tables.wind_speed
-        self.Texternal_heating = tables.Texternal_heating
-        self.Igh_heating = tables.Igh_heating
-        self.living_area_Theating = 21
-        self.Tcooling = 24
-
-
-def print_dwelling(d):
-    for k, v in d.ordered_attrs.ordered_items():
-        print(('%s - %s' % (k, v)))
-    # print d.emissions
 
 
 def monthly_to_annual(var):

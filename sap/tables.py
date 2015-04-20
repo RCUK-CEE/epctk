@@ -8,9 +8,9 @@ import types
 
 DATA_FILE_LOCATION = './sap/'
 
-Igh_heating = numpy.array([26, 54, 94, 150, 190, 201, 194, 164, 116, 68, 33, 21])
-Texternal_heating = numpy.array([4.5, 5, 6.8, 8.7, 11.7, 14.6, 16.9, 16.9, 14.3, 10.8, 7, 4.9])
-wind_speed = numpy.array([5.4, 5.1, 5.1, 4.5, 4.1, 3.9, 3.7, 3.7, 4.2, 4.5, 4.8, 5.1])
+IGH_HEATING = numpy.array([26, 54, 94, 150, 190, 201, 194, 164, 116, 68, 33, 21])
+T_EXTERNAL_HEATING = numpy.array([4.5, 5, 6.8, 8.7, 11.7, 14.6, 16.9, 16.9, 14.3, 10.8, 7, 4.9])
+WIND_SPEED = numpy.array([5.4, 5.1, 5.1, 4.5, 4.1, 3.9, 3.7, 3.7, 4.2, 4.5, 4.8, 5.1])
 
 
 def float_or_zero(s):
@@ -117,6 +117,7 @@ def get_fuel_data_pcdf(fuel_id):
         return get_fuel_data_table_12(fuel_id)
 
 
+# Alias Function name
 get_fuel_data = get_fuel_data_table_12
 
 
@@ -893,7 +894,7 @@ def apply_4c2(dwelling, sys):
         dwelling.temperature_adjustment -= 0.1
 
     # !!! Also check sys2!
-    if true_and_not_missing(dwelling, "sys1_delayed_start_thermostat"):
+    if dwelling.true_and_not_missing("sys1_delayed_start_thermostat"):
         dwelling.temperature_adjustment -= .15
 
     if not sys.fuel.type in [FuelTypes.GAS,
@@ -2714,7 +2715,7 @@ def configure_fuel_costs(dwelling):
     if (hasattr(dwelling, "secondary_sys") and
             not dwelling.secondary_sys.fuel.is_electric):
         fuels.add(dwelling.secondary_sys.fuel)
-    if true_and_not_missing(dwelling, 'use_immersion_heater_summer'):
+    if dwelling.true_and_not_missing('use_immersion_heater_summer'):
         fuels.add(dwelling.electricity_tariff)
 
     standing_charge = 0

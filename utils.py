@@ -1,9 +1,9 @@
 
-
 from sap import tables, worksheet
-from test.test_official_cases_alt_implementation import all_params
 
-# TODO: find out why this is here, nuke it, hate globals! This is used, in a class, recipie for disaster!
+from tests.test_official_cases import all_params
+
+# TODO: figure out how to avoid using this global calc stage var
 calc_stage = 1
 
 def log_obj(param_set, prefix, k, v):

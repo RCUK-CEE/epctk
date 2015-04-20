@@ -5,7 +5,7 @@ import sys
 import yaml_io
 import argparse
 
-from sap import sap_runner
+from sap import runner
 
 
 def print_header(header):
@@ -15,10 +15,10 @@ def print_header(header):
 
 def sap_from_yaml(fname):
     dwelling = yaml_io.from_yaml(fname)
-    sap_runner.run_sap(dwelling)
-    sap_runner.run_der(dwelling)
-    sap_runner.run_ter(dwelling)
-    sap_runner.run_fee(dwelling)
+    runner.run_sap(dwelling)
+    runner.run_der(dwelling)
+    runner.run_ter(dwelling)
+    runner.run_fee(dwelling)
 
     print_header("SAP RESULTS")
     print((dwelling.er_results.report.print_report()))

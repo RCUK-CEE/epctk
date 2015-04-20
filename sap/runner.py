@@ -1,9 +1,3 @@
-import math
-import collections
-import itertools
-import numpy
-import copy
-
 from . import rdsap
 from . import tables
 from . import worksheet
@@ -31,95 +25,151 @@ def perform_full_calc(dwelling):
     worksheet.fuel_use(dwelling)
 
 
-class CalculationResults:
+
+class CalculationReport(object):
+
     def __init__(self):
-        self.report = worksheet.CalculationReport()
+        self.txt = ""
+
+    def start_section(self, number, title):
+        title_str = "%s %s\n" % (number, title)
+        self.txt += "\n"
+        self.txt += title_str
+        self.txt += "=" * len(title_str) + "\n"
+
+    def add_annotation(self, label):
+        self.txt += "%s\n" % (label,)
+
+    def add_single_result(self, label, code, values):
+        self.add_monthly_result(label, code, values)
+
+    def add_monthly_result(self, label, code, values):
+        if code != None:
+            self.txt += "%s %s (%s)\n" % (label, values, code)
+        else:
+            self.txt += "%s %s\n" % (label, values)
+
+    def print_report(self):
+        return self.txt
 
 
-class DwellingAndResultsWrapper(object):
+class CalculationResults(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.report = CalculationReport()
+
+
+# TODO: could probably rather subclass Dwelling
+# FIXME: seems that worksheet in any case depends on the dwelling object having report object. May better to just merge this into Dwelling
+class DwellingResultsWrapper(object):
     def __init__(self, dwelling):
         self.dwelling = dwelling
-        self.set_by_calc = CalculationResults()
-        self.report = self.set_by_calc.report
 
-    def __setattr__(self, k, v):
-        setattr(self.set_by_calc, k, v)
+        self.results = CalculationResults()  # just use a Dict, don't really need CalculationResults for now
+        self.report = self.results.report
+        # self.report = CalculationReport()
+        # self.results['report']
 
-    def __getattr__(self, k):
-        if hasattr(self.set_by_calc, k):
-            return getattr(self.set_by_calc, k)
+    # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to acces results explicitly
+    # This is really fragile...
+    def __setattr__(self, key, value):
+        if key not in ['dwelling', 'results', 'report']:
+            self.results[key] = value
         else:
-            return getattr(self.dwelling, k)
+            self.__dict__[key]= value
 
 
-def run_sap(dwelling):
-    wrapped_dwelling = DwellingAndResultsWrapper(dwelling)
-    wrapped_dwelling.reduced_gains = False
+    def __getattr__(self, item):
+        """
+        return from results if k exists, otherwise return from wrapped
+        dwelling
+        """
+        try:
+            return self.dwelling.__getattr__(item)
+        except AttributeError:
+            try:
+                return self.results[item]
+            except KeyError:
+                raise AttributeError(item)
 
-    tables.do_sap_table_lookups(wrapped_dwelling)
-    perform_full_calc(wrapped_dwelling)
-    worksheet.sap(wrapped_dwelling)
-    worksheet.build_report(wrapped_dwelling)
-
-    dwelling.er_results = wrapped_dwelling.set_by_calc
+    def true_and_not_missing(self, name):
+        return hasattr(self, name) and getattr(self, name)
 
 
-def run_fee(dwelling):
-    wrapped_dwelling = DwellingAndResultsWrapper(dwelling)
-    wrapped_dwelling.reduced_gains = True
 
-    wrapped_dwelling.cooled_area = dwelling.GFA
-    wrapped_dwelling.low_energy_bulb_ratio = 1
-    wrapped_dwelling.ventilation_type = tables.VentilationTypes.NATURAL
-    wrapped_dwelling.water_heating_type_code = 907
-    wrapped_dwelling.fghrs = None
+def run_sap(input_dwelling):
+    """
+    Run SAP on the input dwelling
+    :param input_dwelling:
+    :return:
+    """
+    dwelling = DwellingResultsWrapper(input_dwelling)
+    dwelling.reduced_gains = False
 
-    if dwelling.GFA <= 70:
-        wrapped_dwelling.Nfansandpassivevents = 2
-    elif dwelling.GFA <= 100:
-        wrapped_dwelling.Nfansandpassivevents = 3
+    tables.do_sap_table_lookups(dwelling)
+    perform_full_calc(dwelling)
+    worksheet.sap(dwelling)
+    worksheet.build_report(dwelling)
+
+    input_dwelling.er_results = dwelling.results
+
+
+def run_fee(input_dwelling):
+    dwelling = DwellingResultsWrapper(input_dwelling)
+    dwelling.reduced_gains = True
+
+    dwelling.cooled_area = input_dwelling.GFA
+    dwelling.low_energy_bulb_ratio = 1
+    dwelling.ventilation_type = tables.VentilationTypes.NATURAL
+    dwelling.water_heating_type_code = 907
+    dwelling.fghrs = None
+
+    if input_dwelling.GFA <= 70:
+        dwelling.Nfansandpassivevents = 2
+    elif input_dwelling.GFA <= 100:
+        dwelling.Nfansandpassivevents = 3
     else:
-        wrapped_dwelling.Nfansandpassivevents = 4
+        dwelling.Nfansandpassivevents = 4
 
-    if wrapped_dwelling.overshading == tables.OvershadingTypes.VERY_LITTLE:
-        wrapped_dwelling.overshading = tables.OvershadingTypes.AVERAGE
+    if dwelling.overshading == tables.OvershadingTypes.VERY_LITTLE:
+        dwelling.overshading = tables.OvershadingTypes.AVERAGE
 
-    wrapped_dwelling.main_heating_pcdf_id = None
-    wrapped_dwelling.main_heating_type_code = 191
-    wrapped_dwelling.main_sys_fuel = tables.fuel_from_code(1)
-    wrapped_dwelling.heating_emitter_type = tables.HeatEmitters.RADIATORS
-    wrapped_dwelling.control_type_code = 2106
-    wrapped_dwelling.sys1_delayed_start_thermostat = False
-    wrapped_dwelling.use_immersion_heater_summer = False
-    wrapped_dwelling.immersion_type = None
-    wrapped_dwelling.solar_collector_aperture = None
-    wrapped_dwelling.cylinder_is_thermal_store = False
-    wrapped_dwelling.thermal_store_type = None
-    wrapped_dwelling.sys1_sedbuk_2005_effy = None
-    wrapped_dwelling.sys1_sedbuk_2009_effy = None
+    dwelling.main_heating_pcdf_id = None
+    dwelling.main_heating_type_code = 191
+    dwelling.main_sys_fuel = tables.fuel_from_code(1)
+    dwelling.heating_emitter_type = tables.HeatEmitters.RADIATORS
+    dwelling.control_type_code = 2106
+    dwelling.sys1_delayed_start_thermostat = False
+    dwelling.use_immersion_heater_summer = False
+    dwelling.immersion_type = None
+    dwelling.solar_collector_aperture = None
+    dwelling.cylinder_is_thermal_store = False
+    dwelling.thermal_store_type = None
+    dwelling.sys1_sedbuk_2005_effy = None
+    dwelling.sys1_sedbuk_2009_effy = None
 
     # Don't really need to set these, but sap_tables isn't happy if we don't
-    wrapped_dwelling.cooling_packaged_system = True
-    wrapped_dwelling.cooling_energy_label = "A"
-    wrapped_dwelling.cooling_compressor_control = ""
-    wrapped_dwelling.water_sys_fuel = wrapped_dwelling.electricity_tariff
-    wrapped_dwelling.main_heating_fraction = 1
-    wrapped_dwelling.main_heating_2_fraction = 0
+    dwelling.cooling_packaged_system = True
+    dwelling.cooling_energy_label = "A"
+    dwelling.cooling_compressor_control = ""
+    dwelling.water_sys_fuel = dwelling.electricity_tariff
+    dwelling.main_heating_fraction = 1
+    dwelling.main_heating_2_fraction = 0
 
-    tables.do_sap_table_lookups(wrapped_dwelling)
+    tables.do_sap_table_lookups(dwelling)
 
-    wrapped_dwelling.pump_gain = 0
-    wrapped_dwelling.heating_system_pump_gain = 0
+    dwelling.pump_gain = 0
+    dwelling.heating_system_pump_gain = 0
 
-    perform_demand_calc(wrapped_dwelling)
-    worksheet.fee(wrapped_dwelling)
-    worksheet.build_report(wrapped_dwelling)
+    perform_demand_calc(dwelling)
+    worksheet.fee(dwelling)
+    worksheet.build_report(dwelling)
 
-    dwelling.fee_results = wrapped_dwelling.set_by_calc
+    input_dwelling.fee_results = dwelling.results
 
 
 def run_der(dwelling):
-    wrapped_dwelling = DwellingAndResultsWrapper(dwelling)
+    wrapped_dwelling = DwellingResultsWrapper(dwelling)
     wrapped_dwelling.reduced_gains = True
 
     if wrapped_dwelling.overshading == tables.OvershadingTypes.VERY_LITTLE:
@@ -130,7 +180,7 @@ def run_der(dwelling):
     worksheet.der(wrapped_dwelling)
     worksheet.build_report(wrapped_dwelling)
 
-    dwelling.der_results = wrapped_dwelling.set_by_calc
+    dwelling.der_results = wrapped_dwelling.results
     if (wrapped_dwelling.main_sys_fuel.is_mains_gas or
             (hasattr(wrapped_dwelling, 'main_sys_2_fuel') and
                  wrapped_dwelling.main_sys_2_fuel.is_mains_gas)):
@@ -146,7 +196,7 @@ def element_type_area(etype, els):
 
 
 def run_ter(dwelling):
-    wrapped_dwelling = DwellingAndResultsWrapper(dwelling)
+    wrapped_dwelling = DwellingResultsWrapper(dwelling)
 
     wrapped_dwelling.reduced_gains = True
 
@@ -286,7 +336,7 @@ def run_ter(dwelling):
     perform_full_calc(wrapped_dwelling)
     worksheet.ter(wrapped_dwelling, dwelling.ter_fuel)
     worksheet.build_report(wrapped_dwelling)
-    dwelling.ter_results = wrapped_dwelling.set_by_calc
+    dwelling.ter_results = wrapped_dwelling.results
 
 
 def apply_low_energy_lighting(base, d):
@@ -412,14 +462,14 @@ def run_improvements(dwelling):
     # Need to run the dwelling twice: once with pcdf fuel prices to
     # get cost chage, once with normal SAP fuel prices to get change
     # in SAP rating
-    base_dwelling_pcdf_prices = DwellingAndResultsWrapper(dwelling)
+    base_dwelling_pcdf_prices = DwellingResultsWrapper(dwelling)
     base_dwelling_pcdf_prices.reduced_gains = False
     base_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
     tables.do_sap_table_lookups(base_dwelling_pcdf_prices)
     perform_full_calc(base_dwelling_pcdf_prices)
     worksheet.sap(base_dwelling_pcdf_prices)
 
-    base_results_pcdf_prices = base_dwelling_pcdf_prices.set_by_calc
+    base_results_pcdf_prices = base_dwelling_pcdf_prices.results
     base_results = dwelling.er_results
 
     dwelling.improvement_results = ImprovementResults()
@@ -428,11 +478,11 @@ def run_improvements(dwelling):
     base_sap = base_results.sap_value
     base_co2 = base_results.emissions
     for name, min_improvement, improve in IMPROVEMENTS:
-        wrapped_dwelling_pcdf_prices = DwellingAndResultsWrapper(dwelling)
+        wrapped_dwelling_pcdf_prices = DwellingResultsWrapper(dwelling)
         wrapped_dwelling_pcdf_prices.reduced_gains = False
         wrapped_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
 
-        wrapped_dwelling = DwellingAndResultsWrapper(dwelling)
+        wrapped_dwelling = DwellingResultsWrapper(dwelling)
         wrapped_dwelling.reduced_gains = False
         wrapped_dwelling.use_pcdf_fuel_prices = False
 
@@ -470,7 +520,7 @@ def run_improvements(dwelling):
             base_sap = wrapped_dwelling.sap_value
             base_co2 = wrapped_dwelling.emissions
 
-    improved_dwelling = DwellingAndResultsWrapper(dwelling)
+    improved_dwelling = DwellingResultsWrapper(dwelling)
     improved_dwelling.reduced_gains = False
     improved_dwelling.use_pcdf_fuel_prices = False
     for improvement in dwelling.improvement_results.improvement_effects:
@@ -483,4 +533,5 @@ def run_improvements(dwelling):
     worksheet.build_report(improved_dwelling)
     # print improved_dwelling.report.print_report()
 
-    dwelling.improved_results = improved_dwelling.set_by_calc
+    dwelling.improved_results = improved_dwelling.results
+

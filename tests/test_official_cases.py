@@ -8,7 +8,7 @@ from tests import test_case_parser
 import input_conversion_rules
 import output_checker
 import yaml_io
-from sap import sap_runner
+from sap import runner
 from utils import *
 
 
@@ -108,11 +108,11 @@ def run_dwelling(fname, d):
     elif not hasattr(d, "sap_region"):
         d.sap_region = 11
 
-    sap_runner.run_sap(d)
-    sap_runner.run_improvements(d)
-    sap_runner.run_fee(d)
-    sap_runner.run_der(d)
-    sap_runner.run_ter(d)
+    runner.run_sap(d)
+    runner.run_improvements(d)
+    runner.run_fee(d)
+    runner.run_der(d)
+    runner.run_ter(d)
 
 
 def run_case(fname, reparse):

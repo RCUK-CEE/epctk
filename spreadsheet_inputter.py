@@ -6,7 +6,7 @@ import input_conversion_rules
 from sap import worksheet
 import v0
 from sap import tables
-from sap import sap_runner
+from sap import runner
 from output_checker import check_result
 from output_checker import check_monthly_result
 from output_checker import check_summer_monthly_result
@@ -349,7 +349,7 @@ IMMERSION_TYPES={
     tables.ImmersionTypes.SINGLE:"Single",
 }
 
-def process_hw(xlbook,d):
+def process_hw(xlbook, d: worksheet.Dwelling):
     xlbook.set_input("water_heating_type_code",d.water_heating_type_code)
     if hasattr(d,"use_immersion_heater_summer"):
         xlbook.set_input("use_immersion_heater_summer",d.use_immersion_heater_summer)
@@ -370,11 +370,11 @@ def process_hw(xlbook,d):
         xlbook.set_input("water_sys_fuel","")
 
     xlbook.set_input("has_hw_time_control",
-                     true_and_not_missing(d,"has_hw_time_control"))
+                     d.true_and_not_missing("has_hw_time_control"))
     xlbook.set_input("has_cylinderstat",
-                     true_and_not_missing(d,"has_cylinderstat"))
+                     d.true_and_not_missing("has_cylinderstat"))
     xlbook.set_input("primary_pipework_insulated",
-                     true_and_not_missing(d,"primary_pipework_insulated"))
+                     d.true_and_not_missing("primary_pipework_insulated"))
 
     if not hasattr(d,"hw_cylinder_volume") or d.hw_cylinder_volume==0:
         xlbook.set_input("cylinder_in_heated_space","")
@@ -848,10 +848,10 @@ def run_dwelling(xlbook,d,can_run_fee,can_run_der,can_run_ter):
     #can_run_fee=False
     #can_run_ter=False
     write_to_excel(xlbook,d)
-    sap_runner.run_fee(d)
-    sap_runner.run_der(d)
-    sap_runner.run_ter(d)
-    sap_runner.run_sap(d)
+    runner.run_fee(d)
+    runner.run_der(d)
+    runner.run_ter(d)
+    runner.run_sap(d)
 
     if can_run_der:
         xlbook.set_calc_type("DER")
