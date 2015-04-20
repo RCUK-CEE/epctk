@@ -1,7 +1,6 @@
 import csv
 import math
 import numpy
-from . import sap_worksheet
 import re
 from . import pcdf
 import logging
@@ -44,6 +43,24 @@ class FuelTypes(object):
     ELECTRIC = 4
     COMMUNAL = 5
 
+
+class CylinderInsulationTypes:
+    NONE = 0
+    FOAM = 1
+    JACKET = 2
+
+
+class OpeningTypeDataSource:
+    SAP = 1
+    BFRC = 2
+    MANUFACTURER = 3
+
+
+class GlazingTypes:
+    SINGLE = 1
+    DOUBLE = 2
+    TRIPLE = 3
+    SECONDARY = 4
 
 class FuelData:
     def __init__(self,
@@ -266,7 +283,7 @@ class ElectricityTariff(object):
         return on_peak_name.split("(")[0].strip()
 
 # ELECTRICITY_FROM_CHP=Fuel(49,.529,None,None,None,106,2.92,FuelTypes.COMMUNAL)
-#ELECTRICITY_FOR_DISTRIBUTION_NETWORK=Fuel(50,.517,None,None,None,106,2.92,FuelTypes.COMMUNAL)
+# ELECTRICITY_FOR_DISTRIBUTION_NETWORK=Fuel(50,.517,None,None,None,106,2.92,FuelTypes.COMMUNAL)
 
 ELECTRICITY_STANDARD = ElectricityTariff(30, 30, 1, 1)
 ELECTRICITY_7HR = ElectricityTariff(32, 31, .9, .71)
@@ -336,13 +353,18 @@ FLOOR_INFILTRATION = {
 def true_and_not_missing(d, attr):
     return hasattr(d, attr) and getattr(d, attr)
 
+# ----------------------------
+# SAP STANDARD NUMBERED TABLES
+# ----------------------------
+
 # Table 1a
 DAYS_PER_MONTH = numpy.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31])
+
 
 # Table 1b part 1
 def occupancy(dwelling):
     return 1 + 1.76 * (1 - math.exp(-0.000349 * (dwelling.GFA - 13.9) ** 2)) + 0.0013 * (
-    dwelling.GFA - 13.9) if dwelling.GFA > 13.9 else 1
+        dwelling.GFA - 13.9) if dwelling.GFA > 13.9 else 1
 
 
 # Table 1b part 2
@@ -359,9 +381,10 @@ MONTHLY_HOT_WATER_FACTORS = numpy.array([1.1, 1.06, 1.02, 0.98, 0.94, 0.9, 0.9, 
 MONTHLY_HOT_WATER_TEMPERATURE_RISE = numpy.array(
     [41.2, 41.4, 40.1, 37.6, 36.4, 33.9, 30.4, 33.4, 33.5, 36.3, 39.4, 39.9])
 
+
 # Table 2
 def hw_storage_loss_factor(dwelling):
-    if dwelling.hw_cylinder_insulation_type == sap_worksheet.CylinderInsulationTypes.FOAM:
+    if dwelling.hw_cylinder_insulation_type == CylinderInsulationTypes.FOAM:
         return 0.005 + 0.55 / (dwelling.hw_cylinder_insulation + 4)
     else:
         return 0.005 + 1.76 / (dwelling.hw_cylinder_insulation + 12.8)
@@ -380,9 +403,9 @@ def constant(k):
 def cylinder_indirect(d):
     temperature_factor = 0.6
     if true_and_not_missing(d, 'has_hw_time_control'):
-        temperature_factor = temperature_factor * 0.9
+        temperature_factor *= 0.9
     if not d.has_cylinderstat:
-        temperature_factor = temperature_factor * 1.3
+        temperature_factor *= 1.3
 
     return temperature_factor
 
@@ -394,12 +417,12 @@ def cpsu_store(d):
         temperature_factor = 1.08
 
     if true_and_not_missing(d, 'has_hw_time_control'):
-        temperature_factor = temperature_factor * 0.81
+        temperature_factor *= 0.81
 
     # Check airing cupboard
     if true_and_not_missing(d.water_sys, 'cpsu_not_in_airing_cupboard'):
         #!!! Actually this is if cpsu or thermal store not in airing cupboard
-        temperature_factor = temperature_factor * 1.1
+        temperature_factor *= 1.1
 
     return temperature_factor
 
@@ -1233,10 +1256,11 @@ def appendix_f_cpsu_on_peak(sys, dwelling):
     Vcs = dwelling.hw_cylinder_volume
     Tw = dwelling.water_sys.cpsu_Tw
     Cmax = .1456 * Vcs * (Tw - 48)
-    nm = sap_worksheet.DAYS_PER_MONTH
+    nm = DAYS_PER_MONTH
     Tmin = (
-           (dwelling.h * dwelling.heat_calc_results['Tmean']) - Cmax + (1000 * dwelling.hw_energy_content / (24 * nm)) -
-           dwelling.heat_calc_results['useful_gain']) / dwelling.h
+               (dwelling.h * dwelling.heat_calc_results['Tmean']) - Cmax + (
+                   1000 * dwelling.hw_energy_content / (24 * nm)) -
+               dwelling.heat_calc_results['useful_gain']) / dwelling.h
 
     Text = dwelling.Texternal_heating
     Eonpeak = numpy.where(
@@ -1828,7 +1852,7 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
             if not hasattr(dwelling, 'hw_cylinder_insulation_type'):
                 dwelling.hw_cylinder_volume = pcdf_data["store_boiler_volume"]
                 dwelling.hw_cylinder_insulation = pcdf_data["store_insulation_mms"]
-                dwelling.hw_cylinder_insulation_type = sap_worksheet.CylinderInsulationTypes.FOAM
+                dwelling.hw_cylinder_insulation_type = CylinderInsulationTypes.FOAM
                 # Force calc to use the data from pcdf, don't use a user entered cylinder loss
                 dwelling.measured_cylinder_loss = None
 
@@ -2672,7 +2696,7 @@ def configure_fuel_costs(dwelling):
     dwelling.general_elec_PE = dwelling.electricity_tariff.primary_energy_factor
 
     if dwelling.water_sys.summer_immersion:
-        # Should this be here or in sap_worksheet.py?
+        # Should this be here or in worksheet.py?
         on_peak = immersion_on_peak_fraction(dwelling.Nocc,
                                              dwelling.electricity_tariff,
                                              dwelling.hw_cylinder_volume,
@@ -2851,7 +2875,7 @@ def configure_secondary_system(dwelling):
         if not hasattr(dwelling, 'secondary_sys') and (
                     (dwelling.main_heating_type_code >= 401 and dwelling.main_heating_type_code <= 408)
                 or (
-                            dwelling.main_heating_type_code >= 421 and dwelling.main_heating_type_code <= 425 and dwelling.main_sys_fuel != ELECTRICITY_STANDARD)):
+                                    dwelling.main_heating_type_code >= 421 and dwelling.main_heating_type_code <= 425 and dwelling.main_sys_fuel != ELECTRICITY_STANDARD)):
             # !!! Does 24 hour tariff count as being offpeak?
             dwelling.secondary_heating_type_code = 693
             dwelling.secondary_sys_fuel = dwelling.electricity_tariff
@@ -3100,7 +3124,7 @@ def configure_solar_hw(dwelling):
         dwelling.monthly_solar_hw_factors = TABLE_H3[dwelling.collector_pitch]
         if dwelling.solar_storage_combined_cylinder:
             dwelling.solar_effective_storage_volume = dwelling.solar_dedicated_storage_volume + 0.3 * (
-            dwelling.hw_cylinder_volume - dwelling.solar_dedicated_storage_volume)
+                dwelling.hw_cylinder_volume - dwelling.solar_dedicated_storage_volume)
         else:
             dwelling.solar_effective_storage_volume = dwelling.solar_dedicated_storage_volume
 
@@ -3167,3 +3191,4 @@ def do_sap_table_lookups(dwelling):
 
     if hasattr(dwelling, 'nextStage'):
         dwelling.nextStage()
+

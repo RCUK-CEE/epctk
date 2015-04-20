@@ -2,8 +2,9 @@ import yaml
 import copy
 import numpy
 
-from sap import sap_worksheet
-from sap import sap_tables
+from collections import OrderedDict
+from sap import worksheet
+from sap import tables
 
 
 def elec_tariff_representer(dumper, data):
@@ -12,7 +13,7 @@ def elec_tariff_representer(dumper, data):
 
 def fuel_constructor(loader, node):
     data = loader.construct_mapping(node)
-    return sap_tables.fuel_from_code(data['fuel_code'])
+    return tables.fuel_from_code(data['fuel_code'])
 
 
 def fuel_representer(dumper, data):
@@ -70,19 +71,19 @@ def create_mapper(otype, tag):
 
 
 def configure_yaml():
-    yaml.add_representer(sap_worksheet.ordered_dict, ordered_dict_presenter)
+    yaml.add_representer(OrderedDict, ordered_dict_presenter)
 
-    yaml.add_representer(sap_tables.ElectricityTariff, elec_tariff_representer)
-    yaml.add_representer(sap_tables.Fuel, fuel_representer)
+    yaml.add_representer(tables.ElectricityTariff, elec_tariff_representer)
+    yaml.add_representer(tables.Fuel, fuel_representer)
     yaml.add_constructor('!fuel', fuel_constructor)
 
-    create_mapper(sap_worksheet.HeatLossElement, "HeatLossElement")
-    create_mapper(sap_worksheet.ThermalMassElement, "ThermalMassElement")
-    create_mapper(sap_worksheet.Opening, "Opening")
+    create_mapper(worksheet.HeatLossElement, "HeatLossElement")
+    create_mapper(worksheet.ThermalMassElement, "ThermalMassElement")
+    create_mapper(worksheet.Opening, "Opening")
 
-    yaml.add_representer(sap_worksheet.OpeningType, opening_type_representer)
+    yaml.add_representer(worksheet.OpeningType, opening_type_representer)
     yaml.add_constructor(
-        "!OpeningType", SimpleTagUnMapper(sap_worksheet.OpeningType))
+        "!OpeningType", SimpleTagUnMapper(worksheet.OpeningType))
 
     yaml.add_representer(numpy.ndarray, array_as_list_representer)
     yaml.add_constructor("!Array", array_as_list_constructor)
@@ -104,7 +105,7 @@ def from_yaml(fname):
     with open(fname, 'r') as f:
         loaded = yaml.load(f)
 
-    d = sap_worksheet.Dwelling()
+    d = worksheet.Dwelling()
     for k, v in list(loaded.items()):
         setattr(d, k, v)
 

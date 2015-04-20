@@ -1,6 +1,6 @@
 
 
-from sap import sap_tables, sap_worksheet
+from sap import tables, worksheet
 from test.test_official_cases_alt_implementation import all_params
 
 # TODO: find out why this is here, nuke it, hate globals! This is used, in a class, recipie for disaster!
@@ -39,8 +39,8 @@ def log_obj(param_set, prefix, k, v):
         pass
 
     try:
-        if (isinstance(v, sap_tables.Fuel) or
-                isinstance(v, sap_tables.ElectricityTariff)):
+        if (isinstance(v, tables.Fuel) or
+                isinstance(v, tables.ElectricityTariff)):
             return
         # If this is an object, dump it's dict
         for key, value in list(v.__dict__.items()):
@@ -64,11 +64,11 @@ class TrackedDict(dict):
         all_params[calc_stage].add(self.prefix + key)
 
 
-class ParamTrackerDwelling(sap_worksheet.Dwelling):
+class ParamTrackerDwelling(worksheet.Dwelling):
 
     def __init__(self):
         global calc_stage
-        sap_worksheet.Dwelling.__init__(self)
+        worksheet.Dwelling.__init__(self)
         calc_stage = 1
 
     def __setattr__(self, k, v):
@@ -83,7 +83,7 @@ class ParamTrackerDwelling(sap_worksheet.Dwelling):
             except AttributeError:
                 pass"""
 
-        sap_worksheet.Dwelling.__setattr__(self, k, v)
+        worksheet.Dwelling.__setattr__(self, k, v)
 
     def nextStage(self):
         global calc_stage

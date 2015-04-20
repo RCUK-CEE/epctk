@@ -2,36 +2,581 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7350501f-e420-4216-851c-d82d56f040b6" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../utils/csv.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../etl/edrp_all/load.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../utils/sql.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../.ipynb_checkpoints/CISBAT solid walls-checkpoint.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../CISBAT solid walls.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/~$17.rtf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/~$6.rtf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../utils/data_loaders.py" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/../etl/db.py" afterPath="$PROJECT_DIR$/../etl/sql.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/../utils/array_utils.py" afterPath="$PROJECT_DIR$/../utils/arrays.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../.idea/dataSources.ids" afterPath="$PROJECT_DIR$/../.idea/dataSources.ids" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../.ipynb_checkpoints/Solidwall2.0-checkpoint.ipynb" afterPath="$PROJECT_DIR$/../.ipynb_checkpoints/Solidwall2.0-checkpoint.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Solidwall2.0.ipynb" afterPath="$PROJECT_DIR$/../Solidwall2.0.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/__init__.py" afterPath="$PROJECT_DIR$/../etl/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/weather/__init__.py" afterPath="$PROJECT_DIR$/../etl/weather/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../utils/__init__.py" afterPath="$PROJECT_DIR$/../utils/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../.idea/dataSources.xml" afterPath="$PROJECT_DIR$/../.idea/dataSources.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/edrp_all/extract.py" afterPath="$PROJECT_DIR$/../etl/edrp_all/extract.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/edrp_edf/extract.py" afterPath="$PROJECT_DIR$/../etl/edrp_edf/extract.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/solidwall/extract.py" afterPath="$PROJECT_DIR$/../etl/solidwall/extract.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/edrp_edf/load.py" afterPath="$PROJECT_DIR$/../etl/edrp_edf/load.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/mchp/load.py" afterPath="$PROJECT_DIR$/../etl/mchp/load.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/solidwall/load.py" afterPath="$PROJECT_DIR$/../etl/solidwall/load.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/weather/load.py" afterPath="$PROJECT_DIR$/../etl/weather/load.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../utils/pandas.py" afterPath="$PROJECT_DIR$/../utils/pandas.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/runner.py" afterPath="$PROJECT_DIR$/../etl/runner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../numeric_models/secm.py" afterPath="$PROJECT_DIR$/../numeric_models/secm.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../utils/text.py" afterPath="$PROJECT_DIR$/../utils/text.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../etl/workflow.py" afterPath="$PROJECT_DIR$/../etl/workflow.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sapcli.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../gprof2dot.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/00changelog.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/cache/branchheads" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/cache/tags" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/dirstate" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/last-message.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/requires" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/sourcetreeconfig" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/00changelog.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/00manifest.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/eti__converter.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/input__conversion__rules.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/newcasesparse.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/official__test__cases.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/output__checker.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/result__extractor.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/run__v0.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/run__yaml.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap-calc.sublime-project.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap-calc.sublime-workspace.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/____init____.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/pcdf.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/pcdf2009.dat.d" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/pcdf2009.dat.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/pcdf2009__short.dat.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/rdsap.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/sap__dwelling__validator.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/sap__pdf__4a__parser.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/sap__pdf__4b__parser.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/sap__pdf__4e__parser.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/sap__runner.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/sap__tables.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/sap__worksheet.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table4adata.txt.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table4bdata.txt.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table4edata.txt.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table__10.csv.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table__10c.csv.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table__12.csv.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table__4a.csv.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table__4b.csv.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/sap/table__4e.csv.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/saprun.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/spreadsheet__inputter.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/test__case__parser.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/test__v0.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/utils.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10_l- _heatpump _nibe _fighter 360 index 100101- 7-hour.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10_l2 as 10_l but smaller house.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10a- _heatpump - s-1__v-1(variable) higher _p_s_r.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10b- _heatpump - s-1__v-2(variable).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10c- _heatpump - s-1__v-3(variable).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10d- _heatpump - s-2__v-1(variable).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10e- _heatpump - s-2__v-2(variable).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10f- _heatpump - s-2__v-3(variable).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10g- _heatpump - s-3__v-4(variable).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10h-_heatpump- s-1__v-1(variable) with lower _p_s_r.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10i-_heatpump - s-1__v-1(24-hour).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10j- _heatpump - s-1__v-1(16-hour).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10k-_heatpump - s-1__v-1(11-hour).rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10m- _heatpump _daikin index 100013 -10-hour.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10n- _heatpump _dimplex index 100043 - 7-hour.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10p- _heatpump _mitsubishi - index 100052 -10 hour.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10q- _heatpump _vaillant - index 100081 - standatd tariff.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-10r- _heatpump - warm air 493194.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1_l-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1a-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1b-detached with semi-exposed elements.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1c-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1d-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1e-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1f-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1g-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1h-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1i-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1j-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1k-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1m-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1n-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-1p-detached.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2_l-semi - electric _c_p_s_u__10-hour 300 litres.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2a-semi with semi-exposed elements-basic.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2b-semi with _w_w_h_r-regular boiler.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2c-semi with _w_w_h_r+solar water heating.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2d-semi with _w_w_h_r+solar water heating+_f_g_h_r_s.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2e-semi with _c_p_s_u fired by _l_p_g.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2f-semi - integrated storage__direct 7-hour.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2g-semi - 7-hour electric boiler.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2h-semi -10-hour electric boiler.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2i-semi - underfloor 7-hour.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2j-semi - underfloor 10-hour.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2k-semi - electric _c_p_s_u__10-hour 180 litres.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2m-semi - direct acting - boiler.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2n -semi - electric ceiling heating __ water from single immersion.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2p-semi -electric underfloor, water - oil range cooker.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2r-semi - room heaters - water by immersion with solar panel.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-2s-semi - _electricaire - water by _range with solar panel.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3_l-semi - with _test _database-index 495007.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3a-mid-terrace.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3b-mid-terrace with solid fuel boiler.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3c - _mid_terrace - pellet stove - with solar _d_h_w a1 is 20.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3d - _m_t-biomass room heaters and no dedicated cylinder for solar _d_h_w.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3e - _m_t-gas warm air and _m_v_h_r checking _table 5a.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3f - _m_t-gas warm air and flueless gas fire - water from immersion.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3g -_end_terrace-_l_p_g warm air and decorative bottled gas fire.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3h - _m_t-oil range cooker__ secondary oil and water oil.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3i- flat - mid floor__gas boiler 01840 and _d_h_w thermal store.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3j- flat - mid floor__gas boiler 01840 and integrated thermal store.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3k-semi - with _test _database-index 495006.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3m-semi - with _database-index 08088 keep-hot___f_g_h_r_s 60001 and _w_w_h_r.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3n-semi - non-cond combi 09977 keep-hot___n_o interlock - with _enh__load__comp - no adj.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3r-semi - non-cond _combi 09506 keep-hot__underfloor+weather comp__immersion _d_h_w - no adj.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-3t-semi - _o_i_l _regular_cond 08584__weather compens__underfloor__immersion _d_h_w so +2 adj.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4_l - mid-terrace __community  _heatpump with cylinder in dwelling and _solar.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4a - detached basic - electric _c_p_s_u__bottled gas room heater___m_v_h_r.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4b - flat ground floor - database 05983 combi secondary store.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4c - _m_t with garage - gas boiler 04162 with primary store.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4d - detached - _l_p_g boiler 09978__gas timed keep-hot__water from secondary 606.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4e - detached _l_a_r_g_e__m-_c_h_p _baxi with separate _d_h_w.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4f - semi with garage__anthracite range cooker code 160.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4g - bungalow semi__gas heat pump with radiators.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4h - bungalow _l-shaped detached__electric heatpump with fan coil unit.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4i - flat - upper _maisonette___l_p_g warm air heatpump.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4j - flat - mid floor__electric air-to air heatpump___d_h_w from _h_p.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4k - flat - upper floor__community heating _c_h_p and boilers.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4k(a) - flat - upper floor__community heating _c_h_p and boilers.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4k(b) - flat - upper floor__community heating _c_h_p and boilers.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4m - mid-terrace__integrated storage+direct acting.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4n - terraced - three storey___electric _c_p_s_u code192.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4p - bung with room in room__dual fuel  open fire with _back _boiler code 156.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-4r - semi with garage -5 storey__oil-fired warm air code 513___d_h_w from secondary.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5a-semi with _w_w_h_r+solar+_f_g_h_r_s__09899 fuelled by _l_p_g special cond 18.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5c-detached-oil- as 1m but _manufacturers efficiency 89__6__ fuel _u_c_o_m_e oil.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5d-detached-oil- as 1m but database boiler 493072__ fuel _u_c_o_m_e oil.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5e-detached-oil- as 1m but database boiler 493071__ any biodiesel.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5f-detached-oil- as 1m but _database index 493075 efficiency 90__2__fuel _b30_k oil.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5g-detached-oil- as 1m but database boiler 493074__ mineral or bio oil.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5h-detached-oil- as 1m but database boiler 493073__ fuel rapeseed oil.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5i-detached-oil- with bioethanol secondary.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-5j-detached-oil- with _b30_k secondary.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6a- detached _l_a_r_g_e__community heating - mixture of 2 systems.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6b - detached _l_a_r_g_e__community heating - several boilers.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6c - detached _l_a_r_g_e__community heating - several boilers +_heatpump.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6d - detached _l_a_r_g_e__community heating - mixture of 5 systems.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6e - flat - mid floor__community 5 sources __ water by main community with _w_w_h_r.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6f - semi with garage__range cooker heating__separate community _d_h_w.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6g- semi with garage__community heating__separate community _d_h_w.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6h - detached _l_a_r_g_e__community heating - several boilers+_heatpump+_geothermal.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-6i- detached _l_a_r_g_e__community heating - mixture of 2 systems.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-7a - semi with garage___n_e_w _appendix _q.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-7b - semi with garage___n_e_w _appendix _q  air change rates.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-7c - _flow_smart.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-8a - semi - with multiboiler heating - 2 boilers - _d_h_w from 2nd boiler.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-8b - semi - with multiboiler heating - 2 boilers - _d_h_w from 1st boiler.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-8c - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482___d_h_w from 1st.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-8f- semi - with multi-system heating - heatpump 100033 and gas boiler___d_h_w from 1st.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9a- micro-_c_h_p _baxi _ecogen - index 40001 - bad insulation.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9b- micro-_c_h_p _baxi _ecogen - index 40001- good insulation.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9c- m_c_h_p - oil - service 1 vessel 1 - test database 492023.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9d- m_c_h_p - _ex 3__ service 1 vessel 1.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9e- m-_c_h_p - _ex 3__ service 1 vessel 1.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9f- m_c_h_p - _ex 3__ service 1 vessel 3.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9g- m_c_h_p - _ex 3__ service 2 vessel 1.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9h- m_c_h_p - _ex 3__ service 2 vessel 3.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml/_e_w-9i- m_c_h_p - _ex 3__ service 3 vessel 4.rtf.yml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/yaml__io.py.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/~2ehgignore.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/data/~2eidea/sap__test__case__runner.iml.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/dh/yaml/ew-3p-semi - cond-combi 10222 keep-hot_underfloor+weather compensator 304cb25abe56db3b35045f208c9c2a785f572338.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/dh/yaml/ew-3s-semi - lpg non-cond regular 09529_weather compens_underfloor_imm83e225d93ac6971fcb6c6ad249ba1fcc42d60f4b.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/dh/yaml/ew-5b- flat - mid floor_gas boiler 01840 and integrated thermal store_48cb06f6bab08e1d23e899471ee910583bc796d7.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/dh/yaml/ew-8d - semi - with multiboiler heating - 2 boilers - gas 16013 and oi31df996f2113d5bef0b6099130d12b922a3619e4.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/dh/yaml/ew-8e- semi existing - with multi-system heating - heatpump 100073  an848600f8adc6b097139f74f474cc4a81465f8df2.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/dh/yaml/ew-8g- semi - with multi-system heating - electric boiler _wood stove 912e0e0bf7c9b8724321a63f90a725dc596e35c6.i" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/fncache" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/phaseroots" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/undo" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/store/undo.phaseroots" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/undo.bookmarks" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/undo.branch" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/undo.desc" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hg/undo.dirstate" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.hgignore" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/.name" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/encodings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/misc.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/modules.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/other.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/sap_test_case_runner.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/scopes/scope_settings.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/testrunner.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/vcs.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/.idea/workspace.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/10.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/11.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/12.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/13.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/14.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/15.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/16.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/17.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/18.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/19.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/2.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/20.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/21.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/22.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/23.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/24.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/25.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/26.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/27.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/28.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/29.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/3.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/30.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/4.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/5.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/6.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/7.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/8.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/9.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/dwellings/for roger.zip" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/eti_converter.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/gprof2dot.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/gprof2dot.py.bak" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/input_conversion_rules.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/newcasesparse.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10L- Heatpump Nibe Fighter 360 index 100101- 7-hour.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10L2 as 10L but smaller house.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10a- Heatpump - s-1_v-1(variable) higher PSR.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10b- Heatpump - s-1_v-2(variable).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10c- Heatpump - s-1_v-3(variable).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10d- Heatpump - s-2_v-1(variable).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10e- Heatpump - s-2_v-2(variable).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10f- Heatpump - s-2_v-3(variable).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10g- Heatpump - s-3_v-4(variable).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10h-Heatpump- s-1_v-1(variable) with lower PSR.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10i-Heatpump - s-1_v-1(24-hour).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10j- Heatpump - s-1_v-1(16-hour).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10k-Heatpump - s-1_v-1(11-hour).rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10m- Heatpump Daikin index 100013 -10-hour.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10n- Heatpump Dimplex index 100043 - 7-hour.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10p- Heatpump Mitsubishi - index 100052 -10 hour.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10q- Heatpump Vaillant - index 100081 - standatd tariff.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10r- Heatpump - warm air 493194.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-10s- semi - heat pump with PSR too large.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1L-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1a-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1b-detached with semi-exposed elements.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1c-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1d-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1e-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1f-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1g-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1h-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1i-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1j-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1k-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1m-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1n-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-1p-detached.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2L-semi - electric CPSU_10-hour 300 litres.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2a-semi with semi-exposed elements-basic.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2b-semi with WWHR-regular boiler.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2c-semi with WWHR+solar water heating.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2e-semi with CPSU fired by LPG.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2f-semi - integrated storage_direct 7-hour.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2g-semi - 7-hour electric boiler.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2h-semi -10-hour electric boiler.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2i-semi - underfloor 7-hour.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2j-semi - underfloor 10-hour.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2k-semi - electric CPSU_10-hour 180 litres.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2m-semi - direct acting - boiler.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2n -semi - electric ceiling heating _ water from single immersion.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2p-semi -electric underfloor, water - oil range cooker.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2r-semi - room heaters - water by immersion with solar panel.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3L-semi - with Test Database-index 495007.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3a-mid-terrace.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3b-mid-terrace with solid fuel boiler.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3c - MidTerrace - pellet stove - with solar DHW a1 is 20.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3d - MT-biomass room heaters and no dedicated cylinder for solar DHW.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3e - MT-gas warm air and MVHR checking Table 5a.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3f - MT-gas warm air and flueless gas fire - water from immersion.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3g -EndTerrace-LPG warm air and decorative bottled gas fire.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3h - MT-oil range cooker_ secondary oil and water oil.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3i- flat - mid floor_gas boiler 01840 and DHW thermal store.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3j- flat - mid floor_gas boiler 01840 and integrated thermal store.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3k-semi - with Test Database-index 495006.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3m-semi - with Database-index 08088 keep-hot_FGHRS 60001 and WWHR.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3n-semi - non-cond combi 09977 keep-hot_NO interlock - with Enh_load_comp - no adj.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3p-semi - Cond-combi 10222 keep-hot_underfloor+weather compensator - immersion water_so +3 adj.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3r-semi - non-cond Combi 09506 keep-hot_underfloor+weather comp_immersion DHW - no adj.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3s-semi - LPG Non-cond Regular 09529_weather compens_underfloor_immersion DHW_adj +2r.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-3t-semi - OIL RegularCond 08584_weather compens_underfloor_immersion DHW so +2 adj.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4L - mid-terrace _community  Heatpump with cylinder in dwelling and Solar.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4a - detached basic - electric CPSU_bottled gas room heater_MVHR.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4b - flat ground floor - database 05983 combi secondary store.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4c - MT with garage - gas boiler 04162 with primary store.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4d - detached - LPG boiler 09978_gas timed keep-hot_water from secondary 606.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4e - detached LARGE_m-CHP Baxi with separate DHW.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4f - semi with garage_anthracite range cooker code 160.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4g - bungalow semi_gas heat pump with radiators.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4h - bungalow L-shaped detached_electric heatpump with fan coil unit.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4i - flat - upper Maisonette_LPG warm air heatpump.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4j - flat - mid floor_electric air-to air heatpump_DHW from HP.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4k - flat - upper floor_community heating CHP and boilers.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4k(a) - flat - upper floor_community heating CHP and boilers.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4k(b) - flat - upper floor_community heating CHP and boilers.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4m - mid-terrace_integrated storage+direct acting.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4n - terraced - three storey_Electric CPSU code192.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4p - bung with room in room_dual fuel  open fire with Back Boiler code 156.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-4r - semi with garage -5 storey_oil-fired warm air code 513_DHW from secondary.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5a-semi with WWHR+solar+FGHRS_09899 fuelled by LPG special cond 18.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5b- flat - mid floor_gas boiler 01840 and integrated thermal store_ as 3i but fuelled by LNG.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5c-detached-oil- as 1m but Manufacturers efficiency 89_6_ fuel UCOME oil.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5d-detached-oil- as 1m but database boiler 493072_ fuel UCOME oil.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5e-detached-oil- as 1m but database boiler 493071_ any biodiesel.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5f-detached-oil- as 1m but Database index 493075 efficiency 90_2_fuel B30K oil.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5g-detached-oil- as 1m but database boiler 493074_ mineral or bio oil.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5h-detached-oil- as 1m but database boiler 493073_ fuel rapeseed oil.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5i-detached-oil- with bioethanol secondary.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-5j-detached-oil- with B30K secondary.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6a- detached LARGE_community heating - mixture of 2 systems.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6b - detached LARGE_community heating - several boilers.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6c - detached LARGE_community heating - several boilers +Heatpump.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6d - detached LARGE_community heating - mixture of 5 systems.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6e - flat - mid floor_community 5 sources _ water by main community with WWHR.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6f - semi with garage_range cooker heating_separate community DHW.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6g- semi with garage_community heating_separate community DHW.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6h - detached LARGE_community heating - several boilers+Heatpump+Geothermal.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-6i- detached LARGE_community heating - mixture of 2 systems.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-7a - semi with garage_NEW Appendix Q.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-7b - semi with garage_NEW Appendix Q  air change rates.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-7c - FlowSmart.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-8a - semi - with multiboiler heating - 2 boilers - DHW from 2nd boiler.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-8b - semi - with multiboiler heating - 2 boilers - DHW from 1st boiler.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-8c - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 1st.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-8d - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 2nd-WWHR.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-8e- semi existing - with multi-system heating - heatpump 100073  and gas boiler_DHW from 1st.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-8f- semi - with multi-system heating - heatpump 100033 and gas boiler_DHW from 1st.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-8g- semi - with multi-system heating - Electric boiler _WOOD STOVE  room heaters _water from immersion.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9a- micro-CHP Baxi Ecogen - index 40001 - bad insulation.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9b- micro-CHP Baxi Ecogen - index 40001- good insulation.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9c- mCHP - oil - service 1 vessel 1 - test database 492023.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9d- mCHP - Ex 3_ service 1 vessel 1.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9e- m-CHP - Ex 3_ service 1 vessel 1.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9f- mCHP - Ex 3_ service 1 vessel 3.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9g- mCHP - Ex 3_ service 2 vessel 1.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9h- mCHP - Ex 3_ service 2 vessel 3.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/EW-9i- mCHP - Ex 3_ service 3 vessel 4.rtf" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/official_test_cases/pcdf2009_test_322.dat" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/output_checker.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1L-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1a-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1b-detached with semi-exposed elements.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1c-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1d-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1e-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1f-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1g-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1h-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1i-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1j-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1k-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1m-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1n-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-1p-detached.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2L-semi - electric CPSU_10-hour 300 litres.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2a-semi with semi-exposed elements-basic.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2b-semi with WWHR-regular boiler.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2c-semi with WWHR+solar water heating.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2e-semi with CPSU fired by LPG.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2f-semi - integrated storage_direct 7-hour.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2g-semi - 7-hour electric boiler.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2h-semi -10-hour electric boiler.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2i-semi - underfloor 7-hour.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2j-semi - underfloor 10-hour.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2k-semi - electric CPSU_10-hour 180 litres.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2m-semi - direct acting - boiler.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2n -semi - electric ceiling heating _ water from single immersion.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2p-semi -electric underfloor, water - oil range cooker.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2r-semi - room heaters - water by immersion with solar panel.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-2s-semi - Electricaire - water by Range with solar panel.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3a-mid-terrace.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3b-mid-terrace with solid fuel boiler.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3c - MidTerrace - pellet stove - with solar DHW a1 is 20.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3d - MT-biomass room heaters and no dedicated cylinder for solar DHW.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3e - MT-gas warm air and MVHR checking Table 5a.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3f - MT-gas warm air and flueless gas fire - water from immersion.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3g -EndTerrace-LPG warm air and decorative bottled gas fire.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3h - MT-oil range cooker_ secondary oil and water oil.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3i- flat - mid floor_gas boiler 01840 and DHW thermal store.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3j- flat - mid floor_gas boiler 01840 and integrated thermal store.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/pickled_parsed_data/EW-3k-semi - with Test Database-index 495006.rtf.pkl" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/result_extractor.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/run_v0.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/run_yaml.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap-calc.sublime-project" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/__init__.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/pcdf.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/pcdf2009.dat" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/pcdf2009_short.dat" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/rdsap.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/sap_dwelling_validator.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/sap_pdf_4a_parser.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/sap_pdf_4b_parser.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/sap_pdf_4e_parser.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/sap_runner.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/sap_tables.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/sap_worksheet.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table4adata.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table4bdata.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table4edata.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table_10.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table_10c.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table_12.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table_4a.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table_4b.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/sap/table_4e.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/saprun-cache.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/saprun-nocache.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/saprun-nocache.profile" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/saprun.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/saprun.profile" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/saprun.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/spreadsheet_inputter.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/test_case_parser.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/test_v0.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/utils.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10L- Heatpump Nibe Fighter 360 index 100101- 7-hour.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10L2 as 10L but smaller house.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10a- Heatpump - s-1_v-1(variable) higher PSR.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10b- Heatpump - s-1_v-2(variable).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10c- Heatpump - s-1_v-3(variable).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10d- Heatpump - s-2_v-1(variable).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10e- Heatpump - s-2_v-2(variable).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10f- Heatpump - s-2_v-3(variable).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10g- Heatpump - s-3_v-4(variable).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10h-Heatpump- s-1_v-1(variable) with lower PSR.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10i-Heatpump - s-1_v-1(24-hour).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10j- Heatpump - s-1_v-1(16-hour).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10k-Heatpump - s-1_v-1(11-hour).rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10m- Heatpump Daikin index 100013 -10-hour.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10n- Heatpump Dimplex index 100043 - 7-hour.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10p- Heatpump Mitsubishi - index 100052 -10 hour.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10q- Heatpump Vaillant - index 100081 - standatd tariff.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-10r- Heatpump - warm air 493194.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1L-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1a-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1b-detached with semi-exposed elements.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1c-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1d-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1e-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1f-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1g-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1h-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1i-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1j-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1k-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1m-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1n-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-1p-detached.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2L-semi - electric CPSU_10-hour 300 litres.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2a-semi with semi-exposed elements-basic.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2b-semi with WWHR-regular boiler.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2c-semi with WWHR+solar water heating.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2e-semi with CPSU fired by LPG.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2f-semi - integrated storage_direct 7-hour.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2g-semi - 7-hour electric boiler.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2h-semi -10-hour electric boiler.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2i-semi - underfloor 7-hour.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2j-semi - underfloor 10-hour.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2k-semi - electric CPSU_10-hour 180 litres.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2m-semi - direct acting - boiler.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2n -semi - electric ceiling heating _ water from single immersion.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2p-semi -electric underfloor, water - oil range cooker.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2r-semi - room heaters - water by immersion with solar panel.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-2s-semi - Electricaire - water by Range with solar panel.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3L-semi - with Test Database-index 495007.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3a-mid-terrace.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3b-mid-terrace with solid fuel boiler.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3c - MidTerrace - pellet stove - with solar DHW a1 is 20.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3d - MT-biomass room heaters and no dedicated cylinder for solar DHW.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3e - MT-gas warm air and MVHR checking Table 5a.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3f - MT-gas warm air and flueless gas fire - water from immersion.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3g -EndTerrace-LPG warm air and decorative bottled gas fire.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3h - MT-oil range cooker_ secondary oil and water oil.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3i- flat - mid floor_gas boiler 01840 and DHW thermal store.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3j- flat - mid floor_gas boiler 01840 and integrated thermal store.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3k-semi - with Test Database-index 495006.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3m-semi - with Database-index 08088 keep-hot_FGHRS 60001 and WWHR.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3n-semi - non-cond combi 09977 keep-hot_NO interlock - with Enh_load_comp - no adj.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3p-semi - Cond-combi 10222 keep-hot_underfloor+weather compensator - immersion water_so +3 adj.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3r-semi - non-cond Combi 09506 keep-hot_underfloor+weather comp_immersion DHW - no adj.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3s-semi - LPG Non-cond Regular 09529_weather compens_underfloor_immersion DHW_adj +2r.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-3t-semi - OIL RegularCond 08584_weather compens_underfloor_immersion DHW so +2 adj.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4L - mid-terrace _community  Heatpump with cylinder in dwelling and Solar.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4a - detached basic - electric CPSU_bottled gas room heater_MVHR.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4b - flat ground floor - database 05983 combi secondary store.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4c - MT with garage - gas boiler 04162 with primary store.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4d - detached - LPG boiler 09978_gas timed keep-hot_water from secondary 606.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4e - detached LARGE_m-CHP Baxi with separate DHW.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4f - semi with garage_anthracite range cooker code 160.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4g - bungalow semi_gas heat pump with radiators.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4h - bungalow L-shaped detached_electric heatpump with fan coil unit.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4i - flat - upper Maisonette_LPG warm air heatpump.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4j - flat - mid floor_electric air-to air heatpump_DHW from HP.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4k - flat - upper floor_community heating CHP and boilers.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4k(a) - flat - upper floor_community heating CHP and boilers.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4k(b) - flat - upper floor_community heating CHP and boilers.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4m - mid-terrace_integrated storage+direct acting.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4n - terraced - three storey_Electric CPSU code192.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4p - bung with room in room_dual fuel  open fire with Back Boiler code 156.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-4r - semi with garage -5 storey_oil-fired warm air code 513_DHW from secondary.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5a-semi with WWHR+solar+FGHRS_09899 fuelled by LPG special cond 18.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5b- flat - mid floor_gas boiler 01840 and integrated thermal store_ as 3i but fuelled by LNG.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5c-detached-oil- as 1m but Manufacturers efficiency 89_6_ fuel UCOME oil.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5d-detached-oil- as 1m but database boiler 493072_ fuel UCOME oil.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5e-detached-oil- as 1m but database boiler 493071_ any biodiesel.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5f-detached-oil- as 1m but Database index 493075 efficiency 90_2_fuel B30K oil.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5g-detached-oil- as 1m but database boiler 493074_ mineral or bio oil.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5h-detached-oil- as 1m but database boiler 493073_ fuel rapeseed oil.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5i-detached-oil- with bioethanol secondary.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-5j-detached-oil- with B30K secondary.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6a- detached LARGE_community heating - mixture of 2 systems.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6b - detached LARGE_community heating - several boilers.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6c - detached LARGE_community heating - several boilers +Heatpump.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6d - detached LARGE_community heating - mixture of 5 systems.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6e - flat - mid floor_community 5 sources _ water by main community with WWHR.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6f - semi with garage_range cooker heating_separate community DHW.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6g- semi with garage_community heating_separate community DHW.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6h - detached LARGE_community heating - several boilers+Heatpump+Geothermal.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-6i- detached LARGE_community heating - mixture of 2 systems.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-7a - semi with garage_NEW Appendix Q.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-7b - semi with garage_NEW Appendix Q  air change rates.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-7c - FlowSmart.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-8a - semi - with multiboiler heating - 2 boilers - DHW from 2nd boiler.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-8b - semi - with multiboiler heating - 2 boilers - DHW from 1st boiler.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-8c - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 1st.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-8d - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 2nd-WWHR.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-8e- semi existing - with multi-system heating - heatpump 100073  and gas boiler_DHW from 1st.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-8f- semi - with multi-system heating - heatpump 100033 and gas boiler_DHW from 1st.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-8g- semi - with multi-system heating - Electric boiler _WOOD STOVE  room heaters _water from immersion.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9a- micro-CHP Baxi Ecogen - index 40001 - bad insulation.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9b- micro-CHP Baxi Ecogen - index 40001- good insulation.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9c- mCHP - oil - service 1 vessel 1 - test database 492023.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9d- mCHP - Ex 3_ service 1 vessel 1.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9e- m-CHP - Ex 3_ service 1 vessel 1.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9f- mCHP - Ex 3_ service 1 vessel 3.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9g- mCHP - Ex 3_ service 2 vessel 1.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9h- mCHP - Ex 3_ service 2 vessel 3.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml/EW-9i- mCHP - Ex 3_ service 3 vessel 4.rtf.yml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/../sap_test_case_runner/yaml_io.py" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/sap_tables.py" afterPath="$PROJECT_DIR$/sap/tables.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/sap_worksheet.py" afterPath="$PROJECT_DIR$/sap/worksheet.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../CISBAT solidwall final.ipynb" afterPath="$PROJECT_DIR$/../CISBAT solidwall final.ipynb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/__init__.py" afterPath="$PROJECT_DIR$/sap/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/eti_converter.py" afterPath="$PROJECT_DIR$/eti_converter.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/input_conversion_rules.py" afterPath="$PROJECT_DIR$/input_conversion_rules.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_dwelling_validator.py" afterPath="$PROJECT_DIR$/sap/sap_dwelling_validator.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_runner.py" afterPath="$PROJECT_DIR$/sap/sap_runner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spreadsheet_inputter.py" afterPath="$PROJECT_DIR$/spreadsheet_inputter.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases.py" afterPath="$PROJECT_DIR$/tests/test_official_cases.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" afterPath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils.py" afterPath="$PROJECT_DIR$/utils.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../.idea/workspace.xml" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/yaml_io.py" afterPath="$PROJECT_DIR$/yaml_io.py" />
     </list>
     <ignored path="sapcalc.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -65,8 +610,8 @@
       <file leaf-file-name="sap_runner.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sap/sap_runner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="7365">
-              <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="390" max-vertical-offset="7380">
+              <caret line="54" column="8" selection-start-line="54" selection-start-column="8" selection-end-line="54" selection-end-column="8" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -74,23 +619,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="run_yaml.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/run_yaml.py">
+      <file leaf-file-name="sapcli.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sapcli.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="705">
-              <caret line="20" column="29" selection-start-line="20" selection-start-column="29" selection-end-line="20" selection-end-column="29" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="98" max-vertical-offset="960">
+              <caret line="36" column="48" selection-start-line="36" selection-start-column="48" selection-end-line="36" selection-end-column="48" />
               <folding>
-                <element signature="e#0#14#0" expanded="true" />
+                <element signature="e#33#47#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="yaml_io.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/yaml_io.py">
+      <file leaf-file-name="worksheet.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="895" max-vertical-offset="1755">
-              <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+            <state vertical-scroll-proportion="2.6766467" vertical-offset="0" max-vertical-offset="25050">
+              <caret line="149" column="0" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -98,11 +643,35 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="sap_worksheet.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sap/sap_worksheet.py">
+      <file leaf-file-name="tables.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/tables.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.6008065" vertical-offset="0" max-vertical-offset="25125">
-              <caret line="140" column="54" selection-start-line="140" selection-start-column="54" selection-end-line="140" selection-end-column="54" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="48000">
+              <caret line="3138" column="71" selection-start-line="3138" selection-start-column="71" selection-end-line="3138" selection-end-column="71" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="150">
+              <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="input_conversion_rules.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="7545" max-vertical-offset="23010">
+              <caret line="521" column="0" selection-start-line="521" selection-start-column="0" selection-end-line="521" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -125,13 +694,17 @@
         <option value="$PROJECT_DIR$/saprun.py" />
         <option value="$PROJECT_DIR$/tests/official_test_cases.py" />
         <option value="$PROJECT_DIR$/sap/sap_runner.py" />
-        <option value="$PROJECT_DIR$/sap/__init__.py" />
         <option value="$PROJECT_DIR$/test_case_parser.py" />
         <option value="$PROJECT_DIR$/result_extractor.py" />
         <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
         <option value="$PROJECT_DIR$/sap/sap_dwelling_validator.py" />
         <option value="$PROJECT_DIR$/run_yaml.py" />
         <option value="$PROJECT_DIR$/sap/sap_worksheet.py" />
+        <option value="$PROJECT_DIR$/sap/__init__.py" />
+        <option value="$PROJECT_DIR$/sap/tables.py" />
+        <option value="$PROJECT_DIR$/sapcli.py" />
+        <option value="$PROJECT_DIR$/yaml_io.py" />
+        <option value="$PROJECT_DIR$/sap/worksheet.py" />
       </list>
     </option>
   </component>
@@ -139,10 +712,10 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="4" />
+    <option name="x" value="669" />
     <option name="y" value="23" />
-    <option name="width" value="1436" />
-    <option name="height" value="877" />
+    <option name="width" value="1891" />
+    <option name="height" value="1417" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -167,6 +740,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -195,50 +769,23 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="tests" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="tests" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="yaml_test_cases" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="sap" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/utils.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/sap/tables.py" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="FullScreen" value="false" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings />
+    </option>
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -332,9 +879,6 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
-      <method />
-    </configuration>
     <configuration default="true" type="tests" factoryName="Unittests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -356,6 +900,9 @@
       <option name="PUREUNITTEST" value="true" />
       <option name="PARAMS" value="" />
       <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
       <method />
     </configuration>
     <configuration default="true" type="PyBehaveRunConfigurationType" factoryName="Behave">
@@ -393,20 +940,12 @@
       <method />
     </configuration>
     <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
-      <method />
-    </configuration>
-    <configuration default="true" type="PyLettuceRunConfigurationType" factoryName="Lettuce">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <pass-parent-envs>true</pass-parent-envs>
       <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="sapcalc" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="ADDITIONAL_ARGS" value="" />
       <method />
     </configuration>
     <configuration default="true" type="tests" factoryName="Attests">
@@ -429,6 +968,20 @@
       <option name="USE_PATTERN" value="false" />
       <method />
     </configuration>
+    <configuration default="true" type="PyLettuceRunConfigurationType" factoryName="Lettuce">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="sapcalc" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="ADDITIONAL_ARGS" value="" />
+      <method />
+    </configuration>
     <list size="0" />
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -445,22 +998,40 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="4" y="23" width="1436" height="877" extended-state="1" />
+    <frame x="669" y="23" width="1891" height="1417" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5566879" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20803443" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20797873" sideWeight="0.50037736" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2804878" sideWeight="0.49962264" order="-1" side_tool="false" content_ui="combo" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32931423" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5561417" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23462783" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32931423" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20797873" sideWeight="0.50037736" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21416982" sideWeight="0.49962264" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32931423" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32931423" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5561417" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23462783" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32931423" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20797873" sideWeight="0.50037736" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21416982" sideWeight="0.49962264" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32931423" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -483,6 +1054,46 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/sap/sap_runner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="7365">
+          <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run_yaml.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="300" max-vertical-offset="705">
+          <caret line="20" column="29" selection-start-line="20" selection-start-column="29" selection-end-line="20" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#14#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/yaml_io.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="895" max-vertical-offset="1755">
+          <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="25125">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1425">
@@ -495,7 +1106,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1410">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -506,7 +1116,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="830">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -517,7 +1126,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="840">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -525,7 +1133,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.85465115" vertical-offset="0" max-vertical-offset="860">
           <caret line="49" column="49" selection-start-line="49" selection-start-column="49" selection-end-line="49" selection-end-column="49" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -533,7 +1140,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="860">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -544,7 +1150,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-111.81151" vertical-offset="91350" max-vertical-offset="141855">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -552,7 +1157,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7200">
           <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -560,7 +1164,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-2.609813" vertical-offset="3351" max-vertical-offset="4635">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -568,7 +1171,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.80416346" vertical-offset="1043" max-vertical-offset="2340">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -592,17 +1194,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7650">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.03469545" vertical-offset="0" max-vertical-offset="1297">
-          <caret line="3" column="31" selection-start-line="3" selection-start-column="31" selection-end-line="3" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#31#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -610,9 +1201,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="765">
           <caret line="41" column="15" selection-start-line="41" selection-start-column="15" selection-end-line="41" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#18#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -628,9 +1216,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-4.308404" vertical-offset="5648" max-vertical-offset="7860">
           <caret line="4" column="35" selection-start-line="4" selection-start-column="35" selection-end-line="4" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#14#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -638,7 +1223,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.1156515" vertical-offset="0" max-vertical-offset="1297">
           <caret line="10" column="32" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -647,16 +1231,6 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1297">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.690054" vertical-offset="21758" max-vertical-offset="23055">
-          <caret line="1045" column="15" selection-start-line="1045" selection-start-column="15" selection-end-line="1045" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#14#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -670,16 +1244,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.36391672" vertical-offset="46328" max-vertical-offset="47625">
-          <caret line="3120" column="21" selection-start-line="3120" selection-start-column="21" selection-end-line="3120" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#10#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/sap_dwelling_validator.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.011565151" vertical-offset="0" max-vertical-offset="4665">
@@ -688,49 +1252,104 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_runner.py">
+    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1c-detached.rtf.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="7365">
-          <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.35667107" vertical-offset="0" max-vertical-offset="1020">
+          <caret line="18" column="3" selection-start-line="18" selection-start-column="3" selection-end-line="18" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="7545" max-vertical-offset="23010">
+          <caret line="521" column="0" selection-start-line="521" selection-start-column="0" selection-end-line="521" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/run_yaml.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="705">
-          <caret line="20" column="29" selection-start-line="20" selection-start-column="29" selection-end-line="20" selection-end-column="29" />
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
           <folding>
-            <element signature="e#0#14#0" expanded="true" />
+            <element signature="e#0#14#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/yaml_io.py">
+    <entry file="file://$PROJECT_DIR$/sap/sap_runner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="895" max-vertical-offset="1755">
-          <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="390" max-vertical-offset="7380">
+          <caret line="54" column="8" selection-start-line="54" selection-start-column="8" selection-end-line="54" selection-end-column="8" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1c-detached.rtf.yml">
+    <entry file="file://$PROJECT_DIR$/sap/rdsap.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35667107" vertical-offset="0" max-vertical-offset="1020">
-          <caret line="18" column="3" selection-start-line="18" selection-start-column="3" selection-end-line="18" selection-end-column="3" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3735">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_worksheet.py">
+    <entry file="file://$PROJECT_DIR$/sap/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.6008065" vertical-offset="0" max-vertical-offset="25125">
-          <caret line="140" column="54" selection-start-line="140" selection-start-column="54" selection-end-line="140" selection-end-column="54" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="150">
+          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/tables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="48000">
+          <caret line="3138" column="71" selection-start-line="3138" selection-start-column="71" selection-end-line="3138" selection-end-column="71" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm40/python_stubs/476838877/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33294663" vertical-offset="11158" max-vertical-offset="88005">
+          <caret line="763" column="8" selection-start-line="763" selection-start-column="8" selection-end-line="763" selection-end-column="8" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/yaml_io.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4524362" vertical-offset="705" max-vertical-offset="1770">
+          <caret line="73" column="36" selection-start-line="73" selection-start-column="36" selection-end-line="73" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sapcli.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="98" max-vertical-offset="960">
+          <caret line="36" column="48" selection-start-line="36" selection-start-column="48" selection-end-line="36" selection-end-column="48" />
+          <folding>
+            <element signature="e#33#47#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.6766467" vertical-offset="0" max-vertical-offset="25050">
+          <caret line="149" column="0" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

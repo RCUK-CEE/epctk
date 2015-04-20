@@ -1,18 +1,14 @@
-
 import math
 import collections
-import itertools
+
 import numpy
-import copy
 
-from . import rdsap
-from . import sap_tables
+from sap import tables
 
-from .sap_tables import DAYS_PER_MONTH
-from .sap_tables import MONTHLY_HOT_WATER_FACTORS
-from .sap_tables import MONTHLY_HOT_WATER_TEMPERATURE_RISE
+from sap.tables import DAYS_PER_MONTH, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE, GlazingTypes
 
 
+# REPLACE THIS with collections.orderedict
 # class ordered_dict(dict):
 #
 #     def __init__(self, *args, **kwargs):
@@ -95,19 +91,6 @@ class ThermalMassElement:
         self.name = name
 
 
-class OpeningTypeDataSource:
-    SAP = 1
-    BFRC = 2
-    MANUFACTURER = 3
-
-
-class GlazingTypes:
-    SINGLE = 1
-    DOUBLE = 2
-    TRIPLE = 3
-    SECONDARY = 4
-
-
 def light_transmittance_from_glazing_type(glazing_type):
     if glazing_type == GlazingTypes.SINGLE:
         return 0.9
@@ -143,31 +126,32 @@ class Opening:
         self.name = name
 
 
-class CylinderInsulationTypes:
-    NONE = 0
-    FOAM = 1
-    JACKET = 2
-
-
 class Dwelling():
 
     def __init__(self):
         self.ordered_attrs = collections.OrderedDict()
-        self.apply_sap_hardcoded_values()
+        self.wind_speed = tables.wind_speed
+
+        # apply_sap_hardcoded_values here t avoid setting attrs outside of __init__
+        self.Texternal_heating = tables.Texternal_heating
+        self.Igh_heating = tables.Igh_heating
+        self.living_area_Theating = 21
+        self.Tcooling = 24
+        # self.apply_sap_hardcoded_values()
 
      # Uncomment this function to maintain the order of the parameters added
      # to the dwelling - this is useful for debugging but slows down executation
      # enough that you don't want to do it unless you really need things
      # sorted
-    def __setattr__(self, k, v):
-        super().__setattr__(self, k, v)
-        if k != 'ordered_attrs':
-            self.ordered_attrs[k] = v
+    # def __setattr__(self, k, v):
+    #     super().__setattr__(k, v)
+    #     if k != 'ordered_attrs':
+    #         self.ordered_attrs[k] = v
 
     def apply_sap_hardcoded_values(self):
-        self.wind_speed = sap_tables.wind_speed
-        self.Texternal_heating = sap_tables.Texternal_heating
-        self.Igh_heating = sap_tables.Igh_heating
+        self.wind_speed = tables.wind_speed
+        self.Texternal_heating = tables.Texternal_heating
+        self.Igh_heating = tables.Igh_heating
         self.living_area_Theating = 21
         self.Tcooling = 24
 
@@ -354,21 +338,21 @@ def ventilation(dwelling):
 
     effective_inf_rate = adjusted_infiltration_rate * dwelling.wind_speed / 4.
 
-    if dwelling.ventilation_type == sap_tables.VentilationTypes.NATURAL:
+    if dwelling.ventilation_type == tables.VentilationTypes.NATURAL:
         dwelling.infiltration_ach = numpy.where(
             effective_inf_rate < 1.,
             0.5 + (effective_inf_rate ** 2) * 0.5,
             effective_inf_rate)
-    elif dwelling.ventilation_type == sap_tables.VentilationTypes.MV:
+    elif dwelling.ventilation_type == tables.VentilationTypes.MV:
         system_ach = 0.5
         dwelling.infiltration_ach = effective_inf_rate + system_ach
-    elif dwelling.ventilation_type in [sap_tables.VentilationTypes.MEV_CENTRALISED, sap_tables.VentilationTypes.MEV_DECENTRALISED, sap_tables.VentilationTypes.PIV_FROM_OUTSIDE]:
+    elif dwelling.ventilation_type in [tables.VentilationTypes.MEV_CENTRALISED, tables.VentilationTypes.MEV_DECENTRALISED, tables.VentilationTypes.PIV_FROM_OUTSIDE]:
         system_ach = 0.5
         dwelling.infiltration_ach = numpy.where(
             effective_inf_rate < 0.5 * system_ach,
             system_ach,
             effective_inf_rate + 0.5 * system_ach)
-    elif dwelling.ventilation_type == sap_tables.VentilationTypes.MVHR:
+    elif dwelling.ventilation_type == tables.VentilationTypes.MVHR:
         system_ach = 0.5
         dwelling.infiltration_ach = (
             effective_inf_rate + system_ach * (1 - dwelling.mvhr_effy / 100)
@@ -422,8 +406,8 @@ def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
     utilisation = 1 - math.exp(-1 / solar_to_load)
 
     if dwelling.water_sys.system_type in [
-        sap_tables.HeatingSystem.TYPES.regular_boiler,
-        sap_tables.HeatingSystem.TYPES.room_heater,  # must be back boiler
+        tables.HeatingSystem.TYPES.regular_boiler,
+        tables.HeatingSystem.TYPES.room_heater,  # must be back boiler
     ] and not dwelling.has_cylinderstat:
         utilisation *= .9
 
@@ -523,7 +507,7 @@ def hot_water_use(dwelling):
         dwelling.input_from_solar = solar_system_output(
             dwelling, dwelling.hw_energy_content - dwelling.savings_from_wwhrs, dwelling.daily_hot_water_use)
         if primary_circuit_loss_annual > 0 and dwelling.hw_cylinder_volume > 0 and dwelling.has_cylinderstat:
-            dwelling.primary_circuit_loss *= sap_tables.TABLE_H5
+            dwelling.primary_circuit_loss *= tables.TABLE_H5
     else:
         dwelling.input_from_solar = 0
 
@@ -1234,9 +1218,9 @@ def set_fuel_use(dwelling,
 
 
 def fuel_use(dwelling):
-    cost_export = sap_tables.ELECTRICITY_SOLD.unit_price() / 100
-    C_el_offset = sap_tables.ELECTRICITY_OFFSET.co2_factor
-    primary_el_offset = sap_tables.ELECTRICITY_OFFSET.primary_energy_factor
+    cost_export = tables.ELECTRICITY_SOLD.unit_price() / 100
+    C_el_offset = tables.ELECTRICITY_OFFSET.co2_factor
+    primary_el_offset = tables.ELECTRICITY_OFFSET.primary_energy_factor
 
     C_el = dwelling.general_elec_co2_factor
     cost_el = dwelling.general_elec_price / 100.
@@ -1302,9 +1286,9 @@ def fuel_use(dwelling):
 
     community_distribution_elec = 0
     # !!! Can main sys 2 be community heating?
-    if dwelling.main_sys_1.system_type == sap_tables.HeatingSystem.TYPES.community:
+    if dwelling.main_sys_1.system_type == tables.HeatingSystem.TYPES.community:
         community_distribution_elec += 0.01 * sum(dwelling.Q_spaceheat_main)
-    if dwelling.water_sys.system_type == sap_tables.HeatingSystem.TYPES.community:
+    if dwelling.water_sys.system_type == tables.HeatingSystem.TYPES.community:
         community_distribution_elec += 0.01 * sum(Q_water_heater)
     if community_distribution_elec > 0:
         # !!! Fuel costs should come from sap_tables
@@ -1316,10 +1300,10 @@ def fuel_use(dwelling):
 
         total_community_emissions = (
             (dwelling.emissions_heating_main
-             if dwelling.main_sys_1.system_type == sap_tables.HeatingSystem.TYPES.community
+             if dwelling.main_sys_1.system_type == tables.HeatingSystem.TYPES.community
              else 0) +
             (dwelling.emissions_water
-             if dwelling.water_sys.system_type == sap_tables.HeatingSystem.TYPES.community
+             if dwelling.water_sys.system_type == tables.HeatingSystem.TYPES.community
              else 0) +
             dwelling.emissions_community_distribution +
             (dwelling.emissions_community_elec_credits

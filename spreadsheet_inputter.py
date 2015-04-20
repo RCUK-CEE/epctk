@@ -3,14 +3,14 @@ import logging
 import win32com.client
 from tests import test_case_parser
 import input_conversion_rules
-from sap import sap_worksheet
+from sap import worksheet
 import v0
-from sap import sap_tables
+from sap import tables
 from sap import sap_runner
 from output_checker import check_result
 from output_checker import check_monthly_result
 from output_checker import check_summer_monthly_result
-from sap.sap_tables import true_and_not_missing
+from sap.tables import true_and_not_missing, CylinderInsulationTypes, GlazingTypes
 
 
 class CannotDoInSpreadsheetError(RuntimeError):
@@ -60,18 +60,18 @@ INPUTS=[
 ]
 
 GLAZING_TYPES={
-    sap_worksheet.GlazingTypes.SINGLE:"Single",
-    sap_worksheet.GlazingTypes.DOUBLE:"Double",
-    sap_worksheet.GlazingTypes.TRIPLE:"Triple",
-    sap_worksheet.GlazingTypes.SECONDARY:"Secondary",
+    GlazingTypes.SINGLE:"Single",
+    GlazingTypes.DOUBLE:"Double",
+    GlazingTypes.TRIPLE:"Triple",
+    GlazingTypes.SECONDARY:"Secondary",
 }
 
 ELEMENT_TYPES={
-    sap_worksheet.HeatLossElementTypes.EXTERNAL_WALL:"External wall",
-    sap_worksheet.HeatLossElementTypes.PARTY_WALL:"Party wall",
-    sap_worksheet.HeatLossElementTypes.EXTERNAL_FLOOR:"Ground floor",
-    sap_worksheet.HeatLossElementTypes.EXTERNAL_ROOF:"Roof",
-    sap_worksheet.HeatLossElementTypes.OPAQUE_DOOR:"Opaque door",
+    worksheet.HeatLossElementTypes.EXTERNAL_WALL:"External wall",
+    worksheet.HeatLossElementTypes.PARTY_WALL:"Party wall",
+    worksheet.HeatLossElementTypes.EXTERNAL_FLOOR:"Ground floor",
+    worksheet.HeatLossElementTypes.EXTERNAL_ROOF:"Roof",
+    worksheet.HeatLossElementTypes.OPAQUE_DOOR:"Opaque door",
 }
 
 class XLInputSheetModel(object):
@@ -272,7 +272,7 @@ def process_envelope_elements(xlbook,d):
         xlbook.set_input("Uthermalbridges",h_bridging/A_bridging)
 
 def process_solid_elements(xlbook,d):
-    doors=[el for el in d.heat_loss_elements if el.element_type==sap_worksheet.HeatLossElementTypes.OPAQUE_DOOR]
+    doors=[el for el in d.heat_loss_elements if el.element_type==worksheet.HeatLossElementTypes.OPAQUE_DOOR]
     assert len(doors)==1
 
     xlbook.set_opaque_element(
@@ -283,8 +283,8 @@ def process_solid_elements(xlbook,d):
     idx=1
 
     for el in [el for el in d.heat_loss_elements if not el.element_type in [
-            sap_worksheet.HeatLossElementTypes.OPAQUE_DOOR,
-            sap_worksheet.HeatLossElementTypes.GLAZING,
+            worksheet.HeatLossElementTypes.OPAQUE_DOOR,
+            worksheet.HeatLossElementTypes.GLAZING,
             ]]:
         xlbook.set_opaque_element(
             idx,
@@ -338,15 +338,15 @@ def process_glazing_elements(xlbook,d):
             if not roof_windows[0].orientation_degrees==rw.orientation_degrees:
                 raise CannotDoInSpreadsheetError("More than one roof window orientation")
 
-        combined_window=sap_worksheet.Opening(
+        combined_window=worksheet.Opening(
             sum(rw.area for rw in roof_windows),
             roof_windows[0].orientation_degrees,
             rtype)
         xlbook.set_roof_window(combined_window)
 
 IMMERSION_TYPES={
-    sap_tables.ImmersionTypes.DUAL:"Dual",
-    sap_tables.ImmersionTypes.SINGLE:"Single",
+    tables.ImmersionTypes.DUAL:"Dual",
+    tables.ImmersionTypes.SINGLE:"Single",
 }
 
 def process_hw(xlbook,d):
@@ -402,7 +402,7 @@ def process_hw(xlbook,d):
             xlbook.set_input("hw_cylinder_volume",d.hw_cylinder_volume)
             xlbook.set_input("hw_cylinder_insulation",d.hw_cylinder_insulation)
             xlbook.set_input("hw_cylinder_insulation_type",
-                             "Factory Fitted" if d.hw_cylinder_insulation_type==sap_worksheet.CylinderInsulationTypes.FOAM else "Loose Jacket")
+                             "Factory Fitted" if d.hw_cylinder_insulation_type== CylinderInsulationTypes.FOAM else "Loose Jacket")
 
     if hasattr(d,"solar_collector_aperture") and d.solar_collector_aperture>0:
         write_solar_hw(xlbook,d)
@@ -421,14 +421,14 @@ PITCH={
 60:60,
 }
 OVERSHADING={
-    sap_tables.PVOvershading.HEAVY:'Heavy',
-    sap_tables.PVOvershading.SIGNIFICANT:'Significant',
-    sap_tables.PVOvershading.MODEST:'Modest',
-    sap_tables.PVOvershading.NONE_OR_VERY_LITTLE:'None or very little',
+    tables.PVOvershading.HEAVY:'Heavy',
+    tables.PVOvershading.SIGNIFICANT:'Significant',
+    tables.PVOvershading.MODEST:'Modest',
+    tables.PVOvershading.NONE_OR_VERY_LITTLE:'None or very little',
 }
 COLLECTOR_TYPES={
-    sap_tables.SHWCollectorTypes.EVACUATED_TUBE:"evacuated tube",
-    sap_tables.SHWCollectorTypes.UNGLAZED:"unglazed",
+    tables.SHWCollectorTypes.EVACUATED_TUBE:"evacuated tube",
+    tables.SHWCollectorTypes.UNGLAZED:"unglazed",
 }
 def write_solar_hw(xlbook,d):
     xlbook.set_input("solar_collector_aperture",d.solar_collector_aperture)
@@ -491,9 +491,9 @@ def clear_pv(xlbook,d):
     xlbook.set_input("photovoltaic_systems_overshading_category","")
 
 TERRAIN={
-    sap_tables.TerrainTypes.RURAL:'Rural',
-    sap_tables.TerrainTypes.SUBURBAN:'Low rise urban',
-    sap_tables.TerrainTypes.DENSE_URBAN:'Dense urban',
+    tables.TerrainTypes.RURAL:'Rural',
+    tables.TerrainTypes.SUBURBAN:'Low rise urban',
+    tables.TerrainTypes.DENSE_URBAN:'Dense urban',
 }
 def write_wind(xlbook,d):
     xlbook.set_input("terrain_type",TERRAIN[d.terrain_type])
@@ -509,10 +509,10 @@ def clear_wind(xlbook,d):
     xlbook.set_input("wind_turbine_hub_height","")
 
 SEDBUK_TYPE_TO_STRING={
-    sap_tables.HeatingSystem.TYPES.regular_boiler:"Regular",
-    sap_tables.HeatingSystem.TYPES.storage_combi:"Storage combi",
-    sap_tables.HeatingSystem.TYPES.cpsu:"CPSU",
-    sap_tables.HeatingSystem.TYPES.combi:"Combi",
+    tables.HeatingSystem.TYPES.regular_boiler:"Regular",
+    tables.HeatingSystem.TYPES.storage_combi:"Storage combi",
+    tables.HeatingSystem.TYPES.cpsu:"CPSU",
+    tables.HeatingSystem.TYPES.combi:"Combi",
 }
 def write_sedbuk_data(xlbook,d):
     xlbook.set_input("sys1_sedbuk_type",
@@ -561,14 +561,14 @@ def clear_secondary_system(xlbook):
     xlbook.set_input("secondary_sys_manuf_effy","")
 
 HEATING_EMITTER_TYPES={
-    sap_tables.HeatEmitters.RADIATORS:"Radiators",
-    sap_tables.HeatEmitters.UNDERFLOOR_TIMBER:"Underfloor heating, pipes in insulated timber floor",
-    sap_tables.HeatEmitters.UNDERFLOOR_SCREED:"Underfloor heating, in screed above insulation",
-    sap_tables.HeatEmitters.UNDERFLOOR_CONCRETE:"Underfloor heating, pipes in concrete slab",
-    sap_tables.HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER:"Underfloor heating and radiators, pipes in insulated timber floor",
-    sap_tables.HeatEmitters.RADIATORS_UNDERFLOOR_SCREED:"Underfloor heating and radiators, in screed above insulation",
-    sap_tables.HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE:"Underfloor heating and radiators, pipes in concrete slab",
-    sap_tables.HeatEmitters.FAN_COILS:"Fan coil units",
+    tables.HeatEmitters.RADIATORS:"Radiators",
+    tables.HeatEmitters.UNDERFLOOR_TIMBER:"Underfloor heating, pipes in insulated timber floor",
+    tables.HeatEmitters.UNDERFLOOR_SCREED:"Underfloor heating, in screed above insulation",
+    tables.HeatEmitters.UNDERFLOOR_CONCRETE:"Underfloor heating, pipes in concrete slab",
+    tables.HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER:"Underfloor heating and radiators, pipes in insulated timber floor",
+    tables.HeatEmitters.RADIATORS_UNDERFLOOR_SCREED:"Underfloor heating and radiators, in screed above insulation",
+    tables.HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE:"Underfloor heating and radiators, pipes in concrete slab",
+    tables.HeatEmitters.FAN_COILS:"Fan coil units",
 }
 
 def process_cooling(xlbook,d):
@@ -625,8 +625,8 @@ def process_systems(xlbook,d):
                      true_and_not_missing(d,'cpsu_not_in_airing_cupboard'))
 
     if hasattr(d,'sys1_load_compensator') and d.sys1_load_compensator in [
-                sap_tables.LoadCompensators.ENHANCED_LOAD_COMPENSATOR,
-                sap_tables.LoadCompensators.WEATHER_COMPENSATOR]:
+                tables.LoadCompensators.ENHANCED_LOAD_COMPENSATOR,
+                tables.LoadCompensators.WEATHER_COMPENSATOR]:
         xlbook.set_input("has_enhanced_load_compensator",True)
     else:
         xlbook.set_input("has_enhanced_load_compensator",False)
@@ -671,12 +671,12 @@ def process_systems(xlbook,d):
         clear_wind(xlbook,d)
 
 VENTILATION_TYPES={
-sap_tables.VentilationTypes.NATURAL:"natural",
-sap_tables.VentilationTypes.MVHR:"mvhr",
-sap_tables.VentilationTypes.MEV_CENTRALISED:"mev (centralised)",
-sap_tables.VentilationTypes.MEV_DECENTRALISED:"mev (decentralised)",
-sap_tables.VentilationTypes.MV:"mv",
-sap_tables.VentilationTypes.PIV_FROM_OUTSIDE:"piv",
+tables.VentilationTypes.NATURAL:"natural",
+tables.VentilationTypes.MVHR:"mvhr",
+tables.VentilationTypes.MEV_CENTRALISED:"mev (centralised)",
+tables.VentilationTypes.MEV_DECENTRALISED:"mev (decentralised)",
+tables.VentilationTypes.MV:"mv",
+tables.VentilationTypes.PIV_FROM_OUTSIDE:"piv",
 
 }
 #    MEV_CENTRALISED=1
@@ -685,27 +685,27 @@ sap_tables.VentilationTypes.PIV_FROM_OUTSIDE:"piv",
 #    PIV_FROM_OUTSIDE=5
 
 DUCT_TYPES={
-    sap_tables.DuctTypes.RIGID:"Rigid",
-    sap_tables.DuctTypes.FLEXIBLE:"Flexible",
-    sap_tables.DuctTypes.RIGID_INSULATED:"Rigid",
-    sap_tables.DuctTypes.FLEXIBLE_INSULATED:"Flexible",
+    tables.DuctTypes.RIGID:"Rigid",
+    tables.DuctTypes.FLEXIBLE:"Flexible",
+    tables.DuctTypes.RIGID_INSULATED:"Rigid",
+    tables.DuctTypes.FLEXIBLE_INSULATED:"Flexible",
 }
 DUCTS_INSULATED={
-    sap_tables.DuctTypes.RIGID:False,
-    sap_tables.DuctTypes.FLEXIBLE:False,
-    sap_tables.DuctTypes.RIGID_INSULATED:True,
-    sap_tables.DuctTypes.FLEXIBLE_INSULATED:True,
+    tables.DuctTypes.RIGID:False,
+    tables.DuctTypes.FLEXIBLE:False,
+    tables.DuctTypes.RIGID_INSULATED:True,
+    tables.DuctTypes.FLEXIBLE_INSULATED:True,
 }
 
 WALL_TYPES={
-    sap_tables.WallTypes.MASONRY:'Masonry',
-    sap_tables.WallTypes.OTHER:'Steel/Timber frame',
+    tables.WallTypes.MASONRY:'Masonry',
+    tables.WallTypes.OTHER:'Steel/Timber frame',
 }
 FLOOR_TYPES={
-    sap_tables.FloorTypes.SUSPENDED_TIMBER_UNSEALED:'Suspended wooden floor, unsealed',
-    sap_tables.FloorTypes.SUSPENDED_TIMBER_SEALED:'Suspended wooden floor, sealed',
-    sap_tables.FloorTypes.NOT_SUSPENDED_TIMBER:'Other',
-    sap_tables.FloorTypes.OTHER:'Other',
+    tables.FloorTypes.SUSPENDED_TIMBER_UNSEALED:'Suspended wooden floor, unsealed',
+    tables.FloorTypes.SUSPENDED_TIMBER_SEALED:'Suspended wooden floor, sealed',
+    tables.FloorTypes.NOT_SUSPENDED_TIMBER:'Other',
+    tables.FloorTypes.OTHER:'Other',
 }
 
 def process_ventilation_system(xlbook,d):
@@ -883,7 +883,7 @@ def run_case(xlbook,fname):
             return False
 
         res=v0.load_or_parse_file(fname, test_case_parser.whole_file,False)
-        d=sap_worksheet.Dwelling()
+        d=worksheet.Dwelling()
         input_conversion_rules.process_inputs(d,res.inputs)
 
         can_run_der=True
@@ -904,10 +904,10 @@ def run_case(xlbook,fname):
         if hasattr(d,'photovoltaic_systems') and len(d.photovoltaic_systems)>1:
             can_run_der=False
         if not d.ventilation_type in [
-            sap_tables.VentilationTypes.NATURAL,
-            sap_tables.VentilationTypes.MVHR,
-            sap_tables.VentilationTypes.MEV_CENTRALISED,
-            sap_tables.VentilationTypes.MV]:
+            tables.VentilationTypes.NATURAL,
+            tables.VentilationTypes.MVHR,
+            tables.VentilationTypes.MEV_CENTRALISED,
+            tables.VentilationTypes.MV]:
             #sap_tables.VentilationTypes.MEV_DECENTRALISED]:
             #sap_tables.VentilationTypes.PIV_FROM_OUTSIDE]:
             can_run_der=False

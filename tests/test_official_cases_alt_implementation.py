@@ -171,7 +171,7 @@ def run_case(fname, force_reparse):
 
         output_checker.check_results(dwelling, dwelling_data)
 
-    except sap_tables.SAPCalculationError:
+    except tables.SAPCalculationError:
         if output_checker.is_err_calc(dwelling_data):
             return
         else:
