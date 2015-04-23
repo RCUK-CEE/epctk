@@ -1,6 +1,7 @@
+from .utils import int_or_none, float_or_none
+
 PCDF_DATA_FILE = './sap/pcdf2009.dat'
 PCDF = None
-
 
 fuels = {'1': 'Gas',
          '2': 'LPG',
@@ -25,7 +26,7 @@ condensing = {'1': False,
 
 flue_types = {'0': 'unknown',
               '1': 'open', '2':
-              'room-sealed',
+    'room-sealed',
               '3': 'open or room-sealed'}
 
 flue_fan = {'0': 'False',
@@ -53,14 +54,6 @@ mev_configurations = {'1': 'room_kitchen',
                       '4': 'duct_other',
                       '5': 'wall_kitchen',
                       '6': 'wall_other'}
-
-
-def float_or_none(val):
-    return float(val) if val.strip() != "" else None
-
-
-def int_or_none(val):
-    return int(val) if val.strip() != "" else None
 
 
 def row_id(table_id, toks):
@@ -147,7 +140,7 @@ def get_boiler(boiler_id):
             keep_hot_facility=has_keep_hot[fields[55]],
             keep_hot_timer=has_keep_hot_timer[fields[56]],
             keep_hot_elec_heater=0. if fields[
-                57] == '\n' else float(fields[57]),
+                                           57] == '\n' else float(fields[57]),
         )
         result.update(extra)
 
@@ -319,7 +312,7 @@ def get_mev_system(id):
         configuration = mev_configurations[fields[12 + i * 4]]
         config = dict(
             sfp=float(fields[15 + i * 4]) if fields[
-                15 + i * 4] != "" else None,
+                                                 15 + i * 4] != "" else None,
         )
         sys['configs'][configuration] = config
     return sys

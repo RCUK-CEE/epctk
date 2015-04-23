@@ -1,7 +1,6 @@
-from . import rdsap
-from . import tables
+from .dwelling import DwellingResultsWrapper
+from .tables import CylinderInsulationTypes, GlazingTypes
 from . import worksheet
-from sap.tables import CylinderInsulationTypes, GlazingTypes
 
 
 def perform_demand_calc(dwelling):
@@ -26,77 +25,6 @@ def perform_full_calc(dwelling):
 
 
 
-class CalculationReport(object):
-
-    def __init__(self):
-        self.txt = ""
-
-    def start_section(self, number, title):
-        title_str = "%s %s\n" % (number, title)
-        self.txt += "\n"
-        self.txt += title_str
-        self.txt += "=" * len(title_str) + "\n"
-
-    def add_annotation(self, label):
-        self.txt += "%s\n" % (label,)
-
-    def add_single_result(self, label, code, values):
-        self.add_monthly_result(label, code, values)
-
-    def add_monthly_result(self, label, code, values):
-        if code != None:
-            self.txt += "%s %s (%s)\n" % (label, values, code)
-        else:
-            self.txt += "%s %s\n" % (label, values)
-
-    def print_report(self):
-        return self.txt
-
-
-class CalculationResults(dict):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.report = CalculationReport()
-
-
-# TODO: could probably rather subclass Dwelling
-# FIXME: seems that worksheet in any case depends on the dwelling object having report object. May better to just merge this into Dwelling
-class DwellingResultsWrapper(object):
-    def __init__(self, dwelling):
-        self.dwelling = dwelling
-
-        self.results = CalculationResults()  # just use a Dict, don't really need CalculationResults for now
-        self.report = self.results.report
-        # self.report = CalculationReport()
-        # self.results['report']
-
-    # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to acces results explicitly
-    # This is really fragile...
-    def __setattr__(self, key, value):
-        if key not in ['dwelling', 'results', 'report']:
-            self.results[key] = value
-        else:
-            self.__dict__[key]= value
-
-
-    def __getattr__(self, item):
-        """
-        return from results if k exists, otherwise return from wrapped
-        dwelling
-        """
-        try:
-            return self.dwelling.__getattr__(item)
-        except AttributeError:
-            try:
-                return self.results[item]
-            except KeyError:
-                raise AttributeError(item)
-
-    def true_and_not_missing(self, name):
-        return hasattr(self, name) and getattr(self, name)
-
-
-
 def run_sap(input_dwelling):
     """
     Run SAP on the input dwelling
@@ -109,7 +37,7 @@ def run_sap(input_dwelling):
     tables.do_sap_table_lookups(dwelling)
     perform_full_calc(dwelling)
     worksheet.sap(dwelling)
-    worksheet.build_report(dwelling)
+    dwelling.report.build_report()
 
     input_dwelling.er_results = dwelling.results
 
@@ -163,58 +91,58 @@ def run_fee(input_dwelling):
 
     perform_demand_calc(dwelling)
     worksheet.fee(dwelling)
-    worksheet.build_report(dwelling)
+    dwelling.report.build_report()
 
     input_dwelling.fee_results = dwelling.results
 
 
-def run_der(dwelling):
-    wrapped_dwelling = DwellingResultsWrapper(dwelling)
-    wrapped_dwelling.reduced_gains = True
+def run_der(input_dwelling):
+    dwelling = DwellingResultsWrapper(input_dwelling)
+    dwelling.reduced_gains = True
 
-    if wrapped_dwelling.overshading == tables.OvershadingTypes.VERY_LITTLE:
-        wrapped_dwelling.overshading = tables.OvershadingTypes.AVERAGE
+    if dwelling.overshading == tables.OvershadingTypes.VERY_LITTLE:
+        dwelling.overshading = tables.OvershadingTypes.AVERAGE
 
-    tables.do_sap_table_lookups(wrapped_dwelling)
-    perform_full_calc(wrapped_dwelling)
-    worksheet.der(wrapped_dwelling)
-    worksheet.build_report(wrapped_dwelling)
+    tables.do_sap_table_lookups(dwelling)
+    perform_full_calc(dwelling)
+    worksheet.der(dwelling)
+    dwelling.report.build_report()
 
-    dwelling.der_results = wrapped_dwelling.results
-    if (wrapped_dwelling.main_sys_fuel.is_mains_gas or
-            (hasattr(wrapped_dwelling, 'main_sys_2_fuel') and
-                 wrapped_dwelling.main_sys_2_fuel.is_mains_gas)):
-        dwelling.ter_fuel = tables.fuel_from_code(1)
-    elif sum(wrapped_dwelling.Q_main_1) >= sum(wrapped_dwelling.Q_main_2):
-        dwelling.ter_fuel = wrapped_dwelling.main_sys_fuel
+    input_dwelling.der_results = dwelling.results
+    if (dwelling.main_sys_fuel.is_mains_gas or
+            (hasattr(dwelling, 'main_sys_2_fuel') and
+                 dwelling.main_sys_2_fuel.is_mains_gas)):
+        input_dwelling.ter_fuel = tables.fuel_from_code(1)
+    elif sum(dwelling.Q_main_1) >= sum(dwelling.Q_main_2):
+        input_dwelling.ter_fuel = dwelling.main_sys_fuel
     else:
-        dwelling.ter_fuel = wrapped_dwelling.main_sys_2_fuel
+        input_dwelling.ter_fuel = dwelling.main_sys_2_fuel
 
 
 def element_type_area(etype, els):
     return sum(e.area for e in els if e.element_type == etype)
 
 
-def run_ter(dwelling):
-    wrapped_dwelling = DwellingResultsWrapper(dwelling)
+def run_ter(input_dwelling):
+    dwelling = DwellingResultsWrapper(input_dwelling)
 
-    wrapped_dwelling.reduced_gains = True
+    dwelling.reduced_gains = True
 
     net_wall_area = element_type_area(worksheet.HeatLossElementTypes.EXTERNAL_WALL,
-                                      wrapped_dwelling.heat_loss_elements)
+                                      dwelling.heat_loss_elements)
     opaque_door_area = element_type_area(worksheet.HeatLossElementTypes.OPAQUE_DOOR,
-                                         wrapped_dwelling.heat_loss_elements)
-    window_area = sum(o.area for o in wrapped_dwelling.openings if o.opening_type.roof_window == False)
-    roof_window_area = sum(o.area for o in wrapped_dwelling.openings if o.opening_type.roof_window == True)
+                                         dwelling.heat_loss_elements)
+    window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == False)
+    roof_window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == True)
     gross_wall_area = net_wall_area + window_area + opaque_door_area
 
-    new_opening_area = min(wrapped_dwelling.GFA * .25, gross_wall_area)
+    new_opening_area = min(dwelling.GFA * .25, gross_wall_area)
     new_window_area = max(new_opening_area - 1.85, 0)
 
     floor_area = element_type_area(worksheet.HeatLossElementTypes.EXTERNAL_FLOOR,
-                                   wrapped_dwelling.heat_loss_elements)
+                                   dwelling.heat_loss_elements)
     net_roof_area = element_type_area(worksheet.HeatLossElementTypes.EXTERNAL_ROOF,
-                                      wrapped_dwelling.heat_loss_elements)
+                                      dwelling.heat_loss_elements)
     roof_area = net_roof_area + roof_window_area
 
     new_heat_loss_elements = []
@@ -249,7 +177,7 @@ def run_ter(dwelling):
         element_type=worksheet.HeatLossElementTypes.GLAZING,
     ))
 
-    wrapped_dwelling.heat_loss_elements = new_heat_loss_elements
+    dwelling.heat_loss_elements = new_heat_loss_elements
 
     ter_opening_type = worksheet.OpeningType(
         glazing_type=GlazingTypes.DOUBLE,
@@ -264,79 +192,79 @@ def run_ter(dwelling):
         opening_type=ter_opening_type)
     ]
 
-    wrapped_dwelling.openings = new_openings
+    dwelling.openings = new_openings
 
-    wrapped_dwelling.thermal_mass_parameter = 250
-    wrapped_dwelling.overshading = tables.OvershadingTypes.AVERAGE
+    dwelling.thermal_mass_parameter = 250
+    dwelling.overshading = tables.OvershadingTypes.AVERAGE
 
-    wrapped_dwelling.Nshelteredsides = 2
-    wrapped_dwelling.Uthermalbridges = .11
-    wrapped_dwelling.ventilation_type = tables.VentilationTypes.NATURAL
-    wrapped_dwelling.pressurisation_test_result = 10
-    wrapped_dwelling.Nchimneys = 0
-    wrapped_dwelling.Nflues = 0
-    if dwelling.GFA > 80:
-        wrapped_dwelling.Nfansandpassivevents = 3
+    dwelling.Nshelteredsides = 2
+    dwelling.Uthermalbridges = .11
+    dwelling.ventilation_type = tables.VentilationTypes.NATURAL
+    dwelling.pressurisation_test_result = 10
+    dwelling.Nchimneys = 0
+    dwelling.Nflues = 0
+    if input_dwelling.GFA > 80:
+        dwelling.Nfansandpassivevents = 3
     else:
-        wrapped_dwelling.Nfansandpassivevents = 2
+        dwelling.Nfansandpassivevents = 2
 
-    wrapped_dwelling.main_heating_type_code = 102
-    wrapped_dwelling.main_heating_pcdf_id = None
-    wrapped_dwelling.heating_emitter_type = tables.HeatEmitters.RADIATORS
-    wrapped_dwelling.heating_emitter_type2 = None
-    wrapped_dwelling.main_heating_fraction = 1
-    wrapped_dwelling.main_heating_2_fraction = 0
-    wrapped_dwelling.main_sys_fuel = tables.fuel_from_code(1)
-    wrapped_dwelling.main_heating_oil_pump_inside_dwelling = None
-    wrapped_dwelling.main_heating_2_oil_pump_inside_dwelling = None
-    wrapped_dwelling.control_type_code = 2106
-    wrapped_dwelling.sys1_has_boiler_interlock = True
-    wrapped_dwelling.sys1_load_compensator = None
-    wrapped_dwelling.central_heating_pump_in_heated_space = True
-    wrapped_dwelling.appendix_q_systems = None
+    dwelling.main_heating_type_code = 102
+    dwelling.main_heating_pcdf_id = None
+    dwelling.heating_emitter_type = tables.HeatEmitters.RADIATORS
+    dwelling.heating_emitter_type2 = None
+    dwelling.main_heating_fraction = 1
+    dwelling.main_heating_2_fraction = 0
+    dwelling.main_sys_fuel = tables.fuel_from_code(1)
+    dwelling.main_heating_oil_pump_inside_dwelling = None
+    dwelling.main_heating_2_oil_pump_inside_dwelling = None
+    dwelling.control_type_code = 2106
+    dwelling.sys1_has_boiler_interlock = True
+    dwelling.sys1_load_compensator = None
+    dwelling.central_heating_pump_in_heated_space = True
+    dwelling.appendix_q_systems = None
 
-    wrapped_dwelling.has_hw_time_control = True
-    wrapped_dwelling.water_heating_type_code = 901
-    wrapped_dwelling.use_immersion_heater_summer = False
-    wrapped_dwelling.has_hw_cylinder = True
-    wrapped_dwelling.hw_cylinder_volume = 150
-    wrapped_dwelling.cylinder_in_heated_space = True
-    wrapped_dwelling.hw_cylinder_insulation_type = CylinderInsulationTypes.FOAM
-    wrapped_dwelling.hw_cylinder_insulation = 35
-    wrapped_dwelling.primary_pipework_insulated = False
-    wrapped_dwelling.has_cylinderstat = True
-    wrapped_dwelling.hwsys_has_boiler_interlock = True
-    wrapped_dwelling.measured_cylinder_loss = None
-    wrapped_dwelling.solar_collector_aperture = None
-    wrapped_dwelling.has_electric_shw_pump = False
-    wrapped_dwelling.solar_storage_combined_cylinder = False
-    wrapped_dwelling.wwhr_systems = None
-    wrapped_dwelling.fghrs = None
-    wrapped_dwelling.cylinder_is_thermal_store = False
-    wrapped_dwelling.thermal_store_type = None
-    wrapped_dwelling.sys1_sedbuk_2005_effy = None
-    wrapped_dwelling.sys1_sedbuk_2009_effy = None
+    dwelling.has_hw_time_control = True
+    dwelling.water_heating_type_code = 901
+    dwelling.use_immersion_heater_summer = False
+    dwelling.has_hw_cylinder = True
+    dwelling.hw_cylinder_volume = 150
+    dwelling.cylinder_in_heated_space = True
+    dwelling.hw_cylinder_insulation_type = CylinderInsulationTypes.FOAM
+    dwelling.hw_cylinder_insulation = 35
+    dwelling.primary_pipework_insulated = False
+    dwelling.has_cylinderstat = True
+    dwelling.hwsys_has_boiler_interlock = True
+    dwelling.measured_cylinder_loss = None
+    dwelling.solar_collector_aperture = None
+    dwelling.has_electric_shw_pump = False
+    dwelling.solar_storage_combined_cylinder = False
+    dwelling.wwhr_systems = None
+    dwelling.fghrs = None
+    dwelling.cylinder_is_thermal_store = False
+    dwelling.thermal_store_type = None
+    dwelling.sys1_sedbuk_2005_effy = None
+    dwelling.sys1_sedbuk_2009_effy = None
 
-    wrapped_dwelling.sys1_delayed_start_thermostat = False
+    dwelling.sys1_delayed_start_thermostat = False
 
-    wrapped_dwelling.low_water_use = False
-    wrapped_dwelling.secondary_sys_fuel = wrapped_dwelling.electricity_tariff
-    wrapped_dwelling.secondary_heating_type_code = 691
-    wrapped_dwelling.secondary_hetas_approved = False
-    wrapped_dwelling.low_energy_bulb_ratio = .3
+    dwelling.low_water_use = False
+    dwelling.secondary_sys_fuel = dwelling.electricity_tariff
+    dwelling.secondary_heating_type_code = 691
+    dwelling.secondary_hetas_approved = False
+    dwelling.low_energy_bulb_ratio = .3
 
-    wrapped_dwelling.cooled_area = 0
+    dwelling.cooled_area = 0
 
     # Need to make sure no summer immersion and no renewables 
 
-    tables.do_sap_table_lookups(wrapped_dwelling)
-    wrapped_dwelling.main_sys_1.heating_effy_winter = 78 + .9
-    wrapped_dwelling.main_sys_1.heating_effy_summer = 78 - 9.2
+    tables.do_sap_table_lookups(dwelling)
+    dwelling.main_sys_1.heating_effy_winter = 78 + .9
+    dwelling.main_sys_1.heating_effy_summer = 78 - 9.2
 
-    perform_full_calc(wrapped_dwelling)
-    worksheet.ter(wrapped_dwelling, dwelling.ter_fuel)
-    worksheet.build_report(wrapped_dwelling)
-    dwelling.ter_results = wrapped_dwelling.results
+    perform_full_calc(dwelling)
+    worksheet.ter(dwelling, input_dwelling.ter_fuel)
+    dwelling.report.build_report()
+    input_dwelling.ter_results = dwelling.results
 
 
 def apply_low_energy_lighting(base, d):
@@ -530,7 +458,7 @@ def run_improvements(dwelling):
     tables.do_sap_table_lookups(improved_dwelling)
     perform_full_calc(improved_dwelling)
     worksheet.sap(improved_dwelling)
-    worksheet.build_report(improved_dwelling)
+    dwelling.report.build_report()
     # print improved_dwelling.report.print_report()
 
     dwelling.improved_results = improved_dwelling.results

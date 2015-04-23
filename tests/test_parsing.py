@@ -3,7 +3,7 @@ from unittest import TestCase, main
 from tests.test_case_parser import *
 
 
-class test_field_value(TestCase):
+class TestFieldValue(TestCase):
 
     def parse_single_field(self, txt):
         results = field_value.parseString(txt)
@@ -178,7 +178,7 @@ class test_table(TestCase):
         self.assertEqual('val22', row[2])
 
 
-class test_input_section(TestCase):
+class TestInputSection(TestCase):
 
     """
     def test_simple_input_section(self):
@@ -218,7 +218,7 @@ class test_input_section(TestCase):
         """
 
 
-class test_problem_cases(TestCase):
+class TestProblemCases(TestCase):
 
     def test_252(self):
         string = "Electricity generated - PVs  (0.50\\'d712.02 + 0.50\\'d711.46)\\tab     -288\\tab   11.74\\tab\\ul    -33.86\\ulnone\\tab (252)"
@@ -290,7 +290,7 @@ class test_problem_cases(TestCase):
         parser.ignore(irrelevant_rtf_codes)
         res = parser.parseString(string)
 
-        print((res.improvements.effects))
+        print(res.improvements.effects)
 
         # print res
         for imp in res.improvements.effects:

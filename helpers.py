@@ -1,5 +1,6 @@
 
 from sap import tables, worksheet
+from sap.dwelling import Dwelling
 
 from tests.test_official_cases import all_params
 
@@ -64,11 +65,11 @@ class TrackedDict(dict):
         all_params[calc_stage].add(self.prefix + key)
 
 
-class ParamTrackerDwelling(worksheet.Dwelling):
+class ParamTrackerDwelling(Dwelling):
 
     def __init__(self):
         global calc_stage
-        worksheet.Dwelling.__init__(self)
+        Dwelling.__init__(self)
         calc_stage = 1
 
     def __setattr__(self, k, v):
@@ -83,7 +84,7 @@ class ParamTrackerDwelling(worksheet.Dwelling):
             except AttributeError:
                 pass"""
 
-        worksheet.Dwelling.__setattr__(self, k, v)
+        Dwelling.__setattr__(self, k, v)
 
     def nextStage(self):
         global calc_stage

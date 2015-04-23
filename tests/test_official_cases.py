@@ -3,13 +3,14 @@ import logging
 import os
 import pickle
 import sys
+from sap.utils import SAPCalculationError
 
 from tests import test_case_parser
 import input_conversion_rules
 import output_checker
 import yaml_io
 from sap import runner
-from utils import *
+from helpers import *
 
 
 all_params = [set(), set(), set(), set(), set(), set(), set()]
@@ -131,7 +132,7 @@ def run_case(fname, reparse):
 
         run_dwelling(fname, d)
         output_checker.check_results(d, res)
-    except tables.SAPCalculationError:
+    except SAPCalculationError:
         if output_checker.is_err_calc(res):
             return
         else:

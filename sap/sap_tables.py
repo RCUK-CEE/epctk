@@ -1,39 +1,53 @@
-import csv
+import os
 import math
-import numpy
 import re
-from . import pcdf
-import logging
 import types
 
-DATA_FILE_LOCATION = './sap/'
+import numpy
+
+# from . import pcdf
+#FIXME: had problems with relative imports when using sap as a library from ipython, always getting import errors...
+from .pcdf import get_fuel_prices, get_in_use_factors, get_mev_system, get_boiler, get_solid_fuel_boiler, \
+    get_twin_burner_cooker_boiler, get_heat_pump, get_microchp, get_wwhr_system, get_fghr_system
+
+from .utils import float_or_zero, float_or_none, SAPCalculationError, csv_to_dict
+
+
+DATA_FILE_LOCATION = os.path.dirname(__file__)
 
 IGH_HEATING = numpy.array([26, 54, 94, 150, 190, 201, 194, 164, 116, 68, 33, 21])
 T_EXTERNAL_HEATING = numpy.array([4.5, 5, 6.8, 8.7, 11.7, 14.6, 16.9, 16.9, 14.3, 10.8, 7, 4.9])
 WIND_SPEED = numpy.array([5.4, 5.1, 5.1, 4.5, 4.1, 3.9, 3.7, 3.7, 4.2, 4.5, 4.8, 5.1])
 
 
-def float_or_zero(s):
-    return float(s) if s != '' else 0
+class WallTypes(object):
+    MASONRY = 1
+    OTHER = 2
 
 
-def float_or_none(s):
-    return float(s) if s != '' else None
+class FloorTypes(object):
+    SUSPENDED_TIMBER_UNSEALED = 1
+    SUSPENDED_TIMBER_SEALED = 2
+    NOT_SUSPENDED_TIMBER = 3
+    OTHER = 4
 
 
-class SAPCalculationError(RuntimeError):
-    pass
+class ImmersionTypes(object):
+    SINGLE = 1
+    DUAL = 2
 
 
-def csv_to_dict(filename, translator):
-    results = {}
-    with open(filename, 'r') as infile:
-        reader = csv.reader(infile)
-        for row in reader:
-            if row[0][0] == '#':
-                continue
-            translator(results, row)
-    return results
+class PVOvershading(object):
+    HEAVY = 1
+    SIGNIFICANT = 2
+    MODEST = 3
+    NONE_OR_VERY_LITTLE = 4
+
+
+class TerrainTypes(object):
+    DENSE_URBAN = 1
+    SUBURBAN = 2
+    RURAL = 3
 
 
 class FuelTypes(object):
@@ -42,6 +56,15 @@ class FuelTypes(object):
     SOLID = 3
     ELECTRIC = 4
     COMMUNAL = 5
+
+# TODO: replace single use of this dict with use of the (Enum) class
+FUEL_TYPES = dict(
+    GAS=FuelTypes.GAS,
+    OIL=FuelTypes.OIL,
+    SOLID=FuelTypes.SOLID,
+    COMMUNAL=FuelTypes.COMMUNAL,
+    ELECTRIC=FuelTypes.ELECTRIC,
+)
 
 
 class CylinderInsulationTypes:
@@ -61,6 +84,7 @@ class GlazingTypes:
     DOUBLE = 2
     TRIPLE = 3
     SECONDARY = 4
+
 
 class FuelData:
     def __init__(self,
@@ -96,7 +120,7 @@ PCDF_FUEL_PRICES = None
 def get_fuel_data_pcdf(fuel_id):
     global PCDF_FUEL_PRICES
     if PCDF_FUEL_PRICES is None:
-        PCDF_FUEL_PRICES = pcdf.get_fuel_prices()
+        PCDF_FUEL_PRICES = get_fuel_prices()
 
     if fuel_id in PCDF_FUEL_PRICES:
         pcdf_data = PCDF_FUEL_PRICES[fuel_id]
@@ -189,14 +213,6 @@ class Fuel(object):
         return self._fuel_data
 
 
-FUEL_TYPES = dict(
-    GAS=FuelTypes.GAS,
-    OIL=FuelTypes.OIL,
-    SOLID=FuelTypes.SOLID,
-    COMMUNAL=FuelTypes.COMMUNAL,
-    ELECTRIC=FuelTypes.ELECTRIC,
-)
-
 
 def translate_12_row(fuels, row):
     # !!! Shouldn't allow None values for some of these columns
@@ -213,7 +229,7 @@ def translate_12_row(fuels, row):
     fuels[f.fuel_id] = f
 
 
-TABLE_12_DATA = csv_to_dict(DATA_FILE_LOCATION + 'table_12.csv', translate_12_row)
+TABLE_12_DATA = csv_to_dict(os.path.join(DATA_FILE_LOCATION, 'table_12.csv'), translate_12_row)
 
 
 class ElectricityTariff(object):
@@ -313,36 +329,6 @@ def fuel_from_code(code):
         return Fuel(code)
 
 
-class WallTypes(object):
-    MASONRY = 1
-    OTHER = 2
-
-
-class FloorTypes(object):
-    SUSPENDED_TIMBER_UNSEALED = 1
-    SUSPENDED_TIMBER_SEALED = 2
-    NOT_SUSPENDED_TIMBER = 3
-    OTHER = 4
-
-
-class ImmersionTypes(object):
-    SINGLE = 1
-    DUAL = 2
-
-
-class PVOvershading(object):
-    HEAVY = 1
-    SIGNIFICANT = 2
-    MODEST = 3
-    NONE_OR_VERY_LITTLE = 4
-
-
-class TerrainTypes(object):
-    DENSE_URBAN = 1
-    SUBURBAN = 2
-    RURAL = 3
-
-
 FLOOR_INFILTRATION = {
     FloorTypes.SUSPENDED_TIMBER_UNSEALED: 0.2,
     FloorTypes.SUSPENDED_TIMBER_SEALED: 0.1,
@@ -422,7 +408,7 @@ def cpsu_store(d):
 
     # Check airing cupboard
     if true_and_not_missing(d.water_sys, 'cpsu_not_in_airing_cupboard'):
-        #!!! Actually this is if cpsu or thermal store not in airing cupboard
+        # !!! Actually this is if cpsu or thermal store not in airing cupboard
         temperature_factor *= 1.1
 
     return temperature_factor
@@ -536,7 +522,7 @@ def getTable3Row(dwelling):
     else:
         # Must be combi? 
         raise Exception("WTF?")  # !!!
-        #return 6
+        # return 6
 
 
 def hw_primary_circuit_loss(dwelling):
@@ -590,7 +576,7 @@ def combi_loss_table_3a(dwelling, system):
 # !!! Need to complete this table
 def combi_loss_table_3b(pcdf_data):
     # !!! Need to set storage loss here
-    #dwelling.measured_cylinder_loss=0#pcdf_data['storage_loss_factor_f1']
+    # dwelling.measured_cylinder_loss=0#pcdf_data['storage_loss_factor_f1']
     #dwelling.has_hw_cylinder=True
     #system.table2brow=5
     #dwelling.has_cylinderstat=True
@@ -612,7 +598,7 @@ def translate_4a_row(systems, row):
     if row[6] != 'n/a':
         sys = dict(
             code=int(row[0]),
-            #type=row[1],
+            # type=row[1],
             effy=float_or_zero(row[2]),
             effy_hetas=float_or_zero(row[3]),
             effy_gas=float_or_zero(row[4]),
@@ -639,7 +625,7 @@ def translate_4a_row(systems, row):
         systems[sys['code']] = [sys, ]
 
 
-TABLE_4A = csv_to_dict(DATA_FILE_LOCATION + 'table_4a.csv', translate_4a_row)
+TABLE_4A = csv_to_dict(os.path.join(DATA_FILE_LOCATION, 'table_4a.csv'), translate_4a_row)
 
 
 def get_4a_system(dwelling, code):
@@ -664,7 +650,7 @@ def get_effy(system_data, fuel):
     elif system_data['effy_gas'] > 0:
         if fuel.is_mains_gas:
             return system_data['effy_gas']
-        else:  #if fuel in [BULK_LPG, BOTTLED_LPG, LPG_COND18]:
+        else:  # if fuel in [BULK_LPG, BOTTLED_LPG, LPG_COND18]:
             # Should be LPG fuel if we get here, but do this assertion
             # check anyway which will catch everything apart from LNG
             assert fuel.type == FuelTypes.GAS
@@ -773,7 +759,7 @@ def get_manuf_data_secondary_system(dwelling):
         (dwelling.use_immersion_heater_summer
          if hasattr(dwelling, 'use_immersion_heater_summer')
          else False))
-    #sys.table2brow=system_data['table2brow']
+    # sys.table2brow=system_data['table2brow']
     sys.fuel = dwelling.secondary_sys_fuel
     return sys
 
@@ -802,7 +788,7 @@ def translate_4b_row(systems, row):
     systems[sys['code']] = sys
 
 
-TABLE_4B = csv_to_dict(DATA_FILE_LOCATION + 'table_4b.csv', translate_4b_row)
+TABLE_4B = csv_to_dict(os.path.join(DATA_FILE_LOCATION, 'table_4b.csv'), translate_4b_row)
 
 
 def get_4b_main_system(dwelling, system_code, fuel, use_immersion_in_summer):
@@ -978,7 +964,7 @@ def apply_4c4(dwelling, sys):
         dwelling.main_sys_1.space_mult = .75
 
     if dwelling.water_sys is sys:
-        #!!! This assumes it supplies all of the DHW - also need the 50% case
+        # !!! This assumes it supplies all of the DHW - also need the 50% case
         dwelling.water_sys.water_mult = .7
 
 # Table 4d
@@ -992,6 +978,7 @@ TABLE_4d = {
     HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE: .25,
     HeatEmitters.FAN_COILS: 1,
 }
+
 
 # Table 4e
 def translate_4e_row(controls, row):
@@ -1014,7 +1001,8 @@ def translate_4e_row(controls, row):
     controls[control['code']] = control
 
 
-TABLE_4E = csv_to_dict(DATA_FILE_LOCATION + 'table_4e.csv', translate_4e_row)
+TABLE_4E = csv_to_dict(os.path.join(DATA_FILE_LOCATION, 'table_4e.csv'), translate_4e_row)
+
 
 # Table 4f
 def has_oil_pump(dwelling):
@@ -1038,7 +1026,7 @@ def heating_fans_and_pumps_electricity(dwelling):
         if dwelling.has_room_thermostat:
             Qfansandpumps += 100
         else:
-            #raise RuntimeError("!!! DO WE EVER GET HERE?")
+            # raise RuntimeError("!!! DO WE EVER GET HERE?")
             Qfansandpumps += 100 * 1.3
 
     if dwelling.main_sys_1.has_flue_fan:
@@ -1107,7 +1095,7 @@ def load_4h_tables():
      TABLE_4h_in_use_approved_scheme,
      TABLE_4h_hr_effy,
      TABLE_4h_hr_effy_approved_scheme
-     ) = pcdf.get_in_use_factors()
+     ) = get_in_use_factors()
 
 
 def get_in_use_factor(vent_type, duct_type, approved_scheme):
@@ -1150,7 +1138,7 @@ def fans_and_pumps_gain(dwelling):
     gain_due_to_heating_system = 0
 
     # !!! Nope, this is for balanced without heat recovery
-    #if dwelling.ventilation_type==VentilationTypes.MVHR:
+    # if dwelling.ventilation_type==VentilationTypes.MVHR:
     #    fansandpumps_gain+=dwelling.adjusted_fan_sfp*0.06*dwelling.volume
 
     ch_pump_gain = (0
@@ -1232,7 +1220,7 @@ def summer_to_annual(summer_vals):
     return numpy.array([0, ] * 5 + [float(s) for s in summer_vals] + [0, ] * 4)
 
 
-TABLE_10 = csv_to_dict(DATA_FILE_LOCATION + 'table_10.csv', translate_10_row)
+TABLE_10 = csv_to_dict(os.path.join(DATA_FILE_LOCATION, 'table_10.csv'), translate_10_row)
 
 # Table 10c
 def translate_10c_row(systems, row):
@@ -1243,7 +1231,7 @@ def translate_10c_row(systems, row):
     systems[system['energy_label']] = system
 
 
-TABLE_10C = csv_to_dict(DATA_FILE_LOCATION + 'table_10c.csv', translate_10c_row)
+TABLE_10C = csv_to_dict(os.path.join(DATA_FILE_LOCATION, 'table_10c.csv'), translate_10c_row)
 
 
 def appendix_f_cpsu_on_peak(sys, dwelling):
@@ -1480,7 +1468,7 @@ def configure_ventilation(dwelling):
             assert False
     elif dwelling.ventilation_type == VentilationTypes.MEV_DECENTRALISED:
         if hasattr(dwelling, 'mev_sys_pcdf_id'):
-            sys = pcdf.get_mev_system(dwelling.mev_sys_pcdf_id)
+            sys = get_mev_system(dwelling.mev_sys_pcdf_id)
             get_sfp = lambda configuration: sys['configs'][configuration]['sfp']
         else:
             get_sfp = lambda configuration: getattr(dwelling, "mev_fan_" + configuration + "_sfp")
@@ -1562,7 +1550,7 @@ def is_cpsu(type_code):
 
 
 def is_storage_heater(type_code):
-    return type_code >= 401 and type_code <= 407  #(408 is an integrated system)
+    return type_code >= 401 and type_code <= 407  # (408 is an integrated system)
 
 
 def is_off_peak_only_system(type_code):
@@ -1881,7 +1869,7 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
         sys.table2brow = 7  # !!! Assumes gas-fired
         dwelling.has_cylinderstat = True
         sys.cpsu_Tw = dwelling.cpsu_Tw
-        sys.cpsu_not_in_airing_cupboard = true_and_not_missing(d, 'cpsu_not_in_airing_cupboard')
+        sys.cpsu_not_in_airing_cupboard = dwelling.true_and_not_missing('cpsu_not_in_airing_cupboard')
     else:
         # !!! What about other table rows?
         raise ValueError("Unknown system type")
@@ -1925,7 +1913,7 @@ def solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer):
                         effy,
                         effy,
                         summer_immersion=use_immersion_in_summer,
-                        has_flue_fan=False,  #!!!
+                        has_flue_fan=False,  # !!!
                         has_ch_pump=True,
                         table2brow=2,  # !!! Solid fuel boilers can only have indirect boiler?
                         default_secondary_fraction=0.1,  # !!! Assumes 10% secondary fraction
@@ -1948,7 +1936,7 @@ def twin_burner_cooker_boiler_from_pcdf(pcdf_data,
                         winter_effy,
                         summer_effy,
                         summer_immersion=use_immersion_in_summer,
-                        has_flue_fan=False,  #!!!
+                        has_flue_fan=False,  # !!!
                         has_ch_pump=True,
                         table2brow=2,  # !!! Solid fuel boilers can only have indirect boiler?
                         default_secondary_fraction=0.1,  # !!! Assumes 10% secondary fraction
@@ -2063,7 +2051,7 @@ def micro_chp_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
                         -1,
                         -1,
                         summer_immersion=use_immersion_in_summer,
-                        has_flue_fan=False,  #!!!
+                        has_flue_fan=False,  # !!!
                         has_ch_pump=pcdf_data['separate_circulator'],
                         table2brow=2,
                         default_secondary_fraction=0,  # overwritten below
@@ -2171,7 +2159,7 @@ def heat_pump_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
                         -1,
                         -1,
                         summer_immersion=use_immersion_in_summer,
-                        has_flue_fan=False,  #!!!
+                        has_flue_fan=False,  # !!!
                         has_ch_pump=pcdf_data['separate_circulator'],
                         table2brow=2,
                         default_secondary_fraction=0,  # overwritten below
@@ -2331,23 +2319,23 @@ def pcdf_heating_system(dwelling,
                         pcdf_id,
                         fuel,
                         use_immersion_in_summer):
-    pcdf_data = pcdf.get_boiler(pcdf_id)
+    pcdf_data = get_boiler(pcdf_id)
     if not pcdf_data is None:
         return gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer)
 
-    pcdf_data = pcdf.get_solid_fuel_boiler(pcdf_id)
+    pcdf_data = get_solid_fuel_boiler(pcdf_id)
     if not pcdf_data is None:
         return solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer)
 
-    pcdf_data = pcdf.get_twin_burner_cooker_boiler(pcdf_id)
+    pcdf_data = get_twin_burner_cooker_boiler(pcdf_id)
     if not pcdf_data is None:
         return twin_burner_cooker_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer)
 
-    pcdf_data = pcdf.get_heat_pump(pcdf_id)
+    pcdf_data = get_heat_pump(pcdf_id)
     if not pcdf_data is None:
         return heat_pump_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer)
 
-    pcdf_data = pcdf.get_microchp(pcdf_id)
+    pcdf_data = get_microchp(pcdf_id)
     if not pcdf_data is None:
         return micro_chp_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer)
 
@@ -3049,7 +3037,7 @@ def configure_cooling_system(dwelling):
 def configure_wwhr(dwelling):
     if hasattr(dwelling, 'wwhr_systems') and not dwelling.wwhr_systems is None:
         for sys in dwelling.wwhr_systems:
-            sys['pcdf_sys'] = pcdf.get_wwhr_system(sys['pcdf_id'])
+            sys['pcdf_sys'] = get_wwhr_system(sys['pcdf_id'])
 
 
 def configure_fghr(dwelling):
@@ -3059,7 +3047,7 @@ def configure_fghr(dwelling):
         # !!! Need to add electrical power G1.4
         # !!! Entire fghrs calc is unfinished really
         dwelling.fghrs.update(
-            dict(pcdf.get_fghr_system(dwelling.fghrs['pcdf_id'])))
+            dict(get_fghr_system(dwelling.fghrs['pcdf_id'])))
 
         if dwelling.fghrs["heat_store"] == "3":
             assert dwelling.water_sys.system_type == HeatingSystem.TYPES.combi

@@ -5,6 +5,7 @@ import numpy
 from collections import OrderedDict
 from sap import worksheet
 from sap import tables
+from sap.dwelling import Dwelling
 
 
 def elec_tariff_representer(dumper, data):
@@ -71,7 +72,8 @@ def create_mapper(otype, tag):
 
 
 def configure_yaml():
-    yaml.add_representer(OrderedDict, ordered_dict_presenter)
+    # Don't think you need special treatment for ordereddict
+    # yaml.add_representer(OrderedDict, ordered_dict_presenter)
 
     yaml.add_representer(tables.ElectricityTariff, elec_tariff_representer)
     yaml.add_representer(tables.Fuel, fuel_representer)
@@ -91,7 +93,7 @@ def configure_yaml():
 
 def to_yaml(d, stream):
     configure_yaml()
-    data = copy.deepcopy(d.ordered_attrs)
+    data = copy.deepcopy(d._attrs)
 
     del data["Tcooling"]
     del data["living_area_Theating"]
@@ -105,8 +107,8 @@ def from_yaml(fname):
     with open(fname, 'r') as f:
         loaded = yaml.load(f)
 
-    d = worksheet.Dwelling()
+    dwelling = Dwelling()
     for k, v in list(loaded.items()):
-        setattr(d, k, v)
+        setattr(dwelling, k, v)
 
-    return d
+    return dwelling

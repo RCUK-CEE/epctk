@@ -1,7 +1,6 @@
 __author__ = 'jonathanchambers'
 
 import logging
-import sys
 import yaml_io
 import argparse
 
@@ -21,16 +20,16 @@ def sap_from_yaml(fname):
     runner.run_fee(dwelling)
 
     print_header("SAP RESULTS")
-    print((dwelling.er_results.report.print_report()))
+    print(dwelling.er_results.report)
 
     print_header("DER RESULTS")
-    print((dwelling.der_results.report.print_report()))
+    print(dwelling.der_results.report)
 
     print_header("TER RESULTS")
-    print((dwelling.ter_results.report.print_report()))
+    print(dwelling.ter_results.report)
 
     print_header("FEE RESULTS")
-    print((dwelling.fee_results.report.print_report()))
+    print(dwelling.fee_results.report)
 
 
 def cli():
