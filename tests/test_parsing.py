@@ -1,6 +1,9 @@
 import unittest
 
-from .reference_case_parser import *
+# from tests.reference_case_parser import *
+from tests.reference_case_parser import field_value, primary_input, table_entry, table_label, table, \
+    gen_fuel_result_parser, irrelevant_rtf_codes, gen_monthly_result_parser, table_header_row, table_row, \
+    improvements_section
 
 
 class TestFieldValue(unittest.TestCase):
@@ -256,49 +259,50 @@ class TestProblemCases(unittest.TestCase):
         parser.ignore(irrelevant_rtf_codes)
         res = parser.parseString(string)
 
-        """
-    def test_tricky(self):
-        fname="tests.rtf"
-        f=open(fname,'r')
-        txt=f.read()
-        txt=txt.replace('\\\'b','')
-        txt=txt.replace('\\f1','')
-        string=txt.replace('\\f2','')
-    
-        parser=(input_section_header+Group(input_section)("inputs"))
-        parser.ignore(irrelevant_rtf_codes)
-        res=parser.parseString(string)"""
+    # FIXME: files test.rtf and test2.rtf do not exist...
 
-    def test_tricky2(self):
-        fname = "test2.rtf"
-        f = open(fname, 'r')
-        txt = f.read()
-        txt = txt.replace('\\\'b', '')
-        txt = txt.replace('\\f1', '')
-        string = txt.replace('\\f2', '')
+    # def test_tricky(self):
+    #     fname="tests.rtf"
+    #     f=open(fname,'r')
+    #     txt=f.read()
+    #     txt=txt.replace('\\\'b','')
+    #     txt=txt.replace('\\f1','')
+    #     string=txt.replace('\\f2','')
+    #
+    #     parser=(input_section_header+Group(input_section)("inputs"))
+    #     parser.ignore(irrelevant_rtf_codes)
+    #     res=parser.parseString(string)
 
-        parser = improvements_section
-        """parser=(section("CALCULATION OF ENERGY RATINGS FOR IMPROVED DWELLING",
-                        Group(improved_dwelling_section)("improved"))+
-                section("REGULATIONS COMPLIANCE REPORT ",
-                        Group(regulations_report_section)("regulations_report"))+
-                Optional(section("SAP 2009 OVERHEATING ASSESSMENT FOR NEW DWELLING AS BUILT",
-                        Group(overheating_section)("overheating")))+
-                section("SAP 2009 IMPROVEMENTS",
-                        Group(improvements_section)("improvements")))"""
-
-        parser.ignore(irrelevant_rtf_codes)
-        res = parser.parseString(string)
-
-        print(res.improvements.effects)
-
-        # print res
-        for imp in res.improvements.effects:
-            print((imp.measures, float(imp.sap_change), float(imp.cost_change), float(imp.co2_change)))
-        # for imp in res.improvements:
-        #    print imp.measure,imp.description
-
-        # print res
+    # def test_tricky2(self):
+    #     fname = "test2.rtf"
+    #     f = open(fname, 'r')
+    #     txt = f.read()
+    #     txt = txt.replace('\\\'b', '')
+    #     txt = txt.replace('\\f1', '')
+    #     string = txt.replace('\\f2', '')
+    #
+    #     parser = improvements_section
+    #     """parser=(section("CALCULATION OF ENERGY RATINGS FOR IMPROVED DWELLING",
+    #                     Group(improved_dwelling_section)("improved"))+
+    #             section("REGULATIONS COMPLIANCE REPORT ",
+    #                     Group(regulations_report_section)("regulations_report"))+
+    #             Optional(section("SAP 2009 OVERHEATING ASSESSMENT FOR NEW DWELLING AS BUILT",
+    #                     Group(overheating_section)("overheating")))+
+    #             section("SAP 2009 IMPROVEMENTS",
+    #                     Group(improvements_section)("improvements")))"""
+    #
+    #     parser.ignore(irrelevant_rtf_codes)
+    #     res = parser.parseString(string)
+    #
+    #     print(res.improvements.effects)
+    #
+    #     # print res
+    #     for imp in res.improvements.effects:
+    #         print((imp.measures, float(imp.sap_change), float(imp.cost_change), float(imp.co2_change)))
+    #     # for imp in res.improvements:
+    #     #    print imp.measure,imp.description
+    #
+    #     # print res
 
 if __name__ == '__main__':
     unittest.main()

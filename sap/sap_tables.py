@@ -2,18 +2,15 @@ import os
 import math
 import re
 import types
-
+import copy
 import numpy
-
 # from . import pcdf
-#FIXME: had problems with relative imports when using sap as a library from ipython, always getting import errors...
+# FIXME: had problems with relative imports when using sap as a library from ipython, always getting import errors...
 from .pcdf import get_fuel_prices, get_in_use_factors, get_mev_system, get_boiler, get_solid_fuel_boiler, \
     get_twin_burner_cooker_boiler, get_heat_pump, get_microchp, get_wwhr_system, get_fghr_system
-
 from .utils import float_or_zero, float_or_none, SAPCalculationError, csv_to_dict
 
-
-DATA_FILE_LOCATION = os.path.dirname(__file__)
+DATA_FILE_LOCATION = os.path.join(os.path.dirname(__file__), 'data')
 
 IGH_HEATING = numpy.array([26, 54, 94, 150, 190, 201, 194, 164, 116, 68, 33, 21])
 T_EXTERNAL_HEATING = numpy.array([4.5, 5, 6.8, 8.7, 11.7, 14.6, 16.9, 16.9, 14.3, 10.8, 7, 4.9])
@@ -56,6 +53,7 @@ class FuelTypes(object):
     SOLID = 3
     ELECTRIC = 4
     COMMUNAL = 5
+
 
 # TODO: replace single use of this dict with use of the (Enum) class
 FUEL_TYPES = dict(
@@ -112,7 +110,8 @@ def get_fuel_data_table_12(fuel_id):
     return TABLE_12_DATA[fuel_id]
 
 
-import copy
+# Alias Function name
+get_fuel_data = get_fuel_data_table_12
 
 PCDF_FUEL_PRICES = None
 
@@ -139,10 +138,6 @@ def get_fuel_data_pcdf(fuel_id):
         return f
     else:
         return get_fuel_data_table_12(fuel_id)
-
-
-# Alias Function name
-get_fuel_data = get_fuel_data_table_12
 
 
 class Fuel(object):
@@ -211,7 +206,6 @@ class Fuel(object):
         if self._fuel_data is None:
             self._fuel_data = get_fuel_data(self.fuel_id)
         return self._fuel_data
-
 
 
 def translate_12_row(fuels, row):
@@ -299,6 +293,7 @@ class ElectricityTariff(object):
         on_peak_name = self.on_peak_data.name
         return on_peak_name.split("(")[0].strip()
 
+
 # ELECTRICITY_FROM_CHP=Fuel(49,.529,None,None,None,106,2.92,FuelTypes.COMMUNAL)
 # ELECTRICITY_FOR_DISTRIBUTION_NETWORK=Fuel(50,.517,None,None,None,106,2.92,FuelTypes.COMMUNAL)
 
@@ -340,6 +335,7 @@ FLOOR_INFILTRATION = {
 def true_and_not_missing(d, attr):
     return hasattr(d, attr) and getattr(d, attr)
 
+
 # ----------------------------
 # SAP STANDARD NUMBERED TABLES
 # ----------------------------
@@ -360,6 +356,7 @@ def daily_hw_use(dwelling):
         return (25. * dwelling.Nocc + 36.) * .95
     else:
         return 25. * dwelling.Nocc + 36.
+
 
 # Table 1c
 MONTHLY_HOT_WATER_FACTORS = numpy.array([1.1, 1.06, 1.02, 0.98, 0.94, 0.9, 0.9, 0.94, 0.98, 1.02, 1.06, 1.1])
@@ -465,6 +462,7 @@ TABLE_2b_table2 = {
 def hw_temperature_factor(dwelling, measured_loss):
     table2b = TABLE_2b_manuf if measured_loss else TABLE_2b_table2
     return table2b[dwelling.water_sys.table2brow](dwelling)
+
 
 # Table 3
 TABLE_3 = {
@@ -577,15 +575,16 @@ def combi_loss_table_3a(dwelling, system):
 def combi_loss_table_3b(pcdf_data):
     # !!! Need to set storage loss here
     # dwelling.measured_cylinder_loss=0#pcdf_data['storage_loss_factor_f1']
-    #dwelling.has_hw_cylinder=True
-    #system.table2brow=5
-    #dwelling.has_cylinderstat=True
+    # dwelling.has_hw_cylinder=True
+    # system.table2brow=5
+    # dwelling.has_cylinderstat=True
     return lambda x: 365 * pcdf_data['storage_loss_factor_f1']
 
 
 # !!! Need to complete this table
 def combi_loss_table_3c():
     return None
+
 
 # Table 4a
 # !!! Electric storage systems - offpeak and 24 hour tariff systems
@@ -762,6 +761,7 @@ def get_manuf_data_secondary_system(dwelling):
     # sys.table2brow=system_data['table2brow']
     sys.fuel = dwelling.secondary_sys_fuel
     return sys
+
 
 # Table 4b
 BOILER_TYPES = dict(
@@ -967,6 +967,7 @@ def apply_4c4(dwelling, sys):
         # !!! This assumes it supplies all of the DHW - also need the 50% case
         dwelling.water_sys.water_mult = .7
 
+
 # Table 4d
 TABLE_4d = {
     HeatEmitters.RADIATORS: 1,
@@ -1077,6 +1078,7 @@ def mech_vent_fans_electricity(dwelling):
 def fans_and_pumps_electricity(dwelling):
     dwelling.Q_fans_and_pumps = heating_fans_and_pumps_electricity(dwelling)
     dwelling.Q_mech_vent_fans = mech_vent_fans_electricity(dwelling)
+
 
 # Table 4h
 from .pcdf import DuctTypes
@@ -1204,6 +1206,7 @@ TABLE_6D = {
         light_access_factor=1),
 }
 
+
 # Table 10
 def translate_10_row(regions, row):
     climate_data = dict(
@@ -1221,6 +1224,7 @@ def summer_to_annual(summer_vals):
 
 
 TABLE_10 = csv_to_dict(os.path.join(DATA_FILE_LOCATION, 'table_10.csv'), translate_10_row)
+
 
 # Table 10c
 def translate_10c_row(systems, row):
@@ -1952,6 +1956,7 @@ def twin_burner_cooker_boiler_from_pcdf(pcdf_data,
     sys.has_warm_air_fan = False
     return sys
 
+
 # Table N4
 TABLE_N4 = [
     (0.2, 57, 143, 8),  # PSR;N24.16;N24,9;N16,9;
@@ -2003,6 +2008,7 @@ def table_n4_heating_days(psr):
     N24_9 = int(0.5 + data[2])
     N16_9 = int(0.5 + data[3])
     return N24_16, N24_9, N16_9
+
 
 # Table N8
 TABLE_N8 = [
@@ -3180,4 +3186,3 @@ def do_sap_table_lookups(dwelling):
 
     if hasattr(dwelling, 'nextStage'):
         dwelling.nextStage()
-

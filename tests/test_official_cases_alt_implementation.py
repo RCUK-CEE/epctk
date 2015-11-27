@@ -12,6 +12,7 @@ from sap import pcdf
 from sap import runner
 from sap.utils import SAPCalculationError
 from tests import reference_case_parser
+from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
 all_params = [set(), set(), set(), set(), set(), set(), set()]
 
@@ -182,7 +183,7 @@ def run_case(fname, force_reparse):
 def run_official_cases(cases, maxruns=None, reparse=False):
     count = 0
     for f in cases:
-        if f in official_test_cases.SKIP:
+        if f in SKIP:
             continue
 
         fname = os.path.join('official_reference_cases', f)
@@ -207,7 +208,6 @@ class SingleLevelFilter(logging.Filter):
             return record.levelno == self.passlevel
 
 
-import official_test_cases
 
 
 if __name__ == '__main__':
@@ -242,4 +242,4 @@ if __name__ == '__main__':
     pcdf.DATA_FILE = "./official_reference_cases/pcdf2009_test_322.dat"
 
     run_official_cases(
-        official_test_cases.OFFICIAL_CASES_THAT_WORK, maxruns=options.maxruns, reparse=options.reparse)
+        OFFICIAL_CASES_THAT_WORK, maxruns=options.maxruns, reparse=options.reparse)

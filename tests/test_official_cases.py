@@ -11,7 +11,8 @@ from helpers import *
 from sap import runner
 from sap.utils import SAPCalculationError
 from tests import reference_case_parser
-from .reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
+# from .reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
+from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
 
 def log_all_params(d, prefix=""):
@@ -78,7 +79,7 @@ def load_or_parse_file(fname, parser, force_reparse):
     basename = os.path.basename(fname) + ".pkl"
     pickled_file = os.path.join("./pickled_test_cases", basename)
     if os.path.exists(pickled_file) and not force_reparse:
-        res = pickle.load(open(pickled_file, "r"))
+        res = pickle.load(open(pickled_file, "rb"))
     else:
         print(("Reparsing ", fname))
         res = parse_file(fname, parser)

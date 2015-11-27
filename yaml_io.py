@@ -2,9 +2,8 @@ import yaml
 import copy
 import numpy
 
-from collections import OrderedDict
 from sap import worksheet
-from sap import tables
+from sap import sap_tables
 from sap.dwelling import Dwelling
 
 
@@ -14,7 +13,7 @@ def elec_tariff_representer(dumper, data):
 
 def fuel_constructor(loader, node):
     data = loader.construct_mapping(node)
-    return tables.fuel_from_code(data['fuel_code'])
+    return sap_tables.fuel_from_code(data['fuel_code'])
 
 
 def fuel_representer(dumper, data):
@@ -75,8 +74,8 @@ def configure_yaml():
     # Don't think you need special treatment for ordereddict
     # yaml.add_representer(OrderedDict, ordered_dict_presenter)
 
-    yaml.add_representer(tables.ElectricityTariff, elec_tariff_representer)
-    yaml.add_representer(tables.Fuel, fuel_representer)
+    yaml.add_representer(sap_tables.ElectricityTariff, elec_tariff_representer)
+    yaml.add_representer(sap_tables.Fuel, fuel_representer)
     yaml.add_constructor('!fuel', fuel_constructor)
 
     create_mapper(worksheet.HeatLossElement, "HeatLossElement")

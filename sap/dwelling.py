@@ -1,5 +1,4 @@
 import collections
-
 from .sap_tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING
 
 
@@ -9,13 +8,15 @@ class Dwelling():
         self._attrs = collections.OrderedDict()
         self.wind_speed = WIND_SPEED
 
-        # apply_sap_hardcoded_values here t avoid setting attrs outside of __init__
+        # apply_sap_hardcoded_values here to avoid setting attrs outside of __init__
         self.Texternal_heating = T_EXTERNAL_HEATING
         self.Igh_heating = IGH_HEATING
         self.living_area_Theating = 21
         self.Tcooling = 24
         # self.apply_sap_hardcoded_values()
 
+    # TODO: this allows to get dwelling properties as attributes, but this is rather fragile
+    #
     def __getattr__(self, name):
         try:
             return self._attrs[name]
@@ -24,6 +25,7 @@ class Dwelling():
 
     def __setattr__(self, name, value):
         # exclude _attrs so that we can acually set it during init
+        # FIXME this is kinda hacky :/
         if name == '_attrs':
             return super().__setattr__(name, value)
         self._attrs[name] = value
@@ -50,20 +52,20 @@ class DwellingResultsWrapper(object):
         # self.report = CalculationReport()
         # self.results['report']
 
-
     def __setattr__(self, key, value):
         # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
-        # This is really fragile...
+        # FIXME: This is really fragile...
         if key not in ['dwelling', 'results', 'report']:
             self.results[key] = value
         else:
             self.__dict__[key] = value
 
-
     def __getattr__(self, item):
         """
         return from results if k exists, otherwise return from wrapped
         dwelling
+
+        FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
         """
         try:
             return self.dwelling.__getattr__(item)
@@ -119,17 +121,17 @@ class CalculationReport(object):
             self.add_annotation("Using pressure tests for average dwelling")
         else:
             self.add_annotation("Using calculated infiltration rate")
-        """
-            base_infiltration_rate=dwelling.pressurisation_test_result/20.+inf_chimneys_ach
-        elif hasattr(dwelling,'pressurisation_test_result_average'):
-            base_infiltration_rate=(dwelling.pressurisation_test_result_average+2)/20.+inf_chimneys_ach
-        else:
-            additional_infiltration=(dwelling.Nstoreys-1)*0.1
-            draught_infiltration=0.05 if not dwelling.has_draught_lobby else 0
-            dwelling.window_infiltration=0.25-0.2*dwelling.draught_stripping
-
-            base_infiltration_rate=( additional_infiltration
-                                     """
+        #
+        #     base_infiltration_rate=dwelling.pressurisation_test_result/20.+inf_chimneys_ach
+        # elif hasattr(dwelling,'pressurisation_test_result_average'):
+        #     base_infiltration_rate=(dwelling.pressurisation_test_result_average+2)/20.+inf_chimneys_ach
+        # else:
+        #     additional_infiltration=(dwelling.Nstoreys-1)*0.1
+        #     draught_infiltration=0.05 if not dwelling.has_draught_lobby else 0
+        #     dwelling.window_infiltration=0.25-0.2*dwelling.draught_stripping
+        #
+        #     base_infiltration_rate=( additional_infiltration
+        #
 
         self.add_single_result(
             "Infiltration rate", 18, dwelling.base_infiltration_rate)
@@ -219,15 +221,15 @@ class CalculationReport(object):
 
         self.start_section("9a", "Energy requirements")
         self.add_single_result("Fraction of space heat from secondary",
-                            "201", 1 - dwelling.fraction_of_heat_from_main)
+                               "201", 1 - dwelling.fraction_of_heat_from_main)
         self.add_single_result(
             "Fraction of space heat from main systems", "202", dwelling.fraction_of_heat_from_main)
         self.add_single_result(
             "Fraction of main heating from main system 2", "203", dwelling.main_heating_2_fraction)
         self.add_single_result("Fraction of total space heating from main system 1",
-                            "204", dwelling.fraction_of_heat_from_main * dwelling.main_heating_fraction)
+                               "204", dwelling.fraction_of_heat_from_main * dwelling.main_heating_fraction)
         self.add_single_result("Fraction of total space heating from main system 2",
-                            "205", dwelling.fraction_of_heat_from_main * dwelling.main_heating_2_fraction)
+                               "205", dwelling.fraction_of_heat_from_main * dwelling.main_heating_2_fraction)
 
         self.add_single_result(
             "Efficiency of main heating system 1", "206", dwelling.sys1_space_effy)
@@ -279,7 +281,7 @@ class CalculationReport(object):
                 cost = getattr(dwelling, "cost_%s" % (label,))
                 primary_energy = getattr(dwelling, "primary_energy_%s" % (label,))
                 self.add_single_result(label, None, "%f | %f | %f | %f" %
-                                    (energy, emissions, cost, primary_energy))
+                                       (energy, emissions, cost, primary_energy))
 
         self.start_section("L", "Appendix L - Lighting")
         self.add_single_result(
@@ -292,4 +294,3 @@ class CalculationReport(object):
 
     def __str__(self):
         return self.txt
-

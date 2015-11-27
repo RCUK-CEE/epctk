@@ -1,7 +1,7 @@
 import os
 from .utils import int_or_none, float_or_none
 
-PCDF_DATA_FILE = os.path.join('.','sap', 'pcdf2009.dat')
+PCDF_DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'pcdf2009.dat')
 PCDF = None
 
 fuels = {'1': 'Gas',
@@ -70,20 +70,20 @@ def load_pcdf():
         pcdf_data = dict()
         current = dict()
         currentid = None
-        for l in datafile:
-            if l[0] == "#":
+        for line in datafile:
+            if line[0] == "#":
                 continue
 
-            toks = l.split(',')
-            if l[0] == "$":
+            tokens = line.split(',')
+            if line[0] == "$":
                 # new table
-                currentid = toks[0][1:]
+                currentid = tokens[0][1:]
                 current = dict()
                 pcdf_data[currentid] = current
             else:
                 # existing table
-                id = row_id(currentid, toks)
-                current[id] = toks
+                id = row_id(currentid, tokens)
+                current[id] = tokens
     global PCDF
     PCDF = pcdf_data
 

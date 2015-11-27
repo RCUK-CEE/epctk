@@ -1,10 +1,10 @@
-
 from sap import sap_tables
 from sap.dwelling import Dwelling
 
 # TODO: figure out how to avoid using this global calc stage var
 CALC_STAGE = 1
 ALL_PARAMS = [set(), set(), set(), set(), set(), set(), set()]
+
 
 def log_sap_obj(param_set, prefix, k, v):
     """
@@ -51,12 +51,11 @@ def log_sap_obj(param_set, prefix, k, v):
 
 
 class TrackedDict(dict):
-
-    def __init__(self, d, prefix):
-        dict.__init__(self, d)
+    def __init__(self, data, prefix):
+        super(TrackedDict, self).__init__(data)
         self.prefix = prefix + "."
 
-        for key in list(d.keys()):
+        for key in list(data.keys()):
             ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
 
     def __setitem__(self, key, value):
@@ -65,10 +64,9 @@ class TrackedDict(dict):
 
 
 class ParamTrackerDwelling(Dwelling):
-
     def __init__(self):
         global CALC_STAGE
-        Dwelling.__init__(self)
+        super(ParamTrackerDwelling, self).__init__()
         CALC_STAGE = 1
 
     def __setattr__(self, k, v):
@@ -88,5 +86,3 @@ class ParamTrackerDwelling(Dwelling):
     def nextStage(self):
         global CALC_STAGE
         CALC_STAGE += 1
-
-
