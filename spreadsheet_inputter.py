@@ -2,7 +2,7 @@ import logging
 
 import win32com.client
 from sap.dwelling import Dwelling
-from tests import test_case_parser
+from tests import reference_case_parser
 import input_conversion_rules
 from sap import worksheet
 from sap import tables
@@ -41,7 +41,7 @@ TEST_CASES = [
 
 ]
 
-# TEST_CASES=official_test_cases.OFFICIAL_CASES_THAT_WORK
+# TEST_CASES=official_reference_cases.OFFICIAL_CASES_THAT_WORK
 
 INPUTS = [
     #"electricity_tariff",
@@ -931,7 +931,7 @@ def run_case(xlbook, fname):
     ]:
         return False
 
-    res = v0.load_or_parse_file(fname, test_case_parser.whole_file, False)
+    res = v0.load_or_parse_file(fname, reference_case_parser.whole_file, False)
     d = Dwelling()
     input_conversion_rules.process_inputs(d, res.inputs)
 
@@ -984,7 +984,7 @@ def main():
     logging.basicConfig(level=logging.ERROR)
     from sap import pcdf
 
-    pcdf.DATA_FILE = "./official_test_cases/pcdf2009_test_322.dat"
+    pcdf.DATA_FILE = "./official_reference_cases/pcdf2009_test_322.dat"
 
     xl = win32com.client.gencache.EnsureDispatch("Excel.Application")
     xl_opened_by_script = False

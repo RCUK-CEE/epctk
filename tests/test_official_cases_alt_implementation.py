@@ -1,19 +1,17 @@
+import argparse
 import logging
 import os
 import pickle
 import sys
-import argparse
-from sap.utils import SAPCalculationError
 
-from tests import test_case_parser
 import input_conversion_rules
-
 import output_checker
 import yaml_io
+from helpers import *
 from sap import pcdf
 from sap import runner
-from helpers import *
-
+from sap.utils import SAPCalculationError
+from tests import reference_case_parser
 
 all_params = [set(), set(), set(), set(), set(), set(), set()]
 
@@ -21,19 +19,19 @@ all_params = [set(), set(), set(), set(), set(), set(), set()]
 
 
 def dump_param_list():
-    for i in range(len(all_params)):
-        for k in all_params[i]:
+    for i in range(len(ALL_PARAMS)):
+        for k in ALL_PARAMS[i]:
             print((i, k))
 
-    print(("Dumped inputs: ", len(all_params[1])))
+    print(("Dumped inputs: ", len(ALL_PARAMS[1])))
 
 
 def log_all_params(d, prefix=""):
-    param_set = all_params[calc_stage]
+    param_set = ALL_PARAMS[CALC_STAGE]
 
     for k, v in list(d.items()):
         if k != "ordered_attrs":
-            log_obj(param_set, prefix, k, v)
+            log_sap_obj(param_set, prefix, k, v)
 
 
 def create_sap_dwelling(inputs):
@@ -72,13 +70,13 @@ def run_all_dwellings(parser):
 
 
 def parse_input_file(id):
-    return parse_file("./reference_dwellings/%d.rtf" % id, test_case_parser.whole_file)
+    return parse_file("./reference_dwellings/%d.rtf" % id, reference_case_parser.whole_file)
 
 # -- end not used
 
 
 def parse_file(fname):
-    parser = test_case_parser.whole_file
+    parser = reference_case_parser.whole_file
 
     with open(fname, 'r') as rtf_file:
         txt = rtf_file.read()
@@ -187,7 +185,7 @@ def run_official_cases(cases, maxruns=None, reparse=False):
         if f in official_test_cases.SKIP:
             continue
 
-        fname = os.path.join('official_test_cases', f)
+        fname = os.path.join('official_reference_cases', f)
         run_case(fname, reparse)
         count += 1
         if maxruns is not None and count >= int(maxruns):
@@ -241,7 +239,7 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
 
-    pcdf.DATA_FILE = "./official_test_cases/pcdf2009_test_322.dat"
+    pcdf.DATA_FILE = "./official_reference_cases/pcdf2009_test_322.dat"
 
     run_official_cases(
         official_test_cases.OFFICIAL_CASES_THAT_WORK, maxruns=options.maxruns, reparse=options.reparse)

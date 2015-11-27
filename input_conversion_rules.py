@@ -2,8 +2,8 @@ import logging
 import copy
 
 from sap import worksheet
-from sap import tables
-from sap.tables import CylinderInsulationTypes, OpeningTypeDataSource, GlazingTypes
+from sap import sap_tables
+from sap.sap_tables import CylinderInsulationTypes, OpeningTypeDataSource, GlazingTypes
 
 
 class LambdaMapping(object):
@@ -74,8 +74,8 @@ ORIENTATIONS = {'(Unspecified)': 90,
                 }
 
 OVERSHADING = {
-    'Average': tables.OvershadingTypes.AVERAGE,
-    'Very little': tables.OvershadingTypes.VERY_LITTLE,
+    'Average': sap_tables.OvershadingTypes.AVERAGE,
+    'Very little': sap_tables.OvershadingTypes.VERY_LITTLE,
 }
 
 BOOLEANS = {
@@ -270,43 +270,43 @@ def process_y_value_table(d, y_table):
     d.y_values = y_values
 
 emitter_types = {
-    Labels.RADIATORS: tables.HeatEmitters.RADIATORS,
-    Labels.UNDERFLOOR_SCREED: tables.HeatEmitters.UNDERFLOOR_SCREED,
-    Labels.UNDERFLOOR_TIMBER: tables.HeatEmitters.UNDERFLOOR_TIMBER,
-    Labels.UNDERFLOOR_CONCRETE: tables.HeatEmitters.UNDERFLOOR_CONCRETE,
-    Labels.RADS_UNDERFLOOR_TIMBER: tables.HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER,
-    Labels.RADS_UNDERFLOOR_SCREED: tables.HeatEmitters.RADIATORS_UNDERFLOOR_SCREED,
-    Labels.RADS_UNDERFLOOR_CONRETE: tables.HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE,
-    Labels.FAN_COILS: tables.HeatEmitters.FAN_COILS,
+    Labels.RADIATORS: sap_tables.HeatEmitters.RADIATORS,
+    Labels.UNDERFLOOR_SCREED: sap_tables.HeatEmitters.UNDERFLOOR_SCREED,
+    Labels.UNDERFLOOR_TIMBER: sap_tables.HeatEmitters.UNDERFLOOR_TIMBER,
+    Labels.UNDERFLOOR_CONCRETE: sap_tables.HeatEmitters.UNDERFLOOR_CONCRETE,
+    Labels.RADS_UNDERFLOOR_TIMBER: sap_tables.HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER,
+    Labels.RADS_UNDERFLOOR_SCREED: sap_tables.HeatEmitters.RADIATORS_UNDERFLOOR_SCREED,
+    Labels.RADS_UNDERFLOOR_CONRETE: sap_tables.HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE,
+    Labels.FAN_COILS: sap_tables.HeatEmitters.FAN_COILS,
 }
 FUELS = {
-    'Electricity': tables.ELECTRICITY_STANDARD,
-    'Mains gas': tables.fuel_from_code(1),
-    'mains gas': tables.fuel_from_code(1),
-    'LNG': tables.fuel_from_code(8),
-    'Bulk LPG': tables.fuel_from_code(2),
-    'Bottled LPG': tables.fuel_from_code(3),
-    'LPG cond. 18': tables.fuel_from_code(9),
+    'Electricity': sap_tables.ELECTRICITY_STANDARD,
+    'Mains gas': sap_tables.fuel_from_code(1),
+    'mains gas': sap_tables.fuel_from_code(1),
+    'LNG': sap_tables.fuel_from_code(8),
+    'Bulk LPG': sap_tables.fuel_from_code(2),
+    'Bottled LPG': sap_tables.fuel_from_code(3),
+    'LPG cond. 18': sap_tables.fuel_from_code(9),
 
-    'Heating oil': tables.fuel_from_code(4),
-    'Biodiesel any': tables.fuel_from_code(71),
-    'Biodiesel from any biomass source': tables.fuel_from_code(71),
-    'Biodiesel UCOME': tables.fuel_from_code(72),
-    'Rapeseed oil': tables.fuel_from_code(73),
-    'Mineral or biofuel': tables.fuel_from_code(74),
-    'B30K': tables.fuel_from_code(75),
-    'Bioethanol': tables.fuel_from_code(76),
+    'Heating oil': sap_tables.fuel_from_code(4),
+    'Biodiesel any': sap_tables.fuel_from_code(71),
+    'Biodiesel from any biomass source': sap_tables.fuel_from_code(71),
+    'Biodiesel UCOME': sap_tables.fuel_from_code(72),
+    'Rapeseed oil': sap_tables.fuel_from_code(73),
+    'Mineral or biofuel': sap_tables.fuel_from_code(74),
+    'B30K': sap_tables.fuel_from_code(75),
+    'Bioethanol': sap_tables.fuel_from_code(76),
 
-    'House coal': tables.fuel_from_code(11),
-    'Anthracite': tables.fuel_from_code(15),
-    'Smokeless': tables.fuel_from_code(12),
-    'Wood logs': tables.fuel_from_code(20),
-    'Wood pellets (bags)': tables.fuel_from_code(22),
-    'Wood pellets (bulk)': tables.fuel_from_code(23),
-    'Wood chips': tables.fuel_from_code(21),
-    'wood chips': tables.fuel_from_code(21),
-    'Dual fuel appliance': tables.fuel_from_code(10),
-    'Dual fuel': tables.fuel_from_code(10),
+    'House coal': sap_tables.fuel_from_code(11),
+    'Anthracite': sap_tables.fuel_from_code(15),
+    'Smokeless': sap_tables.fuel_from_code(12),
+    'Wood logs': sap_tables.fuel_from_code(20),
+    'Wood pellets (bags)': sap_tables.fuel_from_code(22),
+    'Wood pellets (bulk)': sap_tables.fuel_from_code(23),
+    'Wood chips': sap_tables.fuel_from_code(21),
+    'wood chips': sap_tables.fuel_from_code(21),
+    'Dual fuel appliance': sap_tables.fuel_from_code(10),
+    'Dual fuel': sap_tables.fuel_from_code(10),
 }
 
 
@@ -323,16 +323,16 @@ def get_fuel(v):
 
 COMMUNITY_FUELS = {
     # Here we are always setting the fuel as a boiler fuel instead of CHP
-    'Mains gas ': tables.fuel_from_code(51),
-    'LPG ': tables.fuel_from_code(52),
-    'Oil ': tables.fuel_from_code(53),
-    'B30D ': tables.fuel_from_code(55),
-    'Electricity ': tables.fuel_from_code(41),
-    'Biomass ': tables.fuel_from_code(43),
-    'Biogas ': tables.fuel_from_code(44),
-    'Biogas': tables.fuel_from_code(44),
-    'Geothermal': tables.fuel_from_code(46),
-    'Waste heat': tables.fuel_from_code(45),
+    'Mains gas ': sap_tables.fuel_from_code(51),
+    'LPG ': sap_tables.fuel_from_code(52),
+    'Oil ': sap_tables.fuel_from_code(53),
+    'B30D ': sap_tables.fuel_from_code(55),
+    'Electricity ': sap_tables.fuel_from_code(41),
+    'Biomass ': sap_tables.fuel_from_code(43),
+    'Biogas ': sap_tables.fuel_from_code(44),
+    'Biogas': sap_tables.fuel_from_code(44),
+    'Geothermal': sap_tables.fuel_from_code(46),
+    'Waste heat': sap_tables.fuel_from_code(45),
 }
 APPENDIX_D7_TYPES = {
     "condensing, modulating burner control": "D7.4c",
@@ -415,9 +415,9 @@ class MainHeatingSystemRule:
                 elif v.value == Labels.OIL_BOILER_PUMP_NOT_IN_HEATED_SPACE:
                     setattr(d, self.oil_pump_location_attr, False)
                 elif v.value == Labels.THERMAL_STORE_HW_ONLY:
-                    d.thermal_store_type = tables.ThermalStoreTypes.HW_ONLY
+                    d.thermal_store_type = sap_tables.ThermalStoreTypes.HW_ONLY
                 elif v.value == Labels.THERMAL_STORE_INTEGRATED:
-                    d.thermal_store_type = tables.ThermalStoreTypes.INTEGRATED
+                    d.thermal_store_type = sap_tables.ThermalStoreTypes.INTEGRATED
                 elif v.value in emitter_types:
                     setattr(
                         d, self.heating_emitter_attr, emitter_types[v.value])
@@ -460,23 +460,23 @@ class MainHeatingSystemRule:
 
     def get_sedbuk_type(self, typestr):
         if "Regular" in typestr or "Range cooker" in typestr:
-            return tables.HeatingSystem.TYPES.regular_boiler
+            return sap_tables.HeatingSystem.TYPES.regular_boiler
         elif "primary store" in typestr:
-            return tables.HeatingSystem.TYPES.storage_combi
+            return sap_tables.HeatingSystem.TYPES.storage_combi
         elif "CPSU" in typestr:
-            return tables.HeatingSystem.TYPES.cpsu
+            return sap_tables.HeatingSystem.TYPES.cpsu
         elif "Combi" in typestr:
-            return tables.HeatingSystem.TYPES.combi
+            return sap_tables.HeatingSystem.TYPES.combi
         else:
             raise ValueError("Unknown sedbuk type")
 
 COMMUNITY_DISTRIBUTION_TYPES = {
     "Piping >= 1991, pre-insulated, low temp, variable flow":
-    tables.CommunityDistributionTypes.MODERN_LOW_TEMP,
+    sap_tables.CommunityDistributionTypes.MODERN_LOW_TEMP,
     "Piping >= 1991, pre-insulated, medium temp, variable flow":
-    tables.CommunityDistributionTypes.MODERN_HIGH_TEMP,
+    sap_tables.CommunityDistributionTypes.MODERN_HIGH_TEMP,
     "Piping <= 1990, not pre-ins, medium/high temp, full flow":
-    tables.CommunityDistributionTypes.PRE_1990_UNINSULATED,
+    sap_tables.CommunityDistributionTypes.PRE_1990_UNINSULATED,
 }
 
 
@@ -514,10 +514,10 @@ def parse_community_heating_sources(r):
     return heat_sources, distribution_type
 
 PV_OVERSHADING = {
-    'Heavy': tables.PVOvershading.HEAVY,
-    'Significant': tables.PVOvershading.SIGNIFICANT,
-    'Modest': tables.PVOvershading.MODEST,
-    'None or very little': tables.PVOvershading.NONE_OR_VERY_LITTLE,
+    'Heavy': sap_tables.PVOvershading.HEAVY,
+    'Significant': sap_tables.PVOvershading.SIGNIFICANT,
+    'Modest': sap_tables.PVOvershading.MODEST,
+    'None or very little': sap_tables.PVOvershading.NONE_OR_VERY_LITTLE,
 }
 
 PV_PITCH = {
@@ -591,9 +591,9 @@ class WindTurbineRule:
                 logging.warning("Unknown wind turbine field: %s", v)
 
 TERRAIN = {
-    'Rural': tables.TerrainTypes.RURAL,
-    'Low rise urban / Suburban': tables.TerrainTypes.SUBURBAN,
-    'Dense urban': tables.TerrainTypes.DENSE_URBAN,
+    'Rural': sap_tables.TerrainTypes.RURAL,
+    'Low rise urban / Suburban': sap_tables.TerrainTypes.SUBURBAN,
+    'Dense urban': sap_tables.TerrainTypes.DENSE_URBAN,
 }
 
 
@@ -630,10 +630,10 @@ class ControlSystemRule:
 
                 if v.value == "Enhanced load compensator":
                     setattr(d, self.load_compensator_attr,
-                            tables.LoadCompensators.ENHANCED_LOAD_COMPENSATOR)
+                            sap_tables.LoadCompensators.ENHANCED_LOAD_COMPENSATOR)
                 elif v.value == "Weather compensator":
                     setattr(d, self.load_compensator_attr,
-                            tables.LoadCompensators.WEATHER_COMPENSATOR)
+                            sap_tables.LoadCompensators.WEATHER_COMPENSATOR)
                 elif v.value == "Delayed start":
                     setattr(d, self.delayed_start_thermo_attr, True)
                 else:
@@ -767,8 +767,8 @@ class CPSUVolumeRule:
             d.cpsu_Tw = float(tokens[2])
 
 IMMERSION_TYPES = dict(
-    Dual=tables.ImmersionTypes.DUAL,
-    Single=tables.ImmersionTypes.SINGLE,
+    Dual=sap_tables.ImmersionTypes.DUAL,
+    Single=sap_tables.ImmersionTypes.SINGLE,
 )
 
 
@@ -891,9 +891,9 @@ class WaterHeatingSystemRule:
                 elif inp.value == "Cylinder in heated space":
                     d.cylinder_in_heated_space = True
                 elif inp.value == "evacuated tube - default data":
-                    d.collector_type = tables.SHWCollectorTypes.EVACUATED_TUBE
+                    d.collector_type = sap_tables.SHWCollectorTypes.EVACUATED_TUBE
                 elif inp.value == "unglazed - declared values":
-                    d.collector_type = tables.SHWCollectorTypes.UNGLAZED
+                    d.collector_type = sap_tables.SHWCollectorTypes.UNGLAZED
                 elif inp.value == "electrically powered pump":
                     d.has_electric_shw_pump = True
                 elif inp.value == "solar powered pump":
@@ -947,16 +947,16 @@ class WaterHeatingSystemRule:
 
         # only one tests case has pv, so just hardcode the input here
         d.fghrs[
-            'overshading_category'] = tables.PVOvershading.NONE_OR_VERY_LITTLE
+            'overshading_category'] = sap_tables.PVOvershading.NONE_OR_VERY_LITTLE
 
 
 DUCT_TYPES = {
-    'rigid': tables.DuctTypes.RIGID,
-    'flexible': tables.DuctTypes.FLEXIBLE,
-    'rigid, insulated': tables.DuctTypes.RIGID_INSULATED,
-    'rigid, uninsulated': tables.DuctTypes.RIGID,
-    'flexible, insulated': tables.DuctTypes.FLEXIBLE_INSULATED,
-    'flexible, uninsulated': tables.DuctTypes.FLEXIBLE,
+    'rigid': sap_tables.DuctTypes.RIGID,
+    'flexible': sap_tables.DuctTypes.FLEXIBLE,
+    'rigid, insulated': sap_tables.DuctTypes.RIGID_INSULATED,
+    'rigid, uninsulated': sap_tables.DuctTypes.RIGID,
+    'flexible, insulated': sap_tables.DuctTypes.FLEXIBLE_INSULATED,
+    'flexible, uninsulated': sap_tables.DuctTypes.FLEXIBLE,
 }
 
 COMMON_MECH_VENT_RULES = {
@@ -978,25 +978,25 @@ class VentilationRule:
     def apply(self, d, r):
         if len(r.vals) == 1 and r.vals[0].value == "Natural ventilation ":
             # natural ventilation
-            d.ventilation_type = tables.VentilationTypes.NATURAL
+            d.ventilation_type = sap_tables.VentilationTypes.NATURAL
         elif len(r.vals) == 1 and r.vals[0].value == "Mechanical extract ventilation, centralised " and r.vals[0].note == 'Table 4g':
-            d.ventilation_type = tables.VentilationTypes.MEV_CENTRALISED
+            d.ventilation_type = sap_tables.VentilationTypes.MEV_CENTRALISED
         elif len(r.vals) == 1 and r.vals[0].value == "MVHR " and r.vals[0].note == 'Table 4g':
-            d.ventilation_type = tables.VentilationTypes.MVHR
+            d.ventilation_type = sap_tables.VentilationTypes.MVHR
         elif len(r.vals) >= 1 and r.vals[0].value == "MVHR " and r.vals[0].note == 'App.Q data sheet':
             self.process_mvhr(d, r)
         elif len(r.vals) >= 1 and r.vals[0].label == "MVHR ":
             self.process_mvhr(d, r)
         elif r.vals[0].value == "Balanced MV (no HR) (Table 4g)":
-            d.ventilation_type = tables.VentilationTypes.MV
+            d.ventilation_type = sap_tables.VentilationTypes.MV
         elif r.vals[0].value == "Balanced MV (no HR) (App.Q data sheet)":
             self.process_mv_no_hr(d, r)
         elif r.vals[0].value == "Positive input ventilation (from outside) (App.Q data sheet)":
             self.process_piv_from_outside(d, r)
         elif r.vals[0].value == "Positive input ventilation (from outside) (Table 4g)":
-            d.ventilation_type = tables.VentilationTypes.PIV_FROM_OUTSIDE
+            d.ventilation_type = sap_tables.VentilationTypes.PIV_FROM_OUTSIDE
         elif r.vals[0].value == "Positive input ventilation ":
-            d.ventilation_type = tables.VentilationTypes.NATURAL
+            d.ventilation_type = sap_tables.VentilationTypes.NATURAL
         else:
             toks = r.vals[0].value.split()
             if r.vals[0].label == 'MEV centralised ':
@@ -1011,7 +1011,7 @@ class VentilationRule:
                 logging.warning("Unknown ventilation rule: %s", r.vals)
 
     def process_mv_no_hr(self, d, r):
-        d.ventilation_type = tables.VentilationTypes.MV
+        d.ventilation_type = sap_tables.VentilationTypes.MV
         for v in r.vals[1:]:
             if apply_common_mv_rules(d, v):
                 continue
@@ -1021,7 +1021,7 @@ class VentilationRule:
                 logging.warning("Unknown MV (no HR) input: %s", v)
 
     def process_piv_from_outside(self, d, r):
-        d.ventilation_type = tables.VentilationTypes.PIV_FROM_OUTSIDE
+        d.ventilation_type = sap_tables.VentilationTypes.PIV_FROM_OUTSIDE
         for v in r.vals[1:]:
             if apply_common_mv_rules(d, v):
                 continue
@@ -1031,7 +1031,7 @@ class VentilationRule:
                 logging.warning("Unknown PIV input: %s", v)
 
     def process_mvhr(self, d, r):
-        d.ventilation_type = tables.VentilationTypes.MVHR
+        d.ventilation_type = sap_tables.VentilationTypes.MVHR
 
         for v in r.vals[1:]:
             if apply_common_mv_rules(d, v):
@@ -1045,7 +1045,7 @@ class VentilationRule:
                 logging.warning("Unknown MVHR input: %s", v)
 
     def process_centralised_mev(self, d, r):
-        d.ventilation_type = tables.VentilationTypes.MEV_CENTRALISED
+        d.ventilation_type = sap_tables.VentilationTypes.MEV_CENTRALISED
         for v in r.vals[1:]:
             if apply_common_mv_rules(d, v):
                 continue
@@ -1055,7 +1055,7 @@ class VentilationRule:
                 logging.warning("Unknown MEV input: %s", v)
 
     def process_centralised_mev_app_q(self, d, r):
-        d.ventilation_type = tables.VentilationTypes.MEV_CENTRALISED
+        d.ventilation_type = sap_tables.VentilationTypes.MEV_CENTRALISED
         for v in r.vals[1:]:
             if apply_common_mv_rules(d, v):
                 continue
@@ -1071,7 +1071,7 @@ class VentilationRule:
             if note_toks[0] == "database":
                 d.mev_sys_pcdf_id = note_toks[5]
 
-        d.ventilation_type = tables.VentilationTypes.MEV_DECENTRALISED
+        d.ventilation_type = sap_tables.VentilationTypes.MEV_DECENTRALISED
         for v in r.vals[1:]:
             if apply_common_mv_rules(d, v):
                 continue
@@ -1104,7 +1104,7 @@ class VentilationRule:
         if r.vals[0].note != "App.Q data sheet":
             raise Exception("WTF")
 
-        d.ventilation_type = tables.VentilationTypes.MEV_DECENTRALISED
+        d.ventilation_type = sap_tables.VentilationTypes.MEV_DECENTRALISED
         location = ""
         for v in r.vals[2:]:
             if apply_common_mv_rules(d, v):
@@ -1131,8 +1131,8 @@ class VentilationRule:
                     float(toks_val[5]))
 
 WALL_TYPES = {
-    'Masonry': tables.WallTypes.MASONRY,
-    'Steel/Timber frame': tables.WallTypes.OTHER,
+    'Masonry': sap_tables.WallTypes.MASONRY,
+    'Steel/Timber frame': sap_tables.WallTypes.OTHER,
 }
 
 
@@ -1140,21 +1140,21 @@ class FloorInfiltrationRule:
 
     def apply(self, d, r):
         if r.vals[0].value == 'Suspended timber ' and r.vals[0].note == 'unsealed':
-            d.floor_type = tables.FloorTypes.SUSPENDED_TIMBER_UNSEALED
+            d.floor_type = sap_tables.FloorTypes.SUSPENDED_TIMBER_UNSEALED
         elif r.vals[0].value == 'Suspended timber ' and r.vals[0].note == 'sealed':
-            d.floor_type = tables.FloorTypes.SUSPENDED_TIMBER_SEALED
+            d.floor_type = sap_tables.FloorTypes.SUSPENDED_TIMBER_SEALED
         elif r.vals[0].value == 'Not suspended timber':
-            d.floor_type = tables.FloorTypes.NOT_SUSPENDED_TIMBER
+            d.floor_type = sap_tables.FloorTypes.NOT_SUSPENDED_TIMBER
         elif r.vals[0].value == 'Not applicable':
             # probably ground floor doesn't exist
-            d.floor_type = tables.FloorTypes.OTHER
+            d.floor_type = sap_tables.FloorTypes.OTHER
         else:
             logging.warning("Unknown floor type: %s", r)
 
 TARIFFS = {
-    'Standard tariff': tables.ELECTRICITY_STANDARD,
-    'Off-peak 7-hour': tables.ELECTRICITY_7HR,
-    'Off-peak 10-hour': tables.ELECTRICITY_10HR,
+    'Standard tariff': sap_tables.ELECTRICITY_STANDARD,
+    'Off-peak 7-hour': sap_tables.ELECTRICITY_7HR,
+    'Off-peak 10-hour': sap_tables.ELECTRICITY_10HR,
 }
 
 
@@ -1361,7 +1361,7 @@ def process_elements_table(d, r):
                                                              kvalueStr),
                                                          name=row[0]))
                 except ValueError:
-                    # Original tests cases don't have kvalues in their tables
+                    # Original tests cases don't have kvalues in their sap_tables
                     pass
 
         if row[0] in Elements.solid_external_elements:

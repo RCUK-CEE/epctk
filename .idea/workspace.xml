@@ -2,44 +2,143 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7350501f-e420-4216-851c-d82d56f040b6" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../.ipynb_checkpoints/Untitled1-checkpoint.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../Untitled1.ipynb" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/10.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/10.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/11.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/11.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/12.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/12.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/13.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/13.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/14.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/14.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/15.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/15.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/16.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/16.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/17.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/17.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/18.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/18.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/19.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/19.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/2.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/2.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/20.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/20.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/21.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/21.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/22.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/22.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/23.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/23.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/24.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/24.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/25.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/25.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/26.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/26.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/27.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/27.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/28.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/28.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/29.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/29.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/3.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/3.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/30.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/30.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/4.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/4.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/5.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/5.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/6.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/6.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/7.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/7.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/8.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/8.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/9.rtf" afterPath="$PROJECT_DIR$/tests/reference_dwellings/9.rtf" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_dwellings/for roger.zip" afterPath="$PROJECT_DIR$/tests/reference_dwellings/for roger.zip" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases.py" afterPath="$PROJECT_DIR$/tests/reference_cases_lists.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10L- Heatpump Nibe Fighter 360 index 100101- 7-hour.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10L- Heatpump Nibe Fighter 360 index 100101- 7-hour.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10L2 as 10L but smaller house.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10L2 as 10L but smaller house.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10a- Heatpump - s-1_v-1(variable) higher PSR.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10a- Heatpump - s-1_v-1(variable) higher PSR.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10b- Heatpump - s-1_v-2(variable).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10b- Heatpump - s-1_v-2(variable).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10c- Heatpump - s-1_v-3(variable).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10c- Heatpump - s-1_v-3(variable).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10d- Heatpump - s-2_v-1(variable).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10d- Heatpump - s-2_v-1(variable).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10e- Heatpump - s-2_v-2(variable).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10e- Heatpump - s-2_v-2(variable).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10f- Heatpump - s-2_v-3(variable).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10f- Heatpump - s-2_v-3(variable).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10g- Heatpump - s-3_v-4(variable).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10g- Heatpump - s-3_v-4(variable).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10h-Heatpump- s-1_v-1(variable) with lower PSR.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10h-Heatpump- s-1_v-1(variable) with lower PSR.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10i-Heatpump - s-1_v-1(24-hour).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10i-Heatpump - s-1_v-1(24-hour).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10j- Heatpump - s-1_v-1(16-hour).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10j- Heatpump - s-1_v-1(16-hour).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10k-Heatpump - s-1_v-1(11-hour).rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10k-Heatpump - s-1_v-1(11-hour).rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10m- Heatpump Daikin index 100013 -10-hour.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10m- Heatpump Daikin index 100013 -10-hour.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10n- Heatpump Dimplex index 100043 - 7-hour.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10n- Heatpump Dimplex index 100043 - 7-hour.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10p- Heatpump Mitsubishi - index 100052 -10 hour.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10p- Heatpump Mitsubishi - index 100052 -10 hour.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10q- Heatpump Vaillant - index 100081 - standatd tariff.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10q- Heatpump Vaillant - index 100081 - standatd tariff.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10r- Heatpump - warm air 493194.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10r- Heatpump - warm air 493194.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-10s- semi - heat pump with PSR too large.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-10s- semi - heat pump with PSR too large.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1L-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1L-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1a-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1a-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1b-detached with semi-exposed elements.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1b-detached with semi-exposed elements.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1c-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1c-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1d-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1d-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1e-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1e-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1f-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1f-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1g-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1g-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1h-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1h-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1i-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1i-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1j-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1j-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1k-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1k-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1m-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1m-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1n-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1n-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-1p-detached.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-1p-detached.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2L-semi - electric CPSU_10-hour 300 litres.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2L-semi - electric CPSU_10-hour 300 litres.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2a-semi with semi-exposed elements-basic.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2a-semi with semi-exposed elements-basic.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2b-semi with WWHR-regular boiler.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2b-semi with WWHR-regular boiler.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2c-semi with WWHR+solar water heating.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2c-semi with WWHR+solar water heating.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2e-semi with CPSU fired by LPG.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2e-semi with CPSU fired by LPG.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2f-semi - integrated storage_direct 7-hour.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2f-semi - integrated storage_direct 7-hour.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2g-semi - 7-hour electric boiler.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2g-semi - 7-hour electric boiler.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2h-semi -10-hour electric boiler.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2h-semi -10-hour electric boiler.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2i-semi - underfloor 7-hour.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2i-semi - underfloor 7-hour.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2j-semi - underfloor 10-hour.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2j-semi - underfloor 10-hour.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2k-semi - electric CPSU_10-hour 180 litres.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2k-semi - electric CPSU_10-hour 180 litres.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2m-semi - direct acting - boiler.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2m-semi - direct acting - boiler.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2n -semi - electric ceiling heating _ water from single immersion.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2n -semi - electric ceiling heating _ water from single immersion.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2p-semi -electric underfloor, water - oil range cooker.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2p-semi -electric underfloor, water - oil range cooker.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2r-semi - room heaters - water by immersion with solar panel.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2r-semi - room heaters - water by immersion with solar panel.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3L-semi - with Test Database-index 495007.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3L-semi - with Test Database-index 495007.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3a-mid-terrace.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3a-mid-terrace.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3b-mid-terrace with solid fuel boiler.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3b-mid-terrace with solid fuel boiler.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3c - MidTerrace - pellet stove - with solar DHW a1 is 20.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3c - MidTerrace - pellet stove - with solar DHW a1 is 20.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3d - MT-biomass room heaters and no dedicated cylinder for solar DHW.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3d - MT-biomass room heaters and no dedicated cylinder for solar DHW.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3e - MT-gas warm air and MVHR checking Table 5a.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3e - MT-gas warm air and MVHR checking Table 5a.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3f - MT-gas warm air and flueless gas fire - water from immersion.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3f - MT-gas warm air and flueless gas fire - water from immersion.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3g -EndTerrace-LPG warm air and decorative bottled gas fire.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3g -EndTerrace-LPG warm air and decorative bottled gas fire.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3h - MT-oil range cooker_ secondary oil and water oil.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3h - MT-oil range cooker_ secondary oil and water oil.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3i- flat - mid floor_gas boiler 01840 and DHW thermal store.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3i- flat - mid floor_gas boiler 01840 and DHW thermal store.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3j- flat - mid floor_gas boiler 01840 and integrated thermal store.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3j- flat - mid floor_gas boiler 01840 and integrated thermal store.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3k-semi - with Test Database-index 495006.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3k-semi - with Test Database-index 495006.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3m-semi - with Database-index 08088 keep-hot_FGHRS 60001 and WWHR.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3m-semi - with Database-index 08088 keep-hot_FGHRS 60001 and WWHR.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3n-semi - non-cond combi 09977 keep-hot_NO interlock - with Enh_load_comp - no adj.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3n-semi - non-cond combi 09977 keep-hot_NO interlock - with Enh_load_comp - no adj.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3p-semi - Cond-combi 10222 keep-hot_underfloor+weather compensator - immersion water_so +3 adj.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3p-semi - Cond-combi 10222 keep-hot_underfloor+weather compensator - immersion water_so +3 adj.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3r-semi - non-cond Combi 09506 keep-hot_underfloor+weather comp_immersion DHW - no adj.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3r-semi - non-cond Combi 09506 keep-hot_underfloor+weather comp_immersion DHW - no adj.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3s-semi - LPG Non-cond Regular 09529_weather compens_underfloor_immersion DHW_adj +2r.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3s-semi - LPG Non-cond Regular 09529_weather compens_underfloor_immersion DHW_adj +2r.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-3t-semi - OIL RegularCond 08584_weather compens_underfloor_immersion DHW so +2 adj.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-3t-semi - OIL RegularCond 08584_weather compens_underfloor_immersion DHW so +2 adj.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4L - mid-terrace _community  Heatpump with cylinder in dwelling and Solar.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4L - mid-terrace _community  Heatpump with cylinder in dwelling and Solar.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4a - detached basic - electric CPSU_bottled gas room heater_MVHR.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4a - detached basic - electric CPSU_bottled gas room heater_MVHR.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4b - flat ground floor - database 05983 combi secondary store.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4b - flat ground floor - database 05983 combi secondary store.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4c - MT with garage - gas boiler 04162 with primary store.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4c - MT with garage - gas boiler 04162 with primary store.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4d - detached - LPG boiler 09978_gas timed keep-hot_water from secondary 606.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4d - detached - LPG boiler 09978_gas timed keep-hot_water from secondary 606.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4e - detached LARGE_m-CHP Baxi with separate DHW.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4e - detached LARGE_m-CHP Baxi with separate DHW.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4f - semi with garage_anthracite range cooker code 160.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4f - semi with garage_anthracite range cooker code 160.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4g - bungalow semi_gas heat pump with radiators.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4g - bungalow semi_gas heat pump with radiators.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4h - bungalow L-shaped detached_electric heatpump with fan coil unit.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4h - bungalow L-shaped detached_electric heatpump with fan coil unit.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4i - flat - upper Maisonette_LPG warm air heatpump.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4i - flat - upper Maisonette_LPG warm air heatpump.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4j - flat - mid floor_electric air-to air heatpump_DHW from HP.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4j - flat - mid floor_electric air-to air heatpump_DHW from HP.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4k - flat - upper floor_community heating CHP and boilers.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4k - flat - upper floor_community heating CHP and boilers.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4k(a) - flat - upper floor_community heating CHP and boilers.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4k(a) - flat - upper floor_community heating CHP and boilers.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4k(b) - flat - upper floor_community heating CHP and boilers.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4k(b) - flat - upper floor_community heating CHP and boilers.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4m - mid-terrace_integrated storage+direct acting.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4m - mid-terrace_integrated storage+direct acting.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4n - terraced - three storey_Electric CPSU code192.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4n - terraced - three storey_Electric CPSU code192.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4p - bung with room in room_dual fuel  open fire with Back Boiler code 156.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4p - bung with room in room_dual fuel  open fire with Back Boiler code 156.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-4r - semi with garage -5 storey_oil-fired warm air code 513_DHW from secondary.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-4r - semi with garage -5 storey_oil-fired warm air code 513_DHW from secondary.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5a-semi with WWHR+solar+FGHRS_09899 fuelled by LPG special cond 18.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5a-semi with WWHR+solar+FGHRS_09899 fuelled by LPG special cond 18.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5b- flat - mid floor_gas boiler 01840 and integrated thermal store_ as 3i but fuelled by LNG.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5b- flat - mid floor_gas boiler 01840 and integrated thermal store_ as 3i but fuelled by LNG.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5c-detached-oil- as 1m but Manufacturers efficiency 89_6_ fuel UCOME oil.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5c-detached-oil- as 1m but Manufacturers efficiency 89_6_ fuel UCOME oil.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5d-detached-oil- as 1m but database boiler 493072_ fuel UCOME oil.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5d-detached-oil- as 1m but database boiler 493072_ fuel UCOME oil.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5e-detached-oil- as 1m but database boiler 493071_ any biodiesel.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5e-detached-oil- as 1m but database boiler 493071_ any biodiesel.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5f-detached-oil- as 1m but Database index 493075 efficiency 90_2_fuel B30K oil.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5f-detached-oil- as 1m but Database index 493075 efficiency 90_2_fuel B30K oil.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5g-detached-oil- as 1m but database boiler 493074_ mineral or bio oil.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5g-detached-oil- as 1m but database boiler 493074_ mineral or bio oil.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5h-detached-oil- as 1m but database boiler 493073_ fuel rapeseed oil.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5h-detached-oil- as 1m but database boiler 493073_ fuel rapeseed oil.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5i-detached-oil- with bioethanol secondary.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5i-detached-oil- with bioethanol secondary.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-5j-detached-oil- with B30K secondary.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-5j-detached-oil- with B30K secondary.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6a- detached LARGE_community heating - mixture of 2 systems.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6a- detached LARGE_community heating - mixture of 2 systems.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6b - detached LARGE_community heating - several boilers.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6b - detached LARGE_community heating - several boilers.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6c - detached LARGE_community heating - several boilers +Heatpump.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6c - detached LARGE_community heating - several boilers +Heatpump.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6d - detached LARGE_community heating - mixture of 5 systems.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6d - detached LARGE_community heating - mixture of 5 systems.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6e - flat - mid floor_community 5 sources _ water by main community with WWHR.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6e - flat - mid floor_community 5 sources _ water by main community with WWHR.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6f - semi with garage_range cooker heating_separate community DHW.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6f - semi with garage_range cooker heating_separate community DHW.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6g- semi with garage_community heating_separate community DHW.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6g- semi with garage_community heating_separate community DHW.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6h - detached LARGE_community heating - several boilers+Heatpump+Geothermal.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6h - detached LARGE_community heating - several boilers+Heatpump+Geothermal.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-6i- detached LARGE_community heating - mixture of 2 systems.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-6i- detached LARGE_community heating - mixture of 2 systems.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-7a - semi with garage_NEW Appendix Q.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-7a - semi with garage_NEW Appendix Q.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-7b - semi with garage_NEW Appendix Q  air change rates.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-7b - semi with garage_NEW Appendix Q  air change rates.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-7c - FlowSmart.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-7c - FlowSmart.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-8a - semi - with multiboiler heating - 2 boilers - DHW from 2nd boiler.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-8a - semi - with multiboiler heating - 2 boilers - DHW from 2nd boiler.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-8b - semi - with multiboiler heating - 2 boilers - DHW from 1st boiler.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-8b - semi - with multiboiler heating - 2 boilers - DHW from 1st boiler.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-8c - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 1st.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-8c - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 1st.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-8d - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 2nd-WWHR.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-8d - semi - with multiboiler heating - 2 boilers - gas 16013 and oil 15482_DHW from 2nd-WWHR.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-8e- semi existing - with multi-system heating - heatpump 100073  and gas boiler_DHW from 1st.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-8e- semi existing - with multi-system heating - heatpump 100073  and gas boiler_DHW from 1st.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-8f- semi - with multi-system heating - heatpump 100033 and gas boiler_DHW from 1st.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-8f- semi - with multi-system heating - heatpump 100033 and gas boiler_DHW from 1st.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-8g- semi - with multi-system heating - Electric boiler _WOOD STOVE  room heaters _water from immersion.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-8g- semi - with multi-system heating - Electric boiler _WOOD STOVE  room heaters _water from immersion.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9a- micro-CHP Baxi Ecogen - index 40001 - bad insulation.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9a- micro-CHP Baxi Ecogen - index 40001 - bad insulation.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9b- micro-CHP Baxi Ecogen - index 40001- good insulation.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9b- micro-CHP Baxi Ecogen - index 40001- good insulation.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9c- mCHP - oil - service 1 vessel 1 - test database 492023.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9c- mCHP - oil - service 1 vessel 1 - test database 492023.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9d- mCHP - Ex 3_ service 1 vessel 1.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9d- mCHP - Ex 3_ service 1 vessel 1.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9e- m-CHP - Ex 3_ service 1 vessel 1.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9e- m-CHP - Ex 3_ service 1 vessel 1.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9f- mCHP - Ex 3_ service 1 vessel 3.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9f- mCHP - Ex 3_ service 1 vessel 3.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9g- mCHP - Ex 3_ service 2 vessel 1.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9g- mCHP - Ex 3_ service 2 vessel 1.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9h- mCHP - Ex 3_ service 2 vessel 3.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9h- mCHP - Ex 3_ service 2 vessel 3.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/EW-9i- mCHP - Ex 3_ service 3 vessel 4.rtf" afterPath="$PROJECT_DIR$/tests/official_reference_cases/EW-9i- mCHP - Ex 3_ service 3 vessel 4.rtf" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/official_test_cases/pcdf2009_test_322.dat" afterPath="$PROJECT_DIR$/tests/official_reference_cases/pcdf2009_test_322.dat" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/test_case_parser.py" afterPath="$PROJECT_DIR$/tests/reference_case_parser.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/pcdf.py" afterPath="$PROJECT_DIR$/sap/pcdf.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/helpers.py" afterPath="$PROJECT_DIR$/helpers.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/input_conversion_rules.py" afterPath="$PROJECT_DIR$/input_conversion_rules.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/dwelling.py" afterPath="$PROJECT_DIR$/sap/dwelling.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/runner.py" afterPath="$PROJECT_DIR$/sap/runner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spreadsheet_inputter.py" afterPath="$PROJECT_DIR$/spreadsheet_inputter.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases.py" afterPath="$PROJECT_DIR$/tests/test_official_cases.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" afterPath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_parsing.py" afterPath="$PROJECT_DIR$/tests/test_parsing.py" />
     </list>
     <ignored path="sapcalc.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -52,6 +151,9 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/sapcalc$Test_SAP.coverage" NAME="Test SAP Coverage Results" MODIFIED="1448622544890" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+  </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
@@ -71,8 +173,34 @@
         <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding />
+              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="runner.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/runner.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="17" column="33" selection-start-line="17" selection-start-column="33" selection-end-line="17" selection-end-column="33" />
+              <folding>
+                <element signature="e#0#44#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="input_conversion_rules.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.2848837">
+              <caret line="1324" column="0" selection-start-line="1324" selection-start-column="0" selection-end-line="1324" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -89,57 +217,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/__init__.py">
+      <file leaf-file-name="test_parsing.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/test_parsing.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+              <caret line="220" column="14" selection-start-line="220" selection-start-column="14" selection-end-line="220" selection-end-column="14" />
               <folding>
-                <element signature="e#0#24#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sap_tables.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/helpers.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="26" column="44" selection-start-line="26" selection-start-column="44" selection-end-line="26" selection-end-column="44" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="official_test_cases.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/official_test_cases.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_official_cases.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.41108546">
-              <caret line="170" column="65" selection-start-line="170" selection-start-column="65" selection-end-line="170" selection-end-column="65" />
-              <folding>
-                <element signature="e#0#14#0" expanded="true" />
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -154,7 +238,6 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/run_v0.py" />
-        <option value="$PROJECT_DIR$/input_conversion_rules.py" />
         <option value="$PROJECT_DIR$/sap/sap_pdf_4e_parser.py" />
         <option value="$PROJECT_DIR$/eti_converter.py" />
         <option value="$PROJECT_DIR$/saprun.py" />
@@ -166,20 +249,23 @@
         <option value="$PROJECT_DIR$/run_yaml.py" />
         <option value="$PROJECT_DIR$/sap/sap_worksheet.py" />
         <option value="$PROJECT_DIR$/utils.py" />
-        <option value="$PROJECT_DIR$/tests/test_parsing.py" />
         <option value="$PROJECT_DIR$/sapcli.py" />
         <option value="$PROJECT_DIR$/yaml_io.py" />
         <option value="$PROJECT_DIR$/sap/utils.py" />
         <option value="$PROJECT_DIR$/__init__.py" />
         <option value="$PROJECT_DIR$/spreadsheet_inputter.py" />
         <option value="$PROJECT_DIR$/sap/tables.py" />
-        <option value="$PROJECT_DIR$/sap/runner.py" />
-        <option value="$PROJECT_DIR$/sap/dwelling.py" />
         <option value="$PROJECT_DIR$/sap/test.py" />
         <option value="$PROJECT_DIR$/sap/worksheet.py" />
         <option value="$PROJECT_DIR$/sap/__init__.py" />
         <option value="$PROJECT_DIR$/sap/pcdf.py" />
         <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
+        <option value="$PROJECT_DIR$/helpers.py" />
+        <option value="$PROJECT_DIR$/tests/test_case_parser.py" />
+        <option value="$PROJECT_DIR$/tests/test_parsing.py" />
+        <option value="$PROJECT_DIR$/sap/dwelling.py" />
+        <option value="$PROJECT_DIR$/sap/runner.py" />
+        <option value="$PROJECT_DIR$/input_conversion_rules.py" />
       </list>
     </option>
   </component>
@@ -258,7 +344,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/helpers.py" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FullScreen" value="false" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
@@ -520,6 +606,17 @@
     </task>
     <servers />
   </component>
+  <component name="TestHistory">
+    <history-entry file="Test_SAP - 2015.11.27 at 11h 08m 43s.xml">
+      <configuration name="Test SAP" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Test_SAP - 2015.11.27 at 11h 08m 54s.xml">
+      <configuration name="Test SAP" configurationId="tests" />
+    </history-entry>
+    <history-entry file="Test_SAP - 2015.11.27 at 11h 09m 05s.xml">
+      <configuration name="Test SAP" configurationId="tests" />
+    </history-entry>
+  </component>
   <component name="ToolWindowManager">
     <frame x="4" y="23" width="1504" height="1417" extended-state="0" />
     <editor active="true" />
@@ -528,16 +625,16 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23462783" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.59683496" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2464205" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20797873" sideWeight="0.50037736" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -572,16 +669,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -658,7 +745,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="47" column="41" selection-start-line="47" selection-start-column="41" selection-end-line="47" selection-end-column="41" />
-          <folding />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -735,7 +824,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/official_test_cases/pcdf2009_test_322.dat">
+    <entry file="file://$PROJECT_DIR$/tests/official_reference_cases/pcdf2009_test_322.dat">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-111.81151">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -763,13 +852,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_case_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.308404">
-          <caret line="4" column="35" selection-start-line="4" selection-start-column="35" selection-end-line="4" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1e-detached.rtf.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.1156515">
@@ -791,13 +873,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24361949">
-          <caret line="521" column="0" selection-start-line="521" selection-start-column="0" selection-end-line="521" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/sap_pdf_4a_parser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -816,13 +891,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.017401392">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_parsing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.6678445">
-          <caret line="151" column="17" selection-start-line="151" selection-start-column="17" selection-end-line="151" selection-end-column="17" />
         </state>
       </provider>
     </entry>
@@ -854,13 +922,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/runner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="5" selection-start-line="0" selection-start-column="5" selection-end-line="0" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/yaml_io.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.35968378">
@@ -875,18 +936,79 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1a-detached.rtf.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.422252">
+          <caret line="21" column="93" selection-start-line="21" selection-start-column="93" selection-end-line="21" selection-end-column="93" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.0415704">
+          <caret line="6" column="20" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/reference_cases_lists.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.37168142">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.015432099">
+          <caret line="1" column="26" selection-start-line="1" selection-start-column="26" selection-end-line="1" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/reference_case_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.351852">
+          <caret line="245" column="9" selection-start-line="245" selection-start-column="9" selection-end-line="245" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.787037">
+          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09259259">
+          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -900,63 +1022,48 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/__init__.py">
+    <entry file="file://$USER_HOME$/anaconda/lib/python3.5/unittest/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1a-detached.rtf.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.422252">
-          <caret line="21" column="93" selection-start-line="21" selection-start-column="93" selection-end-line="21" selection-end-column="93" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="26" column="44" selection-start-line="26" selection-start-column="44" selection-end-line="26" selection-end-column="44" />
+        <state vertical-scroll-proportion="3.904321">
+          <caret line="258" column="0" selection-start-line="258" selection-start-column="0" selection-end-line="258" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/official_test_cases.py">
+    <entry file="file://$PROJECT_DIR$/tests/test_parsing.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.0415704">
-          <caret line="6" column="20" selection-start-line="6" selection-start-column="20" selection-end-line="6" selection-end-column="20" />
+          <caret line="220" column="14" selection-start-line="220" selection-start-column="14" selection-end-line="220" selection-end-column="14" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
+    <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41108546">
-          <caret line="170" column="65" selection-start-line="170" selection-start-column="65" selection-end-line="170" selection-end-column="65" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/runner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="17" column="33" selection-start-line="17" selection-start-column="33" selection-end-line="17" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2848837">
+          <caret line="1324" column="0" selection-start-line="1324" selection-start-column="0" selection-end-line="1324" selection-end-column="0" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>

@@ -1,13 +1,12 @@
 
-from sap import tables, worksheet
+from sap import sap_tables
 from sap.dwelling import Dwelling
 
-from tests.test_official_cases import all_params
-
 # TODO: figure out how to avoid using this global calc stage var
-calc_stage = 1
+CALC_STAGE = 1
+ALL_PARAMS = [set(), set(), set(), set(), set(), set(), set()]
 
-def log_obj(param_set, prefix, k, v):
+def log_sap_obj(param_set, prefix, k, v):
     """
     Customized logging of SAP objects
     """
@@ -19,14 +18,14 @@ def log_obj(param_set, prefix, k, v):
     if k in ["opening_types"]:
         # This is a dict, but the keys aren't interesting (e.g. things
         # like Windows (1), Windows (2), etc)
-        for entry in list(v.values()):
-            log_obj(param_set, prefix, "_" + k, entry)
+        for entry in v.values():
+            log_sap_obj(param_set, prefix, "_" + k, entry)
         return
 
     try:
         # If this is a dict,dump the entries
-        for key, value in list(v.items()):
-            log_obj(param_set, prefix + k + ".", key, value)
+        for key, value in v.items():
+            log_sap_obj(param_set, prefix + k + ".", key, value)
         return
     except AttributeError:
         pass
@@ -34,18 +33,18 @@ def log_obj(param_set, prefix, k, v):
     try:
         # If this is a list,dump the entries
         for entry in v:
-            log_obj(param_set, prefix, k, entry)
+            log_sap_obj(param_set, prefix, k, entry)
         return
     except TypeError:
         pass
 
     try:
-        if (isinstance(v, tables.Fuel) or
-                isinstance(v, tables.ElectricityTariff)):
+        if (isinstance(v, sap_tables.Fuel) or
+                isinstance(v, sap_tables.ElectricityTariff)):
             return
         # If this is an object, dump it's dict
         for key, value in list(v.__dict__.items()):
-            log_obj(param_set, prefix + k + ".", key, value)
+            log_sap_obj(param_set, prefix + k + ".", key, value)
         return
     except AttributeError:
         pass
@@ -58,19 +57,19 @@ class TrackedDict(dict):
         self.prefix = prefix + "."
 
         for key in list(d.keys()):
-            all_params[calc_stage].add(self.prefix + key)
+            ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
 
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)
-        all_params[calc_stage].add(self.prefix + key)
+        ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
 
 
 class ParamTrackerDwelling(Dwelling):
 
     def __init__(self):
-        global calc_stage
+        global CALC_STAGE
         Dwelling.__init__(self)
-        calc_stage = 1
+        CALC_STAGE = 1
 
     def __setattr__(self, k, v):
         """if k!="ordered_attrs":
@@ -87,5 +86,7 @@ class ParamTrackerDwelling(Dwelling):
         Dwelling.__setattr__(self, k, v)
 
     def nextStage(self):
-        global calc_stage
-        calc_stage += 1
+        global CALC_STAGE
+        CALC_STAGE += 1
+
+

@@ -1,6 +1,6 @@
 import collections
 
-from .tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING
+from .sap_tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING
 
 
 class Dwelling():

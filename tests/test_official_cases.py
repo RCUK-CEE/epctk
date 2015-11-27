@@ -4,25 +4,23 @@ import pickle
 import sys
 import unittest
 
-from sap.utils import SAPCalculationError
-from tests import test_case_parser
 import input_conversion_rules
 import output_checker
 import yaml_io
-from sap import runner
 from helpers import *
-from .official_test_cases import OFFICIAL_CASES_THAT_WORK, SKIP
-
-all_params = [set(), set(), set(), set(), set(), set(), set()]
+from sap import runner
+from sap.utils import SAPCalculationError
+from tests import reference_case_parser
+from .reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
 
 def log_all_params(d, prefix=""):
     # FIXME dodgy use of global Calc_stage
-    param_set = all_params[calc_stage]
+    param_set = ALL_PARAMS[CALC_STAGE]
 
     for k, v in list(d.items()):
         if k != "ordered_attrs":
-            log_obj(param_set, prefix, k, v)
+            log_sap_obj(param_set, prefix, k, v)
 
 
 def create_sap_dwelling(inputs):
@@ -73,7 +71,7 @@ def scan_file(fname, parser):
 
 
 def parse_input_file(test_case_id):
-    return parse_file("./reference_dwellings/%d.rtf" % (test_case_id,), test_case_parser.whole_file)
+    return parse_file("./reference_dwellings/%d.rtf" % (test_case_id,), reference_case_parser.whole_file)
 
 
 def load_or_parse_file(fname, parser, force_reparse):
@@ -121,7 +119,7 @@ def run_case(fname, reparse):
     logging.info("RUNNING %s" % (fname,))
 
     try:
-        res = load_or_parse_file(fname, test_case_parser.whole_file, reparse)
+        res = load_or_parse_file(fname, reference_case_parser.whole_file, reparse)
         d = create_sap_dwelling(res.inputs)
 
         yaml_file = os.path.join("yaml_test_cases", os.path.basename(fname) + ".yml")
@@ -172,11 +170,11 @@ def run_sample_cases(force_reparse):
 
 
 def dump_param_list():
-    for i in range(len(all_params)):
-        for k in all_params[i]:
+    for i in range(len(ALL_PARAMS)):
+        for k in ALL_PARAMS[i]:
             print((i, k))
 
-    print(("Dumped inputs: ", len(all_params[1])))
+    print(("Dumped inputs: ", len(ALL_PARAMS[1])))
 
 
 def run_official_cases(cases, maxruns=None, reparse=False):
@@ -185,7 +183,7 @@ def run_official_cases(cases, maxruns=None, reparse=False):
         if filename in SKIP:
             continue
 
-        fname = os.path.join('.', 'official_test_cases', filename)
+        fname = os.path.join('.', 'official_reference_cases', filename)
         # print "RUNNING: ",fname
         run_case(fname, reparse)
         count += 1
@@ -253,7 +251,7 @@ if __name__ == '__main__':
     # logger.setLevel(logging.INFO)
 
 
-    pcdf.DATA_FILE = "./official_test_cases/pcdf2009_test_322.dat"
+    pcdf.DATA_FILE = "./official_reference_cases/pcdf2009_test_322.dat"
 
     run_official_cases(
         OFFICIAL_CASES_THAT_WORK, reparse=options.reparse)
@@ -267,7 +265,7 @@ if __name__ == '__main__':
     # run_case(11)
 
     # run_case("./reference_dwellings/19.rtf",False)
-    # run_case("./official_test_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf")
+    # run_case("./official_reference_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf")
     # exit(0)
 
     # run_official_cases([

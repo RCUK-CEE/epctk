@@ -1,8 +1,11 @@
 import logging
-from pyparsing import *
 
 # WARNING: enabling packrat parse caching can sometimes cause problems with complex grammars.
 # Should be fine with this use case
+from pyparsing import (ParserElement, Optional, Literal,
+                       Word, SkipTo, alphas, nums, Group,
+                       LineEnd, Forward, OneOrMore, NotAny, Combine)
+
 logging.warning("PARSING WITH CACHING ENABLED.")
 ParserElement.enablePackrat()
 

@@ -1,5 +1,5 @@
 from .dwelling import DwellingResultsWrapper
-from .tables import CylinderInsulationTypes, GlazingTypes
+from .sap_tables import CylinderInsulationTypes, GlazingTypes
 from . import worksheet
 
 

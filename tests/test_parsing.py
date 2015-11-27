@@ -1,9 +1,9 @@
-from unittest import TestCase, main
+import unittest
 
-from tests.test_case_parser import *
+from .reference_case_parser import *
 
 
-class TestFieldValue(TestCase):
+class TestFieldValue(unittest.TestCase):
 
     def parse_single_field(self, txt):
         results = field_value.parseString(txt)
@@ -73,7 +73,7 @@ class TestFieldValue(TestCase):
         self.assertEqual("a: 1, b: 2, c: 3", inp.vals[0].note)
 
 
-class test_primary_input(TestCase):
+class test_primary_input(unittest.TestCase):
 
     def test_simple_primary_input(self):
         results = primary_input.parseString("\\par primlab1:\\tab val1")
@@ -131,7 +131,7 @@ class test_primary_input(TestCase):
         self.assertEqual("val2", pinput.vals[1].vals[0].value)
 
 
-class test_table(TestCase):
+class test_table(unittest.TestCase):
 
     def test_entry_special_chars(self):
         results = table_entry.parseString("hello12().,/- ")
@@ -178,7 +178,7 @@ class test_table(TestCase):
         self.assertEqual('val22', row[2])
 
 
-class TestInputSection(TestCase):
+class TestInputSection(unittest.TestCase):
 
     """
     def test_simple_input_section(self):
@@ -218,7 +218,7 @@ class TestInputSection(TestCase):
         """
 
 
-class TestProblemCases(TestCase):
+class TestProblemCases(unittest.TestCase):
 
     def test_252(self):
         string = "Electricity generated - PVs  (0.50\\'d712.02 + 0.50\\'d711.46)\\tab     -288\\tab   11.74\\tab\\ul    -33.86\\ulnone\\tab (252)"
@@ -301,4 +301,4 @@ class TestProblemCases(TestCase):
         # print res
 
 if __name__ == '__main__':
-    main()
+    unittest.main()
