@@ -65,14 +65,14 @@ def scan_file(fname, parser):
 # -- not used
 def run_all_dwellings(parser):
     for id in range(28):
-        fname = "test_dwellings/%d.rtf" % (id + 2,)
+        fname = "reference_dwellings/%d.rtf" % (id + 2,)
         res = scan_file(fname)
 
         print((id + 2, len(res)))  # ,res[0][0]
 
 
 def parse_input_file(id):
-    return parse_file("./test_dwellings/%d.rtf" % id, test_case_parser.whole_file)
+    return parse_file("./reference_dwellings/%d.rtf" % id, test_case_parser.whole_file)
 
 # -- end not used
 
@@ -90,15 +90,15 @@ def parse_file(fname):
 
 
 SAP_REGIONS = {
-    './test_dwellings/2.rtf': 11,
-    './test_dwellings/3.rtf': 11,
-    './test_dwellings/4.rtf': 11,
-    './test_dwellings/5.rtf': 11,
-    './test_dwellings/6.rtf': 8,
-    './test_dwellings/7.rtf': 8,
-    './test_dwellings/8.rtf': 4,
-    './test_dwellings/9.rtf': 11,
-    './test_dwellings/10.rtf': 11,
+    './reference_dwellings/2.rtf': 11,
+    './reference_dwellings/3.rtf': 11,
+    './reference_dwellings/4.rtf': 11,
+    './reference_dwellings/5.rtf': 11,
+    './reference_dwellings/6.rtf': 8,
+    './reference_dwellings/7.rtf': 8,
+    './reference_dwellings/8.rtf': 4,
+    './reference_dwellings/9.rtf': 11,
+    './reference_dwellings/10.rtf': 11,
 }
 
 

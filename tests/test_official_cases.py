@@ -1,23 +1,23 @@
 import logging
-
 import os
 import pickle
 import sys
-from sap.utils import SAPCalculationError
+import unittest
 
+from sap.utils import SAPCalculationError
 from tests import test_case_parser
 import input_conversion_rules
 import output_checker
 import yaml_io
 from sap import runner
 from helpers import *
-
+from .official_test_cases import OFFICIAL_CASES_THAT_WORK, SKIP
 
 all_params = [set(), set(), set(), set(), set(), set(), set()]
 
 
 def log_all_params(d, prefix=""):
-    #FIXME dodgy use of global Calc_stage
+    # FIXME dodgy use of global Calc_stage
     param_set = all_params[calc_stage]
 
     for k, v in list(d.items()):
@@ -30,8 +30,8 @@ def create_sap_dwelling(inputs):
     input_conversion_rules.process_inputs(d, inputs)
 
     # if not sap_dwelling_validator.validate(d):
-        #logging.error("Bad inputs")
-        # exit(0)
+    # logging.error("Bad inputs")
+    # exit(0)
 
     log_all_params(d.__dict__)
 
@@ -41,7 +41,7 @@ def create_sap_dwelling(inputs):
 
 def test_run_all(parser):
     for id in range(28):
-        fname = "test_dwellings/%d.rtf" % (id + 2,)
+        fname = "reference_dwellings/%d.rtf" % (id + 2,)
         f = open(fname, 'r')
         txt = f.read()
         txt = txt.replace('\\\'b', '')
@@ -73,7 +73,7 @@ def scan_file(fname, parser):
 
 
 def parse_input_file(test_case_id):
-    return parse_file("./test_dwellings/%d.rtf" % (test_case_id,), test_case_parser.whole_file)
+    return parse_file("./reference_dwellings/%d.rtf" % (test_case_id,), test_case_parser.whole_file)
 
 
 def load_or_parse_file(fname, parser, force_reparse):
@@ -88,16 +88,17 @@ def load_or_parse_file(fname, parser, force_reparse):
 
     return res
 
+
 SAP_REGIONS = {
-    './test_dwellings/2.rtf': 11,
-    './test_dwellings/3.rtf': 11,
-    './test_dwellings/4.rtf': 11,
-    './test_dwellings/5.rtf': 11,
-    './test_dwellings/6.rtf': 8,
-    './test_dwellings/7.rtf': 8,
-    './test_dwellings/8.rtf': 4,
-    './test_dwellings/9.rtf': 11,
-    './test_dwellings/10.rtf': 11,
+    './reference_dwellings/2.rtf': 11,
+    './reference_dwellings/3.rtf': 11,
+    './reference_dwellings/4.rtf': 11,
+    './reference_dwellings/5.rtf': 11,
+    './reference_dwellings/6.rtf': 8,
+    './reference_dwellings/7.rtf': 8,
+    './reference_dwellings/8.rtf': 4,
+    './reference_dwellings/9.rtf': 11,
+    './reference_dwellings/10.rtf': 11,
 }
 
 
@@ -123,7 +124,7 @@ def run_case(fname, reparse):
         res = load_or_parse_file(fname, test_case_parser.whole_file, reparse)
         d = create_sap_dwelling(res.inputs)
 
-        yaml_file = "yaml_test_cases/" + os.path.basename(fname) + ".yml"
+        yaml_file = os.path.join("yaml_test_cases", os.path.basename(fname) + ".yml")
         if os.path.exists(yaml_file) and not reparse:
             d = yaml_io.from_yaml(yaml_file)
         else:
@@ -153,10 +154,10 @@ def run_sample_cases(force_reparse):
         # fuel boilers?
         if id == 20:
             continue  # two systems and sedbuk - uses made up
-                            # PCDF boiler and custom secondary system
-                            # type (625), also for some reason a 5%
-                            # effy penalty is applied to PCDF boiler
-                            # and 2 oil pumps are counted
+            # PCDF boiler and custom secondary system
+            # type (625), also for some reason a 5%
+            # effy penalty is applied to PCDF boiler
+            # and 2 oil pumps are counted
         # if id==28: continue # secondary system assumed for some reason
         if id == 30:
             # two main systems, one reassigned as secondary.  Why?  FSAP
@@ -167,7 +168,7 @@ def run_sample_cases(force_reparse):
         # gain from central heating pumps in the summer cooling demand
         # calc?
 
-        run_case("./test_dwellings/%d.rtf" % (id,), force_reparse)
+        run_case(os.path.join(".reference_dwellings", "%d.rtf" % id), force_reparse)
 
 
 def dump_param_list():
@@ -180,11 +181,11 @@ def dump_param_list():
 
 def run_official_cases(cases, maxruns=None, reparse=False):
     count = 0
-    for f in cases:
-        if f in official_test_cases.SKIP:
+    for filename in cases:
+        if filename in SKIP:
             continue
 
-        fname = './official_test_cases/' + f
+        fname = os.path.join('.', 'official_test_cases', filename)
         # print "RUNNING: ",fname
         run_case(fname, reparse)
         count += 1
@@ -195,7 +196,6 @@ def run_official_cases(cases, maxruns=None, reparse=False):
 
 
 class SingleLevelFilter(logging.Filter):
-
     def __init__(self, passlevel, reject):
         self.passlevel = passlevel
         self.reject = reject
@@ -207,12 +207,18 @@ class SingleLevelFilter(logging.Filter):
             return (record.levelno == self.passlevel)
 
 
-import official_test_cases
-from sap import pcdf
-from optparse import OptionParser
+class TestOfficialCases(unittest.TestCase):
+    def test_run_all_known_working_noparse(self):
+        run_official_cases(
+            OFFICIAL_CASES_THAT_WORK, reparse=False)
 
 if __name__ == '__main__':
+    from sap import pcdf
+    from optparse import OptionParser
+
+
     parser = OptionParser()
+
     parser.add_option("--reparse",
                       action="store_true",
                       dest="reparse",
@@ -240,29 +246,28 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.ERROR)
 
-    """
-    h1 = logging.StreamHandler(sys.stdout) 
-    h1.addFilter(SingleLevelFilter(logging.WARNING,True))
-    logger=logging.getLogger()
-    logger.addHandler(h1)
-    logger.setLevel(logging.INFO)
-    """
+    # h1 = logging.StreamHandler(sys.stdout)
+    # h1.addFilter(SingleLevelFilter(logging.WARNING,True))
+    # logger=logging.getLogger()
+    # logger.addHandler(h1)
+    # logger.setLevel(logging.INFO)
+
 
     pcdf.DATA_FILE = "./official_test_cases/pcdf2009_test_322.dat"
 
     run_official_cases(
-        official_test_cases.OFFICIAL_CASES_THAT_WORK, reparse=options.reparse)
+        OFFICIAL_CASES_THAT_WORK, reparse=options.reparse)
 
 
-    #pv_cases = [11, 14, 15, ]
-    #wind_cases = [18, 6, 9]
-    #hydro_cases = [10, ]
+    # pv_cases = [11, 14, 15, ]
+    # wind_cases = [18, 6, 9]
+    # hydro_cases = [10, ]
     # for case in pv_cases:
-    #    run_case("./test_dwellings/%d.rtf" % (case,))
+    #    run_case("./reference_dwellings/%d.rtf" % (case,))
     # run_case(11)
 
-    # run_case("./test_dwellings/19.rtf",False)
-    #run_case("./official_test_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf")
+    # run_case("./reference_dwellings/19.rtf",False)
+    # run_case("./official_test_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf")
     # exit(0)
 
     # run_official_cases([
