@@ -4,11 +4,10 @@ import os
 import pickle
 import sys
 
-import input_conversion_rules
 import output_checker
 import yaml_io
 from helpers import *
-from sap import pcdf
+from sap import pcdf, input_conversion_rules
 from sap import runner
 from sap.utils import SAPCalculationError
 from tests import reference_case_parser
@@ -43,9 +42,9 @@ def create_sap_dwelling(inputs):
         #logging.error("Bad inputs")
         # exit(0)
 
-    log_all_params(dwelling.__dict__)
+    log_dwelling_params(dwelling.__dict__)
 
-    dwelling.nextStage()
+    dwelling.next_stage()
     return dwelling
 
 
@@ -128,7 +127,7 @@ def get_dwelling(fname, force_reparse):
     have a bit of a hack by returning both together
     """
     basename = os.path.basename(fname)
-    pickled_fname = os.path.join("pickled_test_cases", basename + ".pkl")
+    pickled_fname = os.path.join("pickled_reference_cases", basename + ".pkl")
     yaml_fname = os.path.join("yaml_test_cases", basename + ".yml")
 
     if os.path.exists(pickled_fname) and not force_reparse:

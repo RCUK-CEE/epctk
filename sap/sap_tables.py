@@ -1,14 +1,19 @@
-import os
+import copy
 import math
+import os
 import re
 import types
-import copy
+
 import numpy
+
 # from . import pcdf
 # FIXME: had problems with relative imports when using sap as a library from ipython, always getting import errors...
+from .utils import float_or_zero, float_or_none, SAPCalculationError, csv_to_dict, true_and_not_missing
+
+
 from .pcdf import get_fuel_prices, get_in_use_factors, get_mev_system, get_boiler, get_solid_fuel_boiler, \
     get_twin_burner_cooker_boiler, get_heat_pump, get_microchp, get_wwhr_system, get_fghr_system
-from .utils import float_or_zero, float_or_none, SAPCalculationError, csv_to_dict
+
 
 DATA_FILE_LOCATION = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -330,11 +335,6 @@ FLOOR_INFILTRATION = {
     FloorTypes.NOT_SUSPENDED_TIMBER: 0,
     FloorTypes.OTHER: 0,
 }
-
-
-def true_and_not_missing(d, attr):
-    return hasattr(d, attr) and getattr(d, attr)
-
 
 # ----------------------------
 # SAP STANDARD NUMBERED TABLES
@@ -880,7 +880,7 @@ def apply_4c2(dwelling, sys):
         dwelling.temperature_adjustment -= 0.1
 
     # !!! Also check sys2!
-    if dwelling.true_and_not_missing("sys1_delayed_start_thermostat"):
+    if true_and_not_missing(dwelling, "sys1_delayed_start_thermostat"):
         dwelling.temperature_adjustment -= .15
 
     if not sys.fuel.type in [FuelTypes.GAS,
@@ -1320,9 +1320,17 @@ def immersion_on_peak_fraction(N_occ,
                                elec_tariff,
                                cylinder_volume,
                                immersion_type):
+    """
+
+    :param N_occ: number of occupants
+    :param elec_tariff:
+    :param cylinder_volume:
+    :param immersion_type:
+    :return:
+    """
     if elec_tariff == ELECTRICITY_7HR:
         if immersion_type == ImmersionTypes.SINGLE:
-            return max(0, ((14530 - 762 * N_occ) / (cylinder_volume) - 80 + 10 * N_occ) / 100)
+            return max(0, ((14530 - 762 * N_occ) / cylinder_volume - 80 + 10 * N_occ) / 100)
         else:
             assert immersion_type == ImmersionTypes.DUAL
             return max(0, ((6.8 - 0.024 * cylinder_volume) * N_occ + 14 - 0.07 * cylinder_volume) / 100)
@@ -1873,7 +1881,7 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
         sys.table2brow = 7  # !!! Assumes gas-fired
         dwelling.has_cylinderstat = True
         sys.cpsu_Tw = dwelling.cpsu_Tw
-        sys.cpsu_not_in_airing_cupboard = dwelling.true_and_not_missing('cpsu_not_in_airing_cupboard')
+        sys.cpsu_not_in_airing_cupboard = true_and_not_missing(dwelling, 'cpsu_not_in_airing_cupboard')
     else:
         # !!! What about other table rows?
         raise ValueError("Unknown system type")
@@ -2709,7 +2717,7 @@ def configure_fuel_costs(dwelling):
     if (hasattr(dwelling, "secondary_sys") and
             not dwelling.secondary_sys.fuel.is_electric):
         fuels.add(dwelling.secondary_sys.fuel)
-    if dwelling.true_and_not_missing('use_immersion_heater_summer'):
+    if true_and_not_missing(dwelling, 'use_immersion_heater_summer'):
         fuels.add(dwelling.electricity_tariff)
 
     standing_charge = 0
@@ -3138,6 +3146,7 @@ def configure_wind_turbines(dwelling):
 
 def do_sap_table_lookups(dwelling):
     global get_fuel_data
+
     if true_and_not_missing(dwelling, 'use_pcdf_fuel_prices'):
         get_fuel_data = get_fuel_data_pcdf
     else:
@@ -3185,4 +3194,4 @@ def do_sap_table_lookups(dwelling):
         assert False
 
     if hasattr(dwelling, 'nextStage'):
-        dwelling.nextStage()
+        dwelling.next_stage()

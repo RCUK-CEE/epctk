@@ -1,16 +1,16 @@
 import logging
 
 import win32com.client
-from sap.dwelling import Dwelling
-from tests import reference_case_parser
-import input_conversion_rules
-from sap import worksheet
-from sap import tables
-from sap import runner
-from output_checker import check_result
+
 from output_checker import check_monthly_result
+from output_checker import check_result
 from output_checker import check_summer_monthly_result
-from sap.tables import true_and_not_missing, CylinderInsulationTypes, GlazingTypes
+from sap import runner
+from sap import worksheet, input_conversion_rules
+from sap.dwelling import Dwelling
+from sap.pcdf import VentilationTypes
+from sap.sap_tables import GlazingTypes
+from tests import reference_case_parser
 
 
 class CannotDoInSpreadsheetError(RuntimeError):
@@ -386,11 +386,11 @@ def process_hw(xlbook, d: Dwelling):
         xlbook.set_input("water_sys_fuel", "")
 
     xlbook.set_input("has_hw_time_control",
-                     d.true_and_not_missing("has_hw_time_control"))
+                     true_and_not_missing(d, "has_hw_time_control"))
     xlbook.set_input("has_cylinderstat",
-                     d.true_and_not_missing("has_cylinderstat"))
+                     true_and_not_missing(d, "has_cylinderstat"))
     xlbook.set_input("primary_pipework_insulated",
-                     d.true_and_not_missing("primary_pipework_insulated"))
+                     true_and_not_missing(d, "primary_pipework_insulated"))
 
     if not hasattr(d, "hw_cylinder_volume") or d.hw_cylinder_volume == 0:
         xlbook.set_input("cylinder_in_heated_space", "")
@@ -932,41 +932,41 @@ def run_case(xlbook, fname):
         return False
 
     res = v0.load_or_parse_file(fname, reference_case_parser.whole_file, False)
-    d = Dwelling()
-    input_conversion_rules.process_inputs(d, res.inputs)
+    dwelling = Dwelling()
+    input_conversion_rules.process_inputs(dwelling, res.inputs)
 
     can_run_der = True
     can_run_ter = True
     can_run_fee = True
 
-    if hasattr(d, 'main_sys_2_fuel'):
+    if hasattr(dwelling, 'main_sys_2_fuel'):
         can_run_der = False
         can_run_ter = False
-    if not hasattr(d, 'main_sys_fuel'):
+    if not hasattr(dwelling, 'main_sys_fuel'):
         # These are the community heating tests cases
         #can_run_der=False
         return
-    if hasattr(d, 'wwhr_systems'):
+    if dwelling.get('wwhr_systems'):
         can_run_der = False
-    if hasattr(d, 'main_heating_pcdf_id'):
+    if hasattr(dwelling, 'main_heating_pcdf_id'):
         can_run_der = False
-    if hasattr(d, 'photovoltaic_systems') and len(d.photovoltaic_systems) > 1:
+    if hasattr(dwelling, 'photovoltaic_systems') and len(dwelling.photovoltaic_systems) > 1:
         can_run_der = False
-    if not d.ventilation_type in [
-        tables.VentilationTypes.NATURAL,
-        tables.VentilationTypes.MVHR,
-        tables.VentilationTypes.MEV_CENTRALISED,
-        tables.VentilationTypes.MV]:
+    if not dwelling['ventilation_type'] in [
+        VentilationTypes.NATURAL,
+        VentilationTypes.MVHR,
+        VentilationTypes.MEV_CENTRALISED,
+        VentilationTypes.MV]:
         #sap_tables.VentilationTypes.MEV_DECENTRALISED]:
         #sap_tables.VentilationTypes.PIV_FROM_OUTSIDE]:
         can_run_der = False
-    if hasattr(d, 'appendix_q_systems'):
+    if hasattr(dwelling, 'appendix_q_systems'):
         can_run_der = False
         can_run_fee = False
 
     print(fname)
     try:
-        run_dwelling(xlbook, d, can_run_fee, can_run_der, can_run_ter)
+        run_dwelling(xlbook, dwelling, can_run_fee, can_run_der, can_run_ter)
         return True
     except CannotDoInSpreadsheetError as e:
         print(("Skipping because: " + e.message))

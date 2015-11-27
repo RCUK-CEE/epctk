@@ -4,43 +4,51 @@ import pickle
 import sys
 import unittest
 
-import input_conversion_rules
 import output_checker
 import yaml_io
-from helpers import *
-from sap import runner
+from helpers import ALL_PARAMS, log_dwelling_params
+from sap import runner, input_conversion_rules
+from sap.dwelling import Dwelling
 from sap.utils import SAPCalculationError
 from tests import reference_case_parser
-# from .reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
-
-def log_all_params(d, prefix=""):
-    # FIXME dodgy use of global Calc_stage
-    param_set = ALL_PARAMS[CALC_STAGE]
-
-    for k, v in list(d.items()):
-        if k != "ordered_attrs":
-            log_sap_obj(param_set, prefix, k, v)
+SAP_REGIONS = {
+    './reference_dwellings/2.rtf': 11,
+    './reference_dwellings/3.rtf': 11,
+    './reference_dwellings/4.rtf': 11,
+    './reference_dwellings/5.rtf': 11,
+    './reference_dwellings/6.rtf': 8,
+    './reference_dwellings/7.rtf': 8,
+    './reference_dwellings/8.rtf': 4,
+    './reference_dwellings/9.rtf': 11,
+    './reference_dwellings/10.rtf': 11,
+}
 
 
 def create_sap_dwelling(inputs):
-    d = ParamTrackerDwelling()  # sap_worksheet.Dwelling()
-    input_conversion_rules.process_inputs(d, inputs)
+    """
+    Create a SAP dwelling object from parsed SAP input file
+    :param inputs:
+    :return:
+    """
+    # dwelling = ParamTrackerDwelling()
 
-    # if not sap_dwelling_validator.validate(d):
+    dwelling = Dwelling()
+    input_conversion_rules.process_inputs(dwelling, inputs)
+
+    # if not sap_dwelling_validator.validate(dwelling):
     # logging.error("Bad inputs")
     # exit(0)
+    log_dwelling_params(dwelling)
 
-    log_all_params(d.__dict__)
-
-    d.nextStage()
-    return d
+    # dwelling.next_stage()
+    return dwelling
 
 
 def test_run_all(parser):
     for id in range(28):
-        fname = "reference_dwellings/%d.rtf" % (id + 2,)
+        fname = os.path.join('reference_dwellings', '%d.rtf' % (id + 2,))
         f = open(fname, 'r')
         txt = f.read()
         txt = txt.replace('\\\'b', '')
@@ -75,30 +83,27 @@ def parse_input_file(test_case_id):
     return parse_file("./reference_dwellings/%d.rtf" % (test_case_id,), reference_case_parser.whole_file)
 
 
-def load_or_parse_file(fname, parser, force_reparse):
-    basename = os.path.basename(fname) + ".pkl"
-    pickled_file = os.path.join("./pickled_test_cases", basename)
+def load_reference_case(case_name, parser, force_reparse):
+    """
+    Load the given file with the given parser. First attempts to
+    load the cached parsed file (pickled), if that does not exist
+    or if force_reparse is true, will reparse the original file
+
+    :param case_name:
+    :param parser:
+    :param force_reparse:
+    :return:
+    """
+    pickled_file = os.path.join('.', 'pickled_reference_cases', os.path.basename(case_name) + ".pkl")
+
     if os.path.exists(pickled_file) and not force_reparse:
-        res = pickle.load(open(pickled_file, "rb"))
+        case = pickle.load(open(pickled_file, "rb"))
     else:
-        print(("Reparsing ", fname))
-        res = parse_file(fname, parser)
-        pickle.dump(res, open(pickled_file, "w"))
+        print("Reparsing ", case_name)
+        case = parse_file(case_name, parser)
+        pickle.dump(case, open(pickled_file, "w"))
 
-    return res
-
-
-SAP_REGIONS = {
-    './reference_dwellings/2.rtf': 11,
-    './reference_dwellings/3.rtf': 11,
-    './reference_dwellings/4.rtf': 11,
-    './reference_dwellings/5.rtf': 11,
-    './reference_dwellings/6.rtf': 8,
-    './reference_dwellings/7.rtf': 8,
-    './reference_dwellings/8.rtf': 4,
-    './reference_dwellings/9.rtf': 11,
-    './reference_dwellings/10.rtf': 11,
-}
+    return case
 
 
 def run_dwelling(fname, d):
@@ -120,20 +125,20 @@ def run_case(fname, reparse):
     logging.info("RUNNING %s" % (fname,))
 
     try:
-        res = load_or_parse_file(fname, reference_case_parser.whole_file, reparse)
-        d = create_sap_dwelling(res.inputs)
+        parsed_ref_case = load_reference_case(fname, reference_case_parser.whole_file, reparse)
+        dwelling = create_sap_dwelling(parsed_ref_case.inputs)
 
         yaml_file = os.path.join("yaml_test_cases", os.path.basename(fname) + ".yml")
         if os.path.exists(yaml_file) and not reparse:
-            d = yaml_io.from_yaml(yaml_file)
+            dwelling = yaml_io.from_yaml(yaml_file)
         else:
             with open(yaml_file, 'w') as f:
-                yaml_io.to_yaml(d, f)
+                yaml_io.to_yaml(dwelling, f)
 
-        run_dwelling(fname, d)
-        output_checker.check_results(d, res)
+        run_dwelling(fname, dwelling)
+        output_checker.check_results(dwelling, parsed_ref_case)
     except SAPCalculationError:
-        if output_checker.is_err_calc(res):
+        if output_checker.is_err_calc(parsed_ref_case):
             return
         else:
             raise
@@ -211,10 +216,10 @@ class TestOfficialCases(unittest.TestCase):
         run_official_cases(
             OFFICIAL_CASES_THAT_WORK, reparse=False)
 
+
 if __name__ == '__main__':
     from sap import pcdf
     from optparse import OptionParser
-
 
     parser = OptionParser()
 

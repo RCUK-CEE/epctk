@@ -2,8 +2,24 @@ from sap import sap_tables
 from sap.dwelling import Dwelling
 
 # TODO: figure out how to avoid using this global calc stage var
-CALC_STAGE = 1
+CALC_STAGE = 0
 ALL_PARAMS = [set(), set(), set(), set(), set(), set(), set()]
+
+
+def log_dwelling_params(dwelling, prefix=""):
+    """
+    Log all the dwelling parameters
+    :param dwelling:
+    :param prefix:
+    :return:
+    """
+    # FIXME dodgy use of global Calc_stage
+    param_set = ALL_PARAMS[CALC_STAGE]
+
+    for k, v in dwelling:
+        # if k != "_attrs":
+        pass
+        # log_sap_obj(param_set, prefix, k, v)
 
 
 def log_sap_obj(param_set, prefix, k, v):
@@ -43,46 +59,48 @@ def log_sap_obj(param_set, prefix, k, v):
                 isinstance(v, sap_tables.ElectricityTariff)):
             return
         # If this is an object, dump it's dict
-        for key, value in list(v.__dict__.items()):
+        for key, value in v.__dict__.items():
             log_sap_obj(param_set, prefix + k + ".", key, value)
         return
     except AttributeError:
         pass
 
 
-class TrackedDict(dict):
-    def __init__(self, data, prefix):
-        super(TrackedDict, self).__init__(data)
-        self.prefix = prefix + "."
-
-        for key in list(data.keys()):
-            ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
-
-    def __setitem__(self, key, value):
-        dict.__setitem__(self, key, value)
-        ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
-
+# FIXME: find out if this is actually used anywhere...
+# class TrackedDict(dict):
+#     def __init__(self, data, prefix):
+#         super(TrackedDict, self).__init__(data)
+#         self.prefix = prefix + "."
+#
+#         for key in list(data.keys()):
+#             ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
+#
+#     def __setitem__(self, key, value):
+#         dict.__setitem__(self, key, value)
+#         ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
+#
 
 class ParamTrackerDwelling(Dwelling):
     def __init__(self):
-        global CALC_STAGE
         super(ParamTrackerDwelling, self).__init__()
-        CALC_STAGE = 1
+        self.calc_stage = 1
 
-    def __setattr__(self, k, v):
-        """if k!="ordered_attrs":
-            if isinstance(v,dict):
-                v=TrackedDict(v,k)
+    # def __setattr__(self, k, v):
+    #     """if k!="ordered_attrs":
+    #         if isinstance(v,dict):
+    #             v=TrackedDict(v,k)
+    #
+    #         all_params[calc_stage].add(k)
+    #         try:
+    #             for key in v.keys():
+    #                 all_params[calc_stage].add(k+"."+key)
+    #         except AttributeError:
+    #             pass"""
+    #
+    #     Dwelling.__setattr__(self, k, v)
 
-            all_params[calc_stage].add(k)
-            try:
-                for key in v.keys():
-                    all_params[calc_stage].add(k+"."+key)
-            except AttributeError:
-                pass"""
+    # TODO: overload dwelling's setitem/getitem (at least for results) so that you can track changes for each stage...
 
-        Dwelling.__setattr__(self, k, v)
+    def next_stage(self):
+        self.calc_stage += 1
 
-    def nextStage(self):
-        global CALC_STAGE
-        CALC_STAGE += 1

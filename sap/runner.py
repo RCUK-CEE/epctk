@@ -1,3 +1,5 @@
+import copy
+
 from sap.pcdf import VentilationTypes
 from .dwelling import DwellingResultsWrapper
 from .sap_tables import CylinderInsulationTypes, GlazingTypes, do_sap_table_lookups, OvershadingTypes, HeatEmitters, \
@@ -27,21 +29,23 @@ def perform_full_calc(dwelling):
 
 
 
-def run_sap(input_dwelling):
+def run_sap(dwelling):
     """
     Run SAP on the input dwelling
     :param input_dwelling:
     :return:
     """
-    dwelling = DwellingResultsWrapper(input_dwelling)
+    # dwelling = DwellingResultsWrapper(input_dwelling)
     dwelling.reduced_gains = False
 
     do_sap_table_lookups(dwelling)
+
     perform_full_calc(dwelling)
+
     worksheet.sap(dwelling)
+
     dwelling.report.build_report()
 
-    input_dwelling.er_results = dwelling.results
 
 
 def run_fee(input_dwelling):
@@ -392,7 +396,7 @@ def run_improvements(dwelling):
     # Need to run the dwelling twice: once with pcdf fuel prices to
     # get cost chage, once with normal SAP fuel prices to get change
     # in SAP rating
-    base_dwelling_pcdf_prices = DwellingResultsWrapper(dwelling)
+    base_dwelling_pcdf_prices = copy.deepcopy(dwelling)
     base_dwelling_pcdf_prices.reduced_gains = False
     base_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
 
@@ -400,58 +404,61 @@ def run_improvements(dwelling):
     perform_full_calc(base_dwelling_pcdf_prices)
     worksheet.sap(base_dwelling_pcdf_prices)
 
-
     dwelling.improvement_results = ImprovementResults()
 
     base_cost = base_dwelling_pcdf_prices.results['fuel_cost']
     base_sap = dwelling.er_results['sap_value']
     base_co2 = dwelling.er_results['emissions']
+
+    # Now improve the dwelling
     for name, min_improvement, improve in IMPROVEMENTS:
-        wrapped_dwelling_pcdf_prices = DwellingResultsWrapper(dwelling)
-        wrapped_dwelling_pcdf_prices.reduced_gains = False
-        wrapped_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
+        dwelling_pcdf_prices = copy.deepcopy(dwelling)
+        dwelling_pcdf_prices.reduced_gains = False
+        dwelling_pcdf_prices.use_pcdf_fuel_prices = True
 
-        wrapped_dwelling = DwellingResultsWrapper(dwelling)
-        wrapped_dwelling.reduced_gains = False
-        wrapped_dwelling.use_pcdf_fuel_prices = False
+        dwelling_regular_prices = copy.deepcopy(dwelling)
+        dwelling_regular_prices.reduced_gains = False
+        dwelling_regular_prices.use_pcdf_fuel_prices = False
 
         apply_previous_improvements(
             base_dwelling_pcdf_prices,
-            wrapped_dwelling,
-            dwelling.improvement_results.improvement_effects)
-        apply_previous_improvements(
-            base_dwelling_pcdf_prices,
-            wrapped_dwelling_pcdf_prices,
+            dwelling_regular_prices,
             dwelling.improvement_results.improvement_effects)
 
-        if not improve(base_dwelling_pcdf_prices, wrapped_dwelling_pcdf_prices):
+        apply_previous_improvements(
+            base_dwelling_pcdf_prices,
+            dwelling_pcdf_prices,
+            dwelling.improvement_results.improvement_effects)
+
+        if not improve(base_dwelling_pcdf_prices, dwelling_pcdf_prices):
             continue
 
-        improve(base_dwelling_pcdf_prices, wrapped_dwelling)
+        improve(base_dwelling_pcdf_prices, dwelling_regular_prices)
 
-        do_sap_table_lookups(wrapped_dwelling_pcdf_prices)
-        perform_full_calc(wrapped_dwelling_pcdf_prices)
-        worksheet.sap(wrapped_dwelling_pcdf_prices)
+        do_sap_table_lookups(dwelling_pcdf_prices)
+        perform_full_calc(dwelling_pcdf_prices)
+        worksheet.sap(dwelling_pcdf_prices)
 
-        do_sap_table_lookups(wrapped_dwelling)
-        perform_full_calc(wrapped_dwelling)
-        worksheet.sap(wrapped_dwelling)
+        do_sap_table_lookups(dwelling_regular_prices)
+        perform_full_calc(dwelling_regular_prices)
+        worksheet.sap(dwelling_regular_prices)
 
-        sap_improvement = wrapped_dwelling.sap_value - base_sap
+        sap_improvement = dwelling_regular_prices.sap_value - base_sap
         if sap_improvement > min_improvement:
             dwelling.improvement_results.add(ImprovementResult(
                 name,
                 sap_improvement,
-                wrapped_dwelling_pcdf_prices.fuel_cost - base_cost,
-                wrapped_dwelling.emissions - base_co2))
+                dwelling_pcdf_prices.fuel_cost - base_cost,
+                dwelling_regular_prices.emissions - base_co2))
 
-            base_cost = wrapped_dwelling_pcdf_prices.fuel_cost
-            base_sap = wrapped_dwelling.sap_value
-            base_co2 = wrapped_dwelling.emissions
+            base_cost = dwelling_pcdf_prices.fuel_cost
+            base_sap = dwelling_regular_prices.sap_value
+            base_co2 = dwelling_regular_prices.emissions
 
-    improved_dwelling = DwellingResultsWrapper(dwelling)
+    improved_dwelling = copy.deepcopy(dwelling)
     improved_dwelling.reduced_gains = False
     improved_dwelling.use_pcdf_fuel_prices = False
+
     for improvement in dwelling.improvement_results.improvement_effects:
         name, min_val, improve = [x for x in IMPROVEMENTS if x[0] == improvement.tag][0]
         improve(base_dwelling_pcdf_prices, improved_dwelling)

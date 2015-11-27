@@ -2,9 +2,18 @@ import collections
 from .sap_tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING
 
 
-class Dwelling():
-    def __init__(self):
+
+# class IterMixin(object):
+#     def __iter__(self):
+#         for attr, value in self.__dict__.items():
+#             if not attr.startswith('__') and not callable(value):
+#                 yield attr, value
+
+
+class Dwelling(dict):
+    def __init__(self, **kwargs):
         # allow attributes to be sorted
+        super().__init__(**kwargs)
         self._attrs = collections.OrderedDict()
         self.wind_speed = WIND_SPEED
 
@@ -13,26 +22,72 @@ class Dwelling():
         self.Igh_heating = IGH_HEATING
         self.living_area_Theating = 21
         self.Tcooling = 24
-        # self.apply_sap_hardcoded_values()
 
-    # TODO: this allows to get dwelling properties as attributes, but this is rather fragile
+        #TODO could just use a Dict, don't really need CalculationResults
+        self.er_results = self.results = CalculationResults()
+        self.report = CalculationReport(self)
+
+    # def __iter__(self):
+    #     for attr, value in self._attrs.items():
+    #         yield attr, value
+
+
+    # def __getitem__(self, item):
+    #     try:
+    #         return self.__dict__[item]
+    #     except KeyError:
+    #         try:
+    #             return self.results[item]
+    #         except KeyError:
+    #             raise KeyError('%s is neither in dwelling properties nor results' % item)
+
+    # def __setattr__(self, key, value):
+    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
+    #     # FIXME: This is really fragile...
+    #     if key not in ['dwelling', 'results', 'report', '_attrs']:
+    #         self.results[key] = value
+    #     else:
+    #         self.__dict__[key] = value
+
+    # TODO: Dwelling had the ability to have attributes stored in OrderedDict. Unclear if this is necessary, disabled for now
+    # def __setattr__(self, name, value):
+    #     # exclude _attrs so that we can acually set it during init
+    #     # FIXME this is kinda hacky :/
+    #     if name == '_attrs':
+    #         return super().__setattr__(name, value)
+    #     self._attrs[name] = value
+
+    # # TODO: this allows to get dwelling properties as attributes, but this is rather fragile
+    # #
+    # def __getattr__(self, name):
+    #     """
+    #     return from results if k exists, otherwise return from wrapped
+    #     dwelling
     #
-    def __getattr__(self, name):
-        try:
-            return self._attrs[name]
-        except KeyError:
-            raise AttributeError(name)
+    #     FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
+    #     """
+    #     try:
+    #         return self._attrs[name]
+    #     except KeyError:
+    #         raise AttributeError(name)
 
-    def __setattr__(self, name, value):
-        # exclude _attrs so that we can acually set it during init
-        # FIXME this is kinda hacky :/
-        if name == '_attrs':
-            return super().__setattr__(name, value)
-        self._attrs[name] = value
+    # def __getattr__(self, item):
+    #     """
+    #     Return own attribute, but if that is missing, return it from the results instead...
+    #
+    #     FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
+    #     """
+    #     try:
+    #         return self.__dict__[item]
+    #     except KeyError:
+    #         try:
+    #             return self.results[item]
+    #         except KeyError:
+    #             raise AttributeError(item)
 
     def __str__(self):
         s = ''
-        for k, v in self._attrs.items():
+        for k, v in self:
             s += '{} - {} \n'.format(k, v)
         return s
 
@@ -42,47 +97,48 @@ class Dwelling():
 
 # TODO: could probably rather subclass Dwelling
 # FIXME: seems that worksheet in any case depends on the dwelling object having report object. May better to just merge this into Dwelling
-class DwellingResultsWrapper(object):
-    def __init__(self, dwelling):
-        self.dwelling = dwelling
-
-        self.results = CalculationResults()  # just use a Dict, don't really need CalculationResults for now
-        self.results.report = CalculationReport(self)
-        self.report = self.results.report
-        # self.report = CalculationReport()
-        # self.results['report']
-
-    def __setattr__(self, key, value):
-        # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
-        # FIXME: This is really fragile...
-        if key not in ['dwelling', 'results', 'report']:
-            self.results[key] = value
-        else:
-            self.__dict__[key] = value
-
-    def __getattr__(self, item):
-        """
-        return from results if k exists, otherwise return from wrapped
-        dwelling
-
-        FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
-        """
-        try:
-            return self.dwelling.__getattr__(item)
-        except AttributeError:
-            try:
-                return self.results[item]
-            except KeyError:
-                raise AttributeError(item)
-
-    def true_and_not_missing(self, name):
-        return hasattr(self, name) and getattr(self, name)
+class DwellingResultsWrapper(Dwelling):
+    pass
+    # def __init__(self, dwelling):
+    #     self.dwelling = dwelling
+    #
+    #     self.results = CalculationResults()  # just use a Dict, don't really need CalculationResults for now
+    #     self.results.report = CalculationReport(self)
+    #     self.report = self.results.report
+    #     # self.report = CalculationReport()
+    #     # self.results['report']
+    #
+    # def __setattr__(self, key, value):
+    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
+    #     # FIXME: This is really fragile...
+    #     if key not in ['dwelling', 'results', 'report']:
+    #         self.results[key] = value
+    #     else:
+    #         self.__dict__[key] = value
+    #
+    # def __getattr__(self, item):
+    #     """
+    #     return from results if k exists, otherwise return from wrapped
+    #     dwelling
+    #
+    #     FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
+    #     """
+    #     try:
+    #         return self.dwelling.__getattr__(item)
+    #     except AttributeError:
+    #         try:
+    #             return self.results[item]
+    #         except KeyError:
+    #             raise AttributeError(item)
+    #
+    # def true_and_not_missing(self, name):
+    #     return hasattr(self, name) and getattr(self, name)
 
 
 class CalculationResults(dict):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.report = None
+        # self.report = None
 
 
 class CalculationReport(object):

@@ -2,22 +2,59 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7350501f-e420-4216-851c-d82d56f040b6" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/table_10.csv" afterPath="$PROJECT_DIR$/sap/data/table_10.csv" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/table_10c.csv" afterPath="$PROJECT_DIR$/sap/data/table_10c.csv" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/table_12.csv" afterPath="$PROJECT_DIR$/sap/data/table_12.csv" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/table_4a.csv" afterPath="$PROJECT_DIR$/sap/data/table_4a.csv" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/table_4b.csv" afterPath="$PROJECT_DIR$/sap/data/table_4b.csv" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/table_4e.csv" afterPath="$PROJECT_DIR$/sap/data/table_4e.csv" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/input_conversion_rules.py" afterPath="$PROJECT_DIR$/sap/input_conversion_rules.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1L-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1L-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1a-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1a-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1b-detached with semi-exposed elements.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1b-detached with semi-exposed elements.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1c-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1c-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1d-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1d-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1e-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1e-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1f-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1f-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1g-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1g-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1h-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1h-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1i-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1i-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1j-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1j-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1k-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1k-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1m-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1m-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1n-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1n-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-1p-detached.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-1p-detached.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2L-semi - electric CPSU_10-hour 300 litres.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2L-semi - electric CPSU_10-hour 300 litres.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2a-semi with semi-exposed elements-basic.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2a-semi with semi-exposed elements-basic.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2b-semi with WWHR-regular boiler.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2b-semi with WWHR-regular boiler.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2c-semi with WWHR+solar water heating.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2c-semi with WWHR+solar water heating.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2e-semi with CPSU fired by LPG.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2e-semi with CPSU fired by LPG.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2f-semi - integrated storage_direct 7-hour.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2f-semi - integrated storage_direct 7-hour.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2g-semi - 7-hour electric boiler.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2g-semi - 7-hour electric boiler.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2h-semi -10-hour electric boiler.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2h-semi -10-hour electric boiler.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2i-semi - underfloor 7-hour.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2i-semi - underfloor 7-hour.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2j-semi - underfloor 10-hour.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2j-semi - underfloor 10-hour.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2k-semi - electric CPSU_10-hour 180 litres.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2k-semi - electric CPSU_10-hour 180 litres.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2m-semi - direct acting - boiler.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2m-semi - direct acting - boiler.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2n -semi - electric ceiling heating _ water from single immersion.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2n -semi - electric ceiling heating _ water from single immersion.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2p-semi -electric underfloor, water - oil range cooker.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2p-semi -electric underfloor, water - oil range cooker.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2r-semi - room heaters - water by immersion with solar panel.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2r-semi - room heaters - water by immersion with solar panel.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3a-mid-terrace.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3a-mid-terrace.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3b-mid-terrace with solid fuel boiler.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3b-mid-terrace with solid fuel boiler.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3c - MidTerrace - pellet stove - with solar DHW a1 is 20.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3c - MidTerrace - pellet stove - with solar DHW a1 is 20.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3d - MT-biomass room heaters and no dedicated cylinder for solar DHW.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3d - MT-biomass room heaters and no dedicated cylinder for solar DHW.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3e - MT-gas warm air and MVHR checking Table 5a.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3e - MT-gas warm air and MVHR checking Table 5a.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3f - MT-gas warm air and flueless gas fire - water from immersion.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3f - MT-gas warm air and flueless gas fire - water from immersion.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3g -EndTerrace-LPG warm air and decorative bottled gas fire.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3g -EndTerrace-LPG warm air and decorative bottled gas fire.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3h - MT-oil range cooker_ secondary oil and water oil.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3h - MT-oil range cooker_ secondary oil and water oil.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3i- flat - mid floor_gas boiler 01840 and DHW thermal store.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3i- flat - mid floor_gas boiler 01840 and DHW thermal store.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3j- flat - mid floor_gas boiler 01840 and integrated thermal store.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3j- flat - mid floor_gas boiler 01840 and integrated thermal store.rtf.pkl" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/tests/pickled_test_cases/EW-3k-semi - with Test Database-index 495006.rtf.pkl" afterPath="$PROJECT_DIR$/tests/pickled_reference_cases/EW-3k-semi - with Test Database-index 495006.rtf.pkl" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/helpers.py" afterPath="$PROJECT_DIR$/helpers.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/dwelling.py" afterPath="$PROJECT_DIR$/sap/dwelling.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/pcdf.py" afterPath="$PROJECT_DIR$/sap/pcdf.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/runner.py" afterPath="$PROJECT_DIR$/sap/runner.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_tables.py" afterPath="$PROJECT_DIR$/sap/sap_tables.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/utils.py" afterPath="$PROJECT_DIR$/sap/utils.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spreadsheet_inputter.py" afterPath="$PROJECT_DIR$/spreadsheet_inputter.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases.py" afterPath="$PROJECT_DIR$/tests/test_official_cases.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" afterPath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_parsing.py" afterPath="$PROJECT_DIR$/tests/test_parsing.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/yaml_io.py" afterPath="$PROJECT_DIR$/yaml_io.py" />
     </list>
     <ignored path="sapcalc.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,7 +68,7 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/sapcalc$Test_SAP.coverage" NAME="Test SAP Coverage Results" MODIFIED="1448624912275" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sapcalc$Test_SAP.coverage" NAME="Test SAP Coverage Results" MODIFIED="1448628377597" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -48,11 +85,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dwelling.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dwelling.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7445932">
-              <caret line="57" column="55" selection-start-line="57" selection-start-column="11" selection-end-line="57" selection-end-column="55" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="31" column="25" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -62,21 +99,21 @@
         <entry file="file://$PROJECT_DIR$/sap/runner.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="461" column="0" selection-start-line="461" selection-start-column="0" selection-end-line="461" selection-end-column="0" />
+              <caret line="37" column="41" selection-start-line="37" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
               <folding>
-                <element signature="e#0#37#0" expanded="true" />
+                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="input_conversion_rules.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
+      <file leaf-file-name="helpers.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="1312" column="22" selection-start-line="1312" selection-start-column="22" selection-end-line="1312" selection-end-column="22" />
+              <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
               <folding>
-                <element signature="e#0#14#0" expanded="true" />
+                <element signature="e#0#26#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -86,39 +123,7 @@
         <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="12" column="68" selection-start-line="12" selection-start-column="20" selection-end-line="12" selection-end-column="68" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pcdf.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="76" column="18" selection-start-line="76" selection-start-column="18" selection-end-line="76" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="utils.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/utils.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="26" column="19" selection-start-line="26" selection-start-column="19" selection-end-line="26" selection-end-column="19" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="yaml_io.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/yaml_io.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+              <caret line="1325" column="23" selection-start-line="1325" selection-start-column="23" selection-end-line="1325" selection-end-column="23" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -130,28 +135,22 @@
         <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-              <folding />
+              <caret line="49" column="24" selection-start-line="49" selection-start-column="24" selection-end-line="49" selection-end-column="24" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="imp.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/anaconda/lib/python3.5/imp.py">
+      <file leaf-file-name="input_conversion_rules.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sap/input_conversion_rules.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="171" column="0" selection-start-line="171" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test_parsing.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/test_parsing.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="261" column="57" selection-start-line="261" selection-start-column="57" selection-end-line="261" selection-end-column="57" />
-              <folding />
+            <state vertical-scroll-proportion="2.4745762">
+              <caret line="596" column="1" selection-start-line="596" selection-start-column="1" selection-end-line="596" selection-end-column="1" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -179,22 +178,23 @@
         <option value="$PROJECT_DIR$/sapcli.py" />
         <option value="$PROJECT_DIR$/sap/utils.py" />
         <option value="$PROJECT_DIR$/__init__.py" />
-        <option value="$PROJECT_DIR$/spreadsheet_inputter.py" />
         <option value="$PROJECT_DIR$/sap/tables.py" />
         <option value="$PROJECT_DIR$/sap/test.py" />
         <option value="$PROJECT_DIR$/sap/worksheet.py" />
         <option value="$PROJECT_DIR$/sap/__init__.py" />
         <option value="$PROJECT_DIR$/tests/test_case_parser.py" />
-        <option value="$PROJECT_DIR$/input_conversion_rules.py" />
         <option value="$PROJECT_DIR$/yaml_io.py" />
         <option value="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
         <option value="$PROJECT_DIR$/tests/test_parsing.py" />
-        <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
-        <option value="$PROJECT_DIR$/sap/sap_tables.py" />
         <option value="$PROJECT_DIR$/sap/pcdf.py" />
         <option value="$PROJECT_DIR$/helpers.py" />
+        <option value="$PROJECT_DIR$/spreadsheet_inputter.py" />
         <option value="$PROJECT_DIR$/sap/dwelling.py" />
         <option value="$PROJECT_DIR$/sap/runner.py" />
+        <option value="$PROJECT_DIR$/input_conversion_rules.py" />
+        <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
+        <option value="$PROJECT_DIR$/sap/sap_tables.py" />
+        <option value="$PROJECT_DIR$/sap/input_conversion_rules.py" />
       </list>
     </option>
   </component>
@@ -280,24 +280,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sap" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="data" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
       <pane id="Scratches" />
@@ -305,13 +287,14 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/helpers.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/sap/utils.py" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FullScreen" value="false" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/sap" />
       <recent name="$PROJECT_DIR$/sap/data" />
       <recent name="$PROJECT_DIR$/tests" />
       <recent name="$PROJECT_DIR$/test" />
@@ -564,34 +547,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 31m 37s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 02m 17s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 32m 39s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 13m 51s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 35m 12s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 17m 11s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 43m 52s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 25m 46s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 43m 55s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 26m 26s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 44m 12s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 27m 12s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 44m 49s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 28m 04s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 45m 38s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 29m 08s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 46m 32s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 35m 34s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.11.27 at 11h 48m 32s.xml">
+    <history-entry file="Test_SAP - 2015.11.27 at 12h 46m 18s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
   </component>
@@ -600,36 +583,20 @@
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2106703" sideWeight="0.49962264" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23462783" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24603774" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4271698" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20797873" sideWeight="0.50037736" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-    </layout>
-    <layout-to-restore>
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24603774" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4271698" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20797873" sideWeight="0.50037736" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21416982" sideWeight="0.49962264" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5561417" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23462783" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20797873" sideWeight="0.50037736" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-    </layout-to-restore>
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+    </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -868,13 +835,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/spreadsheet_inputter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-16.85276">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1f-detached.rtf.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.2173913">
@@ -929,9 +889,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="16" column="62" selection-start-line="16" selection-start-column="62" selection-end-line="16" selection-end-column="62" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -951,16 +909,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/input_conversion_rules.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1312" column="22" selection-start-line="1312" selection-start-column="22" selection-end-line="1312" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/official_reference_cases/pcdf2009_test_322.dat">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -973,24 +921,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="26" column="19" selection-start-line="26" selection-start-column="19" selection-end-line="26" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="12" column="68" selection-start-line="12" selection-start-column="20" selection-end-line="12" selection-end-column="68" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="76" column="18" selection-start-line="76" selection-start-column="18" selection-end-line="76" selection-end-column="18" />
           <folding />
         </state>
       </provider>
@@ -1013,28 +943,36 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5129959">
+          <caret line="76" column="18" selection-start-line="76" selection-start-column="18" selection-end-line="76" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda/lib/python3.5/imp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.39124486">
+          <caret line="171" column="0" selection-start-line="171" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.36507937">
-          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/anaconda/lib/python3.5/imp.py">
+    <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="171" column="0" selection-start-line="171" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <caret line="31" column="25" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
           <folding />
         </state>
       </provider>
@@ -1042,18 +980,50 @@
     <entry file="file://$PROJECT_DIR$/sap/runner.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="461" column="0" selection-start-line="461" selection-start-column="0" selection-end-line="461" selection-end-column="0" />
+          <caret line="37" column="41" selection-start-line="37" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
           <folding>
-            <element signature="e#0#37#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
+    <entry file="file://$PROJECT_DIR$/spreadsheet_inputter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7445932">
-          <caret line="57" column="55" selection-start-line="57" selection-start-column="11" selection-end-line="57" selection-end-column="55" />
-          <folding />
+        <state vertical-scroll-proportion="14.146241">
+          <caret line="948" column="18" selection-start-line="948" selection-start-column="18" selection-end-line="948" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1325" column="23" selection-start-line="1325" selection-start-column="23" selection-end-line="1325" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="49" column="24" selection-start-line="49" selection-start-column="24" selection-end-line="49" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/input_conversion_rules.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.4745762">
+          <caret line="596" column="1" selection-start-line="596" selection-start-column="1" selection-end-line="596" selection-end-column="1" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

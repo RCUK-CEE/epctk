@@ -26,3 +26,7 @@ def csv_to_dict(filename, translator):
                 continue
             translator(results, row)
     return results
+
+
+def true_and_not_missing(d, attr):
+    return hasattr(d, attr) and getattr(d, attr)
