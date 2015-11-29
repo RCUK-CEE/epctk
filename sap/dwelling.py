@@ -2,14 +2,6 @@ import collections
 from .sap_tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING
 
 
-
-# class IterMixin(object):
-#     def __iter__(self):
-#         for attr, value in self.__dict__.items():
-#             if not attr.startswith('__') and not callable(value):
-#                 yield attr, value
-
-
 class Dwelling(dict):
     def __init__(self, **kwargs):
         # allow attributes to be sorted
@@ -129,25 +121,25 @@ class CalculationResults(dict):
 class CalculationReport(object):
     def __init__(self, dwelling):
         self.dwelling = dwelling
-        self.txt = ""
+        self.text = ""
 
     def start_section(self, number, title):
         title_str = "%s %s\n" % (number, title)
-        self.txt += "\n"
-        self.txt += title_str
-        self.txt += "=" * len(title_str) + "\n"
+        self.text += "\n"
+        self.text += title_str
+        self.text += "=" * len(title_str) + "\n"
 
     def add_annotation(self, label):
-        self.txt += "%s\n" % (label,)
+        self.text += "%s\n" % (label,)
 
     def add_single_result(self, label, code, values):
         self.add_monthly_result(label, code, values)
 
     def add_monthly_result(self, label, code, values):
-        if code != None:
-            self.txt += "%s %s (%s)\n" % (label, values, code)
+        if code is not None:
+            self.text += "%s %s (%s)\n" % (label, values, code)
         else:
-            self.txt += "%s %s\n" % (label, values)
+            self.text += "%s %s\n" % (label, values)
 
     def build_report(self):
         dwelling = self.dwelling
@@ -156,9 +148,9 @@ class CalculationReport(object):
         self.add_single_result(
             "Infiltration due to chimneys, etc", 8, dwelling.inf_chimneys_ach)
 
-        if hasattr(dwelling, 'pressurisation_test_result'):
+        if dwelling.get('pressurisation_test_result'):
             self.add_annotation("Using pressure tests")
-        elif hasattr(dwelling, 'pressurisation_test_result_average'):
+        elif dwelling.get('pressurisation_test_result_average'):
             self.add_annotation("Using pressure tests for average dwelling")
         else:
             self.add_annotation("Using calculated infiltration rate")
@@ -193,11 +185,11 @@ class CalculationReport(object):
         self.add_monthly_result("Energy content", 45, dwelling.hw_energy_content)
         self.add_monthly_result("Distribution loss", 46, dwelling.distribution_loss)
 
-        is_pou_heating = (hasattr(dwelling, 'instantaneous_pou_water_heating') and
+        is_pou_heating = (dwelling.get('instantaneous_pou_water_heating') and
                           dwelling.instantaneous_pou_water_heating)
-        has_measured_loss = (hasattr(dwelling, 'measured_cylinder_loss') and
-                             dwelling.measured_cylinder_loss != None)
-        if not is_pou_heating and not has_measured_loss and hasattr(dwelling, 'hw_cylinder_volume'):
+        has_measured_loss = (dwelling.get('measured_cylinder_loss') and
+                             dwelling.measured_cylinder_loss is not None)
+        if not is_pou_heating and not has_measured_loss and dwelling.get('hw_cylinder_volume', False):
             self.add_single_result(
                 "Cylinder volume", None, dwelling.hw_cylinder_volume)
             self.add_single_result(
@@ -254,7 +246,7 @@ class CalculationReport(object):
             "Temperature adjustment", None, dwelling.temperature_adjustment)
         self.add_monthly_result("Dwelling mean temperature", 93, res['Tmean'])
 
-        if not hasattr(dwelling, 'sys1_space_effy'):
+        if not dwelling.get('sys1_space_effy'):
             # Must be FEE calc, exit here
             return
 
@@ -274,10 +266,10 @@ class CalculationReport(object):
 
         self.add_single_result(
             "Efficiency of main heating system 1", "206", dwelling.sys1_space_effy)
-        if hasattr(dwelling, 'sys2_space_effy'):
+        if dwelling.get('sys2_space_effy'):
             self.add_single_result(
                 "Efficiency of main heating system 2", "207", dwelling.sys2_space_effy)
-        if hasattr(dwelling, 'secondary_space_effy'):
+        if dwelling.get('secondary_space_effy'):
             self.add_single_result(
                 "Efficiency of secondary heating system", "208", dwelling.secondary_space_effy)
         self.add_monthly_result(
@@ -315,12 +307,13 @@ class CalculationReport(object):
             "appendix_q_generated",
             "appendix_q_used",
         ]
+
         for label in end_uses:
-            if hasattr(dwelling, "energy_use_%s" % (label,)):
-                energy = getattr(dwelling, "energy_use_%s" % (label,))
-                emissions = getattr(dwelling, "emissions_%s" % (label,))
-                cost = getattr(dwelling, "cost_%s" % (label,))
-                primary_energy = getattr(dwelling, "primary_energy_%s" % (label,))
+            if dwelling.get("energy_use_%s" % (label,)):
+                energy = dwelling["energy_use_%s" % (label,)]
+                emissions = dwelling["emissions_%s" % (label,)]
+                cost = dwelling["cost_%s" % (label,)]
+                primary_energy = dwelling["primary_energy_%s" % (label,)]
                 self.add_single_result(label, None, "%f | %f | %f | %f" %
                                        (energy, emissions, cost, primary_energy))
 
@@ -334,4 +327,4 @@ class CalculationReport(object):
             "Annual consumption", "L8", dwelling.annual_light_consumption)
 
     def __str__(self):
-        return self.txt
+        return self.text

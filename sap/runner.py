@@ -3,7 +3,7 @@ import copy
 from sap.pcdf import VentilationTypes
 from .dwelling import DwellingResultsWrapper
 from .sap_tables import CylinderInsulationTypes, GlazingTypes, lookup_sap_tables, OvershadingTypes, HeatEmitters, \
-    fuel_from_code, HeatingSystem, PVOvershading, hw_volume_factor
+    fuel_from_code, HeatingSystem, PVOvershading, hw_volume_factor, HeatingTypes
 from . import worksheet
 
 
@@ -284,20 +284,20 @@ def apply_low_energy_lighting(base, d):
 
 def needs_separate_solar_cylinder(base, d):
     if base.water_sys.system_type in [
-        HeatingSystem.TYPES.cpsu,
-        HeatingSystem.TYPES.combi,
-        HeatingSystem.TYPES.storage_combi,
-        HeatingSystem.TYPES.heat_pump,
-        HeatingSystem.TYPES.pcdf_heat_pump,
+        HeatingTypes.cpsu,
+        HeatingTypes.combi,
+        HeatingTypes.storage_combi,
+        HeatingTypes.heat_pump,
+        HeatingTypes.pcdf_heat_pump,
     ]:
         return True
     if (hasattr(base, 'instantaneous_pou_water_heating') and
             base.instantaneous_pou_water_heating):
         return True
-    if (base.water_sys.system_type == HeatingSystem.TYPES.community
+    if (base.water_sys.system_type == HeatingTypes.community
         and not hasattr(d, 'hw_cylinder_volume')):
         return True
-    if (base.water_sys.system_type == HeatingSystem.TYPES.microchp
+    if (base.water_sys.system_type == HeatingTypes.microchp
         and base.water_sys.has_integral_store):
         return True
 

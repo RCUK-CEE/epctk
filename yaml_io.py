@@ -107,7 +107,7 @@ def from_yaml(fname):
         loaded = yaml.load(f)
 
     dwelling = Dwelling()
-    for k, v in list(loaded.items()):
-        setattr(dwelling, k, v)
+    for key, value in loaded.items():
+        dwelling[key] =  value
 
     return dwelling

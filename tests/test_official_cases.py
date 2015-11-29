@@ -9,7 +9,7 @@ import yaml_io
 from helpers import ALL_PARAMS, log_dwelling_params
 from sap import runner
 from sap.dwelling import Dwelling
-from sap.rtf_reader import input_conversion_rules
+from sap.io import input_conversion_rules
 from sap.utils import SAPCalculationError
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
@@ -25,6 +25,27 @@ SAP_REGIONS = {
     '9.rtf': 11,
     '10.rtf': 11,
 }
+
+
+class SingleLevelFilter(logging.Filter):
+    def __init__(self, passlevel, reject):
+        super().__init__()
+        self.passlevel = passlevel
+        self.reject = reject
+
+    def filter(self, record):
+        if self.reject:
+            return record.levelno != self.passlevel
+        else:
+            return record.levelno == self.passlevel
+
+
+def dump_param_list():
+    for i in range(len(ALL_PARAMS)):
+        for k in ALL_PARAMS[i]:
+            print((i, k))
+
+    print(("Dumped inputs: ", len(ALL_PARAMS[1])))
 
 
 def create_sap_dwelling(inputs):
@@ -47,6 +68,17 @@ def create_sap_dwelling(inputs):
     return dwelling
 
 
+# def scan_file(fname, parser):
+#     with open(fname, 'r') as f:
+#         txt = f.read()
+#         txt = txt.replace('\\\'b', '')
+#         txt = txt.replace('\\f2', '')
+#         res = []
+#         for srvrtokens, startloc, endloc in parser.scanString(txt):
+#             res.append(srvrtokens)
+#         return res
+
+
 def parse_file(fname, parser):
     with open(fname, 'r') as f:
         txt = f.read()
@@ -56,19 +88,9 @@ def parse_file(fname, parser):
         return parser.parseString(txt)
 
 
-def scan_file(fname, parser):
-    with open(fname, 'r') as f:
-        txt = f.read()
-        txt = txt.replace('\\\'b', '')
-        txt = txt.replace('\\f2', '')
-        res = []
-        for srvrtokens, startloc, endloc in parser.scanString(txt):
-            res.append(srvrtokens)
-        return res
-
-
 def parse_input_file(test_case_id):
-    return parse_file("./reference_dwellings/%d.rtf" % (test_case_id,), reference_case_parser.whole_file)
+    return parse_file(os.path.join("reference_dwellings", "%d.rtf" % (test_case_id,)),
+                      reference_case_parser.whole_file)
 
 
 def load_reference_case(case_name, parser, force_reparse):
@@ -95,6 +117,14 @@ def load_reference_case(case_name, parser, force_reparse):
 
 
 def run_dwelling(fname, dwelling):
+    """
+    Run dwelling that was loaded from fname
+
+    :param fname: file name needed to lookup SAP region
+    :param dwelling: dwelling definition loaded from file
+    :return:
+    """
+
     # FIXME !!! Bit of a hack here because our tests case files don't include sap region
     if fname in SAP_REGIONS:
         dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
@@ -109,26 +139,25 @@ def run_dwelling(fname, dwelling):
 
 
 def run_case(fname, reparse):
-    logging.info("RUNNING %s" % (fname,))
+    logging.warning("RUNNING %s" % (fname,))
 
     try:
-        parsed_ref_case = load_reference_case(fname, reference_case_parser.whole_file, reparse)
-        dwelling = create_sap_dwelling(parsed_ref_case.inputs)
-
         yaml_file = os.path.join("yaml_test_cases", os.path.basename(fname) + ".yml")
         if os.path.exists(yaml_file) and not reparse:
             dwelling = yaml_io.from_yaml(yaml_file)
         else:
+            parsed_ref_case = load_reference_case(fname, reference_case_parser.whole_file, reparse)
+            dwelling = create_sap_dwelling(parsed_ref_case.inputs)
             with open(yaml_file, 'w') as f:
                 yaml_io.to_yaml(dwelling, f)
-
+            output_checker.check_results(dwelling, parsed_ref_case)
         run_dwelling(fname, dwelling)
-        output_checker.check_results(dwelling, parsed_ref_case)
+
     except SAPCalculationError:
-        if output_checker.is_err_calc(parsed_ref_case):
-            return
-        else:
-            raise
+        # if output_checker.is_err_calc(parsed_ref_case):
+        #     return
+        # else:
+        raise
     logging.info("DONE")
 
 
@@ -162,14 +191,6 @@ def run_sample_cases(force_reparse):
         run_case(os.path.join(".reference_dwellings", "%d.rtf" % id), force_reparse)
 
 
-def dump_param_list():
-    for i in range(len(ALL_PARAMS)):
-        for k in ALL_PARAMS[i]:
-            print((i, k))
-
-    print(("Dumped inputs: ", len(ALL_PARAMS[1])))
-
-
 def run_official_cases(cases, maxruns=None, reparse=False):
     count = 0
     for filename in cases:
@@ -184,18 +205,6 @@ def run_official_cases(cases, maxruns=None, reparse=False):
             break
 
     print(("Ran: ", count))
-
-
-class SingleLevelFilter(logging.Filter):
-    def __init__(self, passlevel, reject):
-        self.passlevel = passlevel
-        self.reject = reject
-
-    def filter(self, record):
-        if self.reject:
-            return (record.levelno != self.passlevel)
-        else:
-            return (record.levelno == self.passlevel)
 
 
 class TestOfficialCases(unittest.TestCase):

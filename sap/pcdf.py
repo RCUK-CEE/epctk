@@ -4,7 +4,7 @@ from .utils import int_or_none, float_or_none
 PCDF_DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'pcdf2009.dat')
 PCDF = None
 
-fuels = {'1': 'Gas',
+FUELS = {'1': 'Gas',
          '2': 'LPG',
          '4': 'Oil',
          '12': 'Smokeless',
@@ -136,7 +136,7 @@ def get_boiler(boiler_id):
         brand=str(fields[4]),
         model=str(fields[5]),
         model_qualifier=str(fields[6]),
-        fuel=fuels[fields[10]],
+        fuel=FUELS[fields[10]],
         main_type=main_types[fields[13]],
         subsidiary_type=subsidiary_types[fields[14]],
         subsidiary_type_table=fields[15],
@@ -185,7 +185,7 @@ def get_solid_fuel_boiler(id):
         manufacturer=str(fields[3], encoding='latin-1'),
         brand=str(fields[4]),
         model=str(fields[5]),
-        fuel=fuels[fields[10]],
+        fuel=FUELS[fields[10]],
         main_type=fields[11],
         fan_assisted=flue_fan[fields[13]],
         seasonal_effy=fields[19],
@@ -208,7 +208,7 @@ def get_twin_burner_cooker_boiler(id):
         manufacturer=str(fields[3], encoding='latin-1'),
         brand=str(fields[4]),
         model=str(fields[5]),
-        fuel=fuels[fields[10]],
+        fuel=FUELS[fields[10]],
         condensing=condensing[fields[12]],
         flue_type=fields[13],
         fan_assisted=fields[14],

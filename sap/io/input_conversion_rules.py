@@ -4,9 +4,9 @@ import copy
 from sap import worksheet
 from sap.pcdf import DuctTypes, VentilationTypes
 from sap.sap_tables import CylinderInsulationTypes, OpeningTypeDataSource, GlazingTypes, HeatEmitters, \
-    ELECTRICITY_STANDARD, fuel_from_code, OvershadingTypes, CommunityDistributionTypes, HeatingSystem, PVOvershading, \
+    ELECTRICITY_STANDARD, fuel_from_code, OvershadingTypes, CommunityDistributionTypes, PVOvershading, \
     LoadCompensators, TerrainTypes, SHWCollectorTypes, FloorTypes, WallTypes, ELECTRICITY_7HR, ELECTRICITY_10HR, \
-    ThermalStoreTypes, ImmersionTypes
+    ThermalStoreTypes, ImmersionTypes, HeatingTypes
 
 
 class LambdaMapping(object):
@@ -273,7 +273,7 @@ def process_y_value_table(d, y_table):
 
     d.y_values = y_values
 
-emitter_types = {
+EMITTER_TYPES = {
     Labels.RADIATORS: HeatEmitters.RADIATORS,
     Labels.UNDERFLOOR_SCREED: HeatEmitters.UNDERFLOOR_SCREED,
     Labels.UNDERFLOOR_TIMBER: HeatEmitters.UNDERFLOOR_TIMBER,
@@ -283,6 +283,7 @@ emitter_types = {
     Labels.RADS_UNDERFLOOR_CONRETE: HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE,
     Labels.FAN_COILS: HeatEmitters.FAN_COILS,
 }
+
 FUELS = {
     'Electricity': ELECTRICITY_STANDARD,
     'Mains gas': fuel_from_code(1),
@@ -376,7 +377,7 @@ class MainHeatingSystemRule:
         """
 
         :param dwelling:
-        :param data:
+        :param data: PyParsing ParseResults object
         :return:
         """
         if data.vals[0].value == 'Community heating scheme':
@@ -385,14 +386,13 @@ class MainHeatingSystemRule:
             dwelling['community_heat_sources'] = heat_src
             dwelling['sap_community_distribution_type'] = sap_dist_typ
             return
-        print(type(data))
-        data.pprint()
+
         v_prev = None
         for v in data.vals:
             if v.label != '':
                 if v.label == Labels.SYSTEM_FUEL:
                     fuel = get_fuel(v)
-                    if fuel != None:
+                    if fuel is not None:
                         dwelling[self.fuel_attr] = fuel
                     else:
                         logging.warning("Unknown fuel: %s", v.vals[0].value)
@@ -409,17 +409,20 @@ class MainHeatingSystemRule:
                     logging.warning("Unknown system input: %s", v)
             else:
                 try:
+                    # -- Extract the heating type code attribute using a simple heuristic
                     # Expects that there should be an int-valued bit of information in this line...
+                    # If not (ValueError) then go on to try to parse the rest
+                    # FIXME: is this a solid enough heuristic to reliably catch the heating code type?
                     value_type = int(v.value.split()[0])
-                    print("main_heating_type", value_type)
                     dwelling[self.heating_type_code_attr] = value_type
 
                     if v.note == "HETAS Approved" or "HETAS" in v.value:
                         dwelling[self.hetas_attr] = True
 
                     continue
-                except ValueError as e:
-                    logging.warning("Could not extract main heating type from input: {}".format(v))
+                except ValueError:
+                    # logging.warning("Could not extract main heating type from input: {}".format(v))
+                    pass
 
                 if v.value == Labels.CENTRAL_HEATING_PUMP:
                     dwelling['central_heating_pump_in_heated_space'] = True
@@ -439,8 +442,8 @@ class MainHeatingSystemRule:
                 elif v.value == Labels.THERMAL_STORE_INTEGRATED:
                     dwelling['thermal_store_type'] = ThermalStoreTypes.INTEGRATED
 
-                elif v.value in emitter_types:
-                    dwelling[self.heating_emitter_attr] = emitter_types[v.value]
+                elif v.value in EMITTER_TYPES:
+                    dwelling[self.heating_emitter_attr] = EMITTER_TYPES[v.value]
 
                 elif v.value.split()[0] == 'Database':
                     if v.note != "":
@@ -483,13 +486,13 @@ class MainHeatingSystemRule:
 
     def get_sedbuk_type(self, typestr):
         if "Regular" in typestr or "Range cooker" in typestr:
-            return HeatingSystem.TYPES.regular_boiler
+            return HeatingTypes.regular_boiler
         elif "primary store" in typestr:
-            return HeatingSystem.TYPES.storage_combi
+            return HeatingTypes.storage_combi
         elif "CPSU" in typestr:
-            return HeatingSystem.TYPES.cpsu
+            return HeatingTypes.cpsu
         elif "Combi" in typestr:
-            return HeatingSystem.TYPES.combi
+            return HeatingTypes.combi
         else:
             raise ValueError("Unknown sedbuk type")
 
@@ -507,14 +510,17 @@ def parse_community_heating_sources(r):
     heat_sources = []
     distribution_type = None
     current_heat_source = None
+
     for v in r.vals[1:]:
         if v.label == "Heat source":
-            if current_heat_source != None:
+            if current_heat_source is not None:
                 heat_sources.append(current_heat_source)
             current_heat_source = dict(source=v.vals[0].value)
+
         elif v.label == "Fuel":
             current_heat_source['fuel'] = copy.deepcopy(
                 COMMUNITY_FUELS[v.vals[0].value])
+
         else:
             tokens = [x.split() for x in v.value.split(',')]
             if len(tokens) == 1 and len(tokens[0]) == 0:
@@ -532,8 +538,10 @@ def parse_community_heating_sources(r):
                 current_heat_source['heat_to_power'] = float(tokens[0][2])
             else:
                 logging.warning("Unknown community heating field: %s", v)
-    if current_heat_source != None:
+
+    if current_heat_source is not None:
         heat_sources.append(current_heat_source)
+
     return heat_sources, distribution_type
 
 PV_OVERSHADING = {
@@ -552,6 +560,7 @@ PV_PITCH = {
     "600": 60,
     "600 pitch": 60,
 }
+
 PV_ORIENTATION = {
     "North": 0,
     "orientation North": 0,

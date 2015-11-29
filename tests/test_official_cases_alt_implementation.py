@@ -9,7 +9,7 @@ import yaml_io
 from helpers import *
 from sap import pcdf
 from sap import runner
-from sap.rtf_reader import input_conversion_rules
+from sap.io import input_conversion_rules
 from sap.utils import SAPCalculationError
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP

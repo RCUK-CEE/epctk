@@ -435,7 +435,7 @@ def cpsu_store(dwelling):
         temperature_factor *= 0.81
 
     # Check airing cupboard
-    if true_and_not_missing(d.water_sys, 'cpsu_not_in_airing_cupboard'):
+    if true_and_not_missing(dwelling.water_sys, 'cpsu_not_in_airing_cupboard'):
         # !!! Actually this is if cpsu or thermal store not in airing cupboard
         temperature_factor *= 1.1
 
@@ -517,14 +517,14 @@ def getTable3Row(dwelling):
         # !!! Also need to do this for second main system?
 
         # Water heating with main
-        if dwelling.main_sys_1.system_type == HeatingSystem.TYPES.cpsu:
+        if dwelling.main_sys_1.system_type == HeatingTypes.cpsu:
             return 7
         if (dwelling.get('main_heating_type_code') and
                     dwelling.main_heating_type_code == 191):
             return 1
 
-    if dwelling.water_sys.system_type in [HeatingSystem.TYPES.combi,
-                                          HeatingSystem.TYPES.storage_combi]:
+    if dwelling.water_sys.system_type in [HeatingTypes.combi,
+                                          HeatingTypes.storage_combi]:
         return 6
     elif dwelling.water_heating_type_code == 903:
         # Immersion
@@ -535,8 +535,8 @@ def getTable3Row(dwelling):
     elif true_and_not_missing(dwelling, 'cylinder_is_thermal_store'):
         # !!! Need to check length of pipework here and insulation
         return 10
-    elif (dwelling.water_sys.system_type in [HeatingSystem.TYPES.pcdf_heat_pump,
-                                             HeatingSystem.TYPES.microchp]
+    elif (dwelling.water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
+                                             HeatingTypes.microchp]
           and dwelling.water_sys.has_integral_store):
         return 8
     elif dwelling.has_hw_cylinder:
@@ -698,26 +698,26 @@ def has_ch_pump(dwelling):
 def system_type_from_sap_code(system_code, system_data):
     if ('boiler_type' in system_data and
                 system_data['boiler_type'] == BOILER_TYPES['COMBI']):
-        return HeatingSystem.TYPES.combi
+        return HeatingTypes.combi
     elif is_cpsu(system_code):
-        return HeatingSystem.TYPES.cpsu
+        return HeatingTypes.cpsu
     elif is_off_peak_only_system(system_code):
-        return HeatingSystem.TYPES.off_peak_only
+        return HeatingTypes.off_peak_only
     elif is_integrated_system(system_code):
-        return HeatingSystem.TYPES.integrated_system
+        return HeatingTypes.integrated_system
     elif is_storage_heater(system_code):
-        return HeatingSystem.TYPES.storage_heater
+        return HeatingTypes.storage_heater
     elif is_electric_boiler(system_code):
-        return HeatingSystem.TYPES.electric_boiler
+        return HeatingTypes.electric_boiler
     elif is_boiler(system_code):
-        return HeatingSystem.TYPES.regular_boiler
+        return HeatingTypes.regular_boiler
     elif is_heat_pump(system_code):
-        return HeatingSystem.TYPES.heat_pump
+        return HeatingTypes.heat_pump
     elif is_room_heater(system_code):
-        return HeatingSystem.TYPES.room_heater
+        return HeatingTypes.room_heater
     elif is_warm_air_system(system_code):
-        return HeatingSystem.TYPES.warm_air
-    return HeatingSystem.TYPES.misc
+        return HeatingTypes.warm_air
+    return HeatingTypes.misc
 
 
 def get_4a_main_system(dwelling,
@@ -747,10 +747,10 @@ def get_4a_main_system(dwelling,
     if system_data['water_effy'] != "same":
         system.water_effy = float(system_data['water_effy'])
 
-    if system.system_type in [HeatingSystem.TYPES.combi,
-                              HeatingSystem.TYPES.storage_combi]:
+    if system.system_type in [HeatingTypes.combi,
+                              HeatingTypes.storage_combi]:
         system.combi_loss = combi_loss_table_3a(dwelling, system)
-    elif system.system_type == HeatingSystem.TYPES.cpsu:
+    elif system.system_type == HeatingTypes.cpsu:
         system.cpsu_Tw = dwelling.cpsu_Tw
         system.cpsu_not_in_airing_cupboard = true_and_not_missing(dwelling, 'cpsu_not_in_airing_cupboard')
     return system
@@ -784,7 +784,7 @@ def get_4a_secondary_system(dwelling):
 def get_manuf_data_secondary_system(dwelling):
     effy = dwelling.secondary_sys_manuf_effy
     sys = SecondarySystem(
-        HeatingSystem.TYPES.misc,
+        HeatingTypes.misc,
         effy,
         (dwelling.use_immersion_heater_summer
          if dwelling.get('use_immersion_heater_summer')
@@ -835,10 +835,10 @@ def get_4b_main_system(dwelling, system_code, fuel, use_immersion_in_summer):
                            fuel)
     system.responsiveness = system_data['responsiveness']
     system.is_condensing = system_data['condensing']
-    if system.system_type in [HeatingSystem.TYPES.combi,
-                              HeatingSystem.TYPES.storage_combi]:
+    if system.system_type in [HeatingTypes.combi,
+                              HeatingTypes.storage_combi]:
         system.combi_loss = combi_loss_table_3a(dwelling, system)
-    elif system.system_type == HeatingSystem.TYPES.cpsu:
+    elif system.system_type == HeatingTypes.cpsu:
         system.cpsu_not_in_airing_cupboard = true_and_not_missing(dwelling, 'cpsu_not_in_airing_cupboard')
 
     return system
@@ -905,7 +905,7 @@ def apply_4c2(dwelling, sys):
     # !!! This entire function needs to be independent of sys1/sys2!
 
     # !!! Need to check  main_sys_2 here as well?
-    if (dwelling.main_sys_1.system_type == HeatingSystem.TYPES.cpsu or
+    if (dwelling.main_sys_1.system_type == HeatingTypes.cpsu or
             (dwelling.get('thermal_store_type') and
                      dwelling.thermal_store_type == ThermalStoreTypes.INTEGRATED)):
         dwelling.temperature_adjustment -= 0.1
@@ -934,9 +934,9 @@ def apply_4c2(dwelling, sys):
 
     if apply_adjustment:
         space_heat_effy_adjustment = -5
-        if not dwelling.water_sys.system_type in [HeatingSystem.TYPES.combi,
-                                                  HeatingSystem.TYPES.cpsu,
-                                                  HeatingSystem.TYPES.storage_combi]:
+        if not dwelling.water_sys.system_type in [HeatingTypes.combi,
+                                                  HeatingTypes.cpsu,
+                                                  HeatingTypes.storage_combi]:
             dhw_heat_effy_adjustment = -5
         else:
             dhw_heat_effy_adjustment = 0
@@ -1301,39 +1301,39 @@ def appendix_f_cpsu_on_peak(sys, dwelling):
 # Table 12a
 def dhw_on_peak_fraction(water_sys, dwelling):
     # !!! Need to complete this table
-    if water_sys.system_type == HeatingSystem.TYPES.cpsu:
+    if water_sys.system_type == HeatingTypes.cpsu:
         return appendix_f_cpsu_on_peak(water_sys, dwelling)
-    elif water_sys.system_type == HeatingSystem.TYPES.heat_pump:
+    elif water_sys.system_type == HeatingTypes.heat_pump:
         # !!! Need off-peak immersion option
         return .7
-    elif water_sys.system_type in [HeatingSystem.TYPES.pcdf_heat_pump,
-                                   HeatingSystem.TYPES.microchp]:
+    elif water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
+                                   HeatingTypes.microchp]:
         return .7
     else:
         return water_sys.fuel.general_elec_on_peak_fraction
 
 
 def space_heat_on_peak_fraction(sys, dwelling):
-    if sys.system_type == HeatingSystem.TYPES.off_peak_only:
+    if sys.system_type == HeatingTypes.off_peak_only:
         return 0
-    elif sys.system_type == HeatingSystem.TYPES.integrated_system:
+    elif sys.system_type == HeatingTypes.integrated_system:
         assert sys.fuel == ELECTRICITY_7HR
         return .2
-    elif sys.system_type == HeatingSystem.TYPES.storage_heater:
+    elif sys.system_type == HeatingTypes.storage_heater:
         return 0
-    elif sys.system_type == HeatingSystem.TYPES.cpsu:
+    elif sys.system_type == HeatingTypes.cpsu:
         return appendix_f_cpsu_on_peak(sys, dwelling)
-    elif sys.system_type == HeatingSystem.TYPES.electric_boiler:
+    elif sys.system_type == HeatingTypes.electric_boiler:
         if sys.fuel == ELECTRICITY_7HR:
             return 0.9
         elif sys.fuel == ELECTRICITY_10HR:
             return .5
         else:
             return 1
-    elif sys.system_type in [HeatingSystem.TYPES.pcdf_heat_pump,
-                             HeatingSystem.TYPES.microchp]:
+    elif sys.system_type in [HeatingTypes.pcdf_heat_pump,
+                             HeatingTypes.microchp]:
         return .8
-    elif sys.system_type == HeatingSystem.TYPES.heat_pump:
+    elif sys.system_type == HeatingTypes.heat_pump:
         return 0.6
     # !!! underfloor heating
     # !!! ground source heat pump
@@ -1700,7 +1700,6 @@ class HeatingSystem(object):
     #              pcdf_heat_pump=11,
     #              microchp=14,
     #              community=12)
-    TYPES = HeatingTypes
 
     def __init__(self, system_type,
                  winter_effy,
@@ -1724,9 +1723,9 @@ class HeatingSystem(object):
         self.has_warm_air_fan = False
 
         self.has_oil_pump = (fuel.type == FuelTypes.OIL and
-                             system_type in [self.TYPES.regular_boiler,
-                                             self.TYPES.combi,
-                                             self.TYPES.storage_combi])
+                             system_type in [HeatingTypes.regular_boiler,
+                                             HeatingTypes.combi,
+                                             HeatingTypes.storage_combi])
 
         self.fuel = fuel
 
@@ -1816,7 +1815,7 @@ class DedicatedWaterSystem(object):
         self.base_effy = numpy.array([effy, ] * 12)
         self.summer_immersion = summer_immersion
         self.water_mult = 1  # Might be changed after init
-        self.system_type = HeatingSystem.TYPES.misc
+        self.system_type = HeatingTypes.misc
         self.is_community_heating = False
 
     def water_heat_effy(self, _Q_water):
@@ -1840,11 +1839,11 @@ class DedicatedWaterSystem(object):
 
 def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
     if pcdf_data['main_type'] == "Combi":
-        system_type = HeatingSystem.TYPES.combi
+        system_type = HeatingTypes.combi
     elif pcdf_data['main_type'] == "CPSU":
-        system_type = HeatingSystem.TYPES.cpsu
+        system_type = HeatingTypes.cpsu
     else:
-        system_type = HeatingSystem.TYPES.regular_boiler
+        system_type = HeatingTypes.regular_boiler
 
     sys = HeatingSystem(system_type,
                         pcdf_data['winter_effy'],
@@ -1935,7 +1934,7 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
         # !!! What about other table rows?
         raise ValueError("Unknown system type")
 
-    if sys.system_type == HeatingSystem.TYPES.combi:
+    if sys.system_type == HeatingTypes.combi:
         configure_combi_loss(dwelling, sys, pcdf_data)
     # !!! Assumes gas/oil boiler
     sys.responsiveness = USE_TABLE_4D_FOR_RESPONSIVENESS
@@ -1970,7 +1969,7 @@ def solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer):
             float(pcdf_data['nominal_heat_to_water']) + float(pcdf_data['nominal_heat_to_room'])) / float(
             pcdf_data['nominal_fuel_use'])
         effy = .975 * nominal_effy
-    sys = HeatingSystem(HeatingSystem.TYPES.regular_boiler,  # !!!
+    sys = HeatingSystem(HeatingTypes.regular_boiler,  # !!!
                         effy,
                         effy,
                         summer_immersion=use_immersion_in_summer,
@@ -1993,7 +1992,7 @@ def twin_burner_cooker_boiler_from_pcdf(pcdf_data,
     winter_effy = pcdf_data['winter_effy']
     summer_effy = pcdf_data['summer_effy']
 
-    sys = HeatingSystem(HeatingSystem.TYPES.regular_boiler,  # !!!
+    sys = HeatingSystem(HeatingTypes.regular_boiler,  # !!!
                         winter_effy,
                         summer_effy,
                         summer_immersion=use_immersion_in_summer,
@@ -2110,7 +2109,7 @@ def table_n8_secondary_fraction(psr, heating_duration):
 def micro_chp_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
     # !!! Probably should check provision type in here for consistency
     # !!! with water sys inputs (e.g. summer immersion, etc)
-    sys = HeatingSystem(HeatingSystem.TYPES.microchp,
+    sys = HeatingSystem(HeatingTypes.microchp,
                         -1,
                         -1,
                         summer_immersion=use_immersion_in_summer,
@@ -2218,7 +2217,7 @@ def add_appendix_n_equations_microchp(dwelling, sys, pcdf_data):
 def heat_pump_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
     # !!! Probably should check provision type in here for consistency
     # !!! with water sys inputs (e.g. summer immersion, etc)
-    sys = HeatingSystem(HeatingSystem.TYPES.pcdf_heat_pump,
+    sys = HeatingSystem(HeatingTypes.pcdf_heat_pump,
                         -1,
                         -1,
                         summer_immersion=use_immersion_in_summer,
@@ -2425,31 +2424,31 @@ def sap_table_heating_system(dwelling,
 TABLE_D7 = {
     FuelTypes.GAS: {
         # Modulating, condensing, type
-        (False, False, HeatingSystem.TYPES.regular_boiler): (-6.5, 3.8, -6.5),
-        (False, True, HeatingSystem.TYPES.regular_boiler): (-2.5, 1.45, -2.5),
-        (True, False, HeatingSystem.TYPES.regular_boiler): (-2.0, 3.15, -2.0),
-        (True, True, HeatingSystem.TYPES.regular_boiler): (-2.0, -0.95, -2.0),
-        (False, False, HeatingSystem.TYPES.combi): (-6.8, -3.7, -6.8),
-        (False, True, HeatingSystem.TYPES.combi): (-2.8, -5.0, -2.8),
-        (True, False, HeatingSystem.TYPES.combi): (-6.1, 4.15, -6.1),
-        (True, True, HeatingSystem.TYPES.combi): (-2.1, -0.7, -2.1),
-        (False, False, HeatingSystem.TYPES.storage_combi): (-6.59, -0.5, -6.59),
-        (False, True, HeatingSystem.TYPES.storage_combi): (-6.59, -0.5, -6.59),
-        (True, False, HeatingSystem.TYPES.storage_combi): (-1.7, 3.0, -1.7),
-        (True, True, HeatingSystem.TYPES.storage_combi): (-1.7, -1.0, -1.7),
-        (False, False, HeatingSystem.TYPES.cpsu): (-0.64, -1.25, -0.64),
-        (True, False, HeatingSystem.TYPES.cpsu): (-0.64, -1.25, -0.64),
-        (False, True, HeatingSystem.TYPES.cpsu): (-0.28, -3.15, -0.28),
-        (True, True, HeatingSystem.TYPES.cpsu): (-0.28, -3.15, -0.28),
+        (False, False, HeatingTypes.regular_boiler): (-6.5, 3.8, -6.5),
+        (False, True, HeatingTypes.regular_boiler): (-2.5, 1.45, -2.5),
+        (True, False, HeatingTypes.regular_boiler): (-2.0, 3.15, -2.0),
+        (True, True, HeatingTypes.regular_boiler): (-2.0, -0.95, -2.0),
+        (False, False, HeatingTypes.combi): (-6.8, -3.7, -6.8),
+        (False, True, HeatingTypes.combi): (-2.8, -5.0, -2.8),
+        (True, False, HeatingTypes.combi): (-6.1, 4.15, -6.1),
+        (True, True, HeatingTypes.combi): (-2.1, -0.7, -2.1),
+        (False, False, HeatingTypes.storage_combi): (-6.59, -0.5, -6.59),
+        (False, True, HeatingTypes.storage_combi): (-6.59, -0.5, -6.59),
+        (True, False, HeatingTypes.storage_combi): (-1.7, 3.0, -1.7),
+        (True, True, HeatingTypes.storage_combi): (-1.7, -1.0, -1.7),
+        (False, False, HeatingTypes.cpsu): (-0.64, -1.25, -0.64),
+        (True, False, HeatingTypes.cpsu): (-0.64, -1.25, -0.64),
+        (False, True, HeatingTypes.cpsu): (-0.28, -3.15, -0.28),
+        (True, True, HeatingTypes.cpsu): (-0.28, -3.15, -0.28),
     },
     FuelTypes.OIL: {
         # Condensing, type
-        (False, HeatingSystem.TYPES.regular_boiler): (0, -5.2, -1.1),
-        (True, HeatingSystem.TYPES.regular_boiler): (0, 1.1, -1.1),
-        (False, HeatingSystem.TYPES.combi): (-2.8, 1.45, -2.8),
-        (True, HeatingSystem.TYPES.combi): (-2.8, -0.25, -2.8),
-        (False, HeatingSystem.TYPES.storage_combi): (-2.8, -2.8, -2.8),
-        (True, HeatingSystem.TYPES.storage_combi): (-2.8, -0.95, -2.8),
+        (False, HeatingTypes.regular_boiler): (0, -5.2, -1.1),
+        (True, HeatingTypes.regular_boiler): (0, 1.1, -1.1),
+        (False, HeatingTypes.combi): (-2.8, 1.45, -2.8),
+        (True, HeatingTypes.combi): (-2.8, -0.25, -2.8),
+        (False, HeatingTypes.storage_combi): (-2.8, -2.8, -2.8),
+        (True, HeatingTypes.storage_combi): (-2.8, -0.95, -2.8),
     }
 }
 
@@ -2522,15 +2521,15 @@ class AppendixD:
 TABLE_D2_7 = {
     FuelTypes.GAS: {
         # !!! Assumes modulating burner !!!
-        HeatingSystem.TYPES.regular_boiler: (1., -9.7),
-        HeatingSystem.TYPES.combi: (.9, -9.2),
-        HeatingSystem.TYPES.storage_combi: (.8, -8.3),
-        HeatingSystem.TYPES.cpsu: (.22, -1.64),
+        HeatingTypes.regular_boiler: (1., -9.7),
+        HeatingTypes.combi: (.9, -9.2),
+        HeatingTypes.storage_combi: (.8, -8.3),
+        HeatingTypes.cpsu: (.22, -1.64),
     },
     FuelTypes.OIL: {
-        HeatingSystem.TYPES.regular_boiler: (1.1, -10.6),
-        HeatingSystem.TYPES.combi: (1., -8.5),
-        HeatingSystem.TYPES.storage_combi: (.9, -7.2),
+        HeatingTypes.regular_boiler: (1.1, -10.6),
+        HeatingTypes.combi: (1., -8.5),
+        HeatingTypes.storage_combi: (.9, -7.2),
     }
 }
 
@@ -2565,11 +2564,11 @@ def sedbuk_2009_heating_system(dwelling,
     has_flue_fan = fan_assisted_flue and fuel.type != FuelTypes.OIL
 
     # !!! Assumes either a regular boiler or storage combi
-    if boiler_type == HeatingSystem.TYPES.regular_boiler:
+    if boiler_type == HeatingTypes.regular_boiler:
         table2brow = 2
-    elif boiler_type == HeatingSystem.TYPES.storage_combi:
+    elif boiler_type == HeatingTypes.storage_combi:
         table2brow = 3
-    elif boiler_type == HeatingSystem.TYPES.cpsu:
+    elif boiler_type == HeatingTypes.cpsu:
         table2brow = 7
     else:
         table2brow = -1
@@ -2586,13 +2585,13 @@ def sedbuk_2009_heating_system(dwelling,
 
     system.responsiveness = 1
     system.is_condensing = is_condensing
-    if system.system_type in [HeatingSystem.TYPES.combi,
-                              HeatingSystem.TYPES.storage_combi]:
+    if system.system_type in [HeatingTypes.combi,
+                              HeatingTypes.storage_combi]:
         system.combi_loss = combi_loss_table_3a(dwelling, system)
 
         if dwelling.get('hw_cylinder_volume') and dwelling.hw_cylinder_volume > 0:
             dwelling.has_cylinderstat = True  # !!! Does this go here?
-    elif system.system_type == HeatingSystem.TYPES.cpsu:
+    elif system.system_type == HeatingTypes.cpsu:
         # !!! Might also need to set cpsu_Tw here?
         system.cpsu_not_in_airing_cupboard = true_and_not_missing(dwelling, 'cpsu_not_in_airing_cupboard')
 
@@ -2630,7 +2629,7 @@ class CommunityHeating:
     def __init__(self, heat_sources, sap_distribution_type):
         self.is_community_heating = True
         self.table2brow = 2  # !!! Assume indirect cylinder inside dwelling
-        self.system_type = HeatingSystem.TYPES.community
+        self.system_type = HeatingTypes.community
         self.has_ch_pump = False
         self.has_oil_pump = False
 
@@ -2840,6 +2839,7 @@ def configure_control_system2(dwelling, system):
 
 
 def configure_main_system(dwelling):
+    print(dwelling)
     if dwelling.get('main_heating_pcdf_id') and dwelling.main_heating_pcdf_id is not None:
         dwelling.main_sys_1 = pcdf_heating_system(dwelling,
                                                   dwelling.main_heating_pcdf_id,
@@ -2972,7 +2972,7 @@ def configure_water_system(dwelling):
                 dwelling.water_sys.dhw_charging_factor = 1.05
             else:
                 dwelling.water_sys.dhw_charging_factor = 1.0
-            if dwelling.main_sys_1.system_type == HeatingSystem.TYPES.community:
+            if dwelling.main_sys_1.system_type == HeatingTypes.community:
                 # Standing charge already covered by main system
                 dwelling.water_sys.fuel.standing_charge = 0
             else:
@@ -3000,7 +3000,7 @@ def configure_water_storage(dwelling):
             dwelling.temperature_factor = hw_temperature_factor(dwelling, True)
         else:
             # !!! Is this electric CPSU tests in the right place?
-            if (dwelling.water_sys.system_type == HeatingSystem.TYPES.cpsu and
+            if (dwelling.water_sys.system_type == HeatingTypes.cpsu and
                     dwelling.water_sys.fuel.is_electric):
                 dwelling.storage_loss_factor = 0.022
             elif not dwelling.get('storage_loss_factor'):
@@ -3059,8 +3059,8 @@ def configure_controls(dwelling):
     dwelling.water_sys.has_interlock = dwelling.hwsys_has_boiler_interlock if dwelling.get(
         'hwsys_has_boiler_interlock') else False
 
-    if dwelling.water_sys.system_type in [HeatingSystem.TYPES.combi,
-                                          HeatingSystem.TYPES.storage_combi]:
+    if dwelling.water_sys.system_type in [HeatingTypes.combi,
+                                          HeatingTypes.storage_combi]:
         dwelling.combi_loss = dwelling.water_sys.combi_loss
 
     if not dwelling.get('heating_control_type_sys1'):
@@ -3115,7 +3115,7 @@ def configure_fghr(dwelling):
             dict(get_fghr_system(dwelling.fghrs['pcdf_id'])))
 
         if dwelling.fghrs["heat_store"] == "3":
-            assert dwelling.water_sys.system_type == HeatingSystem.TYPES.combi
+            assert dwelling.water_sys.system_type == HeatingTypes.combi
             assert not dwelling.get('hw_cylinder_volume')
             assert not dwelling.has_hw_cylinder
 
@@ -3144,8 +3144,8 @@ def configure_fghr(dwelling):
         else:
             assert not "PV_kWp" in dwelling.fghrs
 
-        if (dwelling.water_sys.system_type in [HeatingSystem.TYPES.combi,
-                                               HeatingSystem.TYPES.storage_combi]
+        if (dwelling.water_sys.system_type in [HeatingTypes.combi,
+                                               HeatingTypes.storage_combi]
             and true_and_not_missing(dwelling.water_sys, 'has_no_keep_hot')
             and not dwelling.has_hw_cylinder):
             dwelling.fghrs['equations'] = dwelling.fghrs['equations_combi_without_keephot_without_ext_store']

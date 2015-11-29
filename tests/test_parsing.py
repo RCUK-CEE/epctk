@@ -76,7 +76,7 @@ class TestFieldValue(unittest.TestCase):
         self.assertEqual("a: 1, b: 2, c: 3", inp.vals[0].note)
 
 
-class test_primary_input(unittest.TestCase):
+class TestPrimaryInput(unittest.TestCase):
 
     def test_simple_primary_input(self):
         results = primary_input.parseString("\\par primlab1:\\tab val1")
@@ -134,7 +134,7 @@ class test_primary_input(unittest.TestCase):
         self.assertEqual("val2", pinput.vals[1].vals[0].value)
 
 
-class test_table(unittest.TestCase):
+class TestTable(unittest.TestCase):
 
     def test_entry_special_chars(self):
         results = table_entry.parseString("hello12().,/- ")
