@@ -7,22 +7,23 @@ import unittest
 import output_checker
 import yaml_io
 from helpers import ALL_PARAMS, log_dwelling_params
-from sap import runner, input_conversion_rules
+from sap import runner
 from sap.dwelling import Dwelling
+from sap.rtf_reader import input_conversion_rules
 from sap.utils import SAPCalculationError
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
 SAP_REGIONS = {
-    './reference_dwellings/2.rtf': 11,
-    './reference_dwellings/3.rtf': 11,
-    './reference_dwellings/4.rtf': 11,
-    './reference_dwellings/5.rtf': 11,
-    './reference_dwellings/6.rtf': 8,
-    './reference_dwellings/7.rtf': 8,
-    './reference_dwellings/8.rtf': 4,
-    './reference_dwellings/9.rtf': 11,
-    './reference_dwellings/10.rtf': 11,
+    '2.rtf': 11,
+    '3.rtf': 11,
+    '4.rtf': 11,
+    '5.rtf': 11,
+    '6.rtf': 8,
+    '7.rtf': 8,
+    '8.rtf': 4,
+    '9.rtf': 11,
+    '10.rtf': 11,
 }
 
 
@@ -46,37 +47,24 @@ def create_sap_dwelling(inputs):
     return dwelling
 
 
-def test_run_all(parser):
-    for id in range(28):
-        fname = os.path.join('reference_dwellings', '%d.rtf' % (id + 2,))
-        f = open(fname, 'r')
+def parse_file(fname, parser):
+    with open(fname, 'r') as f:
         txt = f.read()
         txt = txt.replace('\\\'b', '')
-        res = []
-        for srvrtokens, startloc, endloc in parser.scanString(txt):
-            res.append(srvrtokens)
-
-        print((id + 2, len(res)))  # ,res[0][0]
-
-
-def parse_file(fname, parser):
-    f = open(fname, 'r')
-    txt = f.read()
-    txt = txt.replace('\\\'b', '')
-    txt = txt.replace('\\f1', '')
-    txt = txt.replace('\\f2', '')
-    return parser.parseString(txt)
+        txt = txt.replace('\\f1', '')
+        txt = txt.replace('\\f2', '')
+        return parser.parseString(txt)
 
 
 def scan_file(fname, parser):
-    f = open(fname, 'r')
-    txt = f.read()
-    txt = txt.replace('\\\'b', '')
-    txt = txt.replace('\\f2', '')
-    res = []
-    for srvrtokens, startloc, endloc in parser.scanString(txt):
-        res.append(srvrtokens)
-    return res
+    with open(fname, 'r') as f:
+        txt = f.read()
+        txt = txt.replace('\\\'b', '')
+        txt = txt.replace('\\f2', '')
+        res = []
+        for srvrtokens, startloc, endloc in parser.scanString(txt):
+            res.append(srvrtokens)
+        return res
 
 
 def parse_input_file(test_case_id):
@@ -106,19 +94,18 @@ def load_reference_case(case_name, parser, force_reparse):
     return case
 
 
-def run_dwelling(fname, d):
-    # !!! Bit of a hack here because our tests case files don't include
-    # !!! sap region
+def run_dwelling(fname, dwelling):
+    # FIXME !!! Bit of a hack here because our tests case files don't include sap region
     if fname in SAP_REGIONS:
-        d.sap_region = SAP_REGIONS[fname]
-    elif not hasattr(d, "sap_region"):
-        d.sap_region = 11
+        dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
+    elif not dwelling.get("sap_region"):
+        dwelling['sap_region'] = 11
 
-    runner.run_sap(d)
-    runner.run_improvements(d)
-    runner.run_fee(d)
-    runner.run_der(d)
-    runner.run_ter(d)
+    runner.run_sap(dwelling)
+    runner.run_improvements(dwelling)
+    runner.run_fee(dwelling)
+    runner.run_der(dwelling)
+    runner.run_ter(dwelling)
 
 
 def run_case(fname, reparse):
@@ -215,6 +202,10 @@ class TestOfficialCases(unittest.TestCase):
     def test_run_all_known_working_noparse(self):
         run_official_cases(
             OFFICIAL_CASES_THAT_WORK, reparse=False)
+    #
+    # def test_run_all_known_working_parse(self):
+    #     run_official_cases(
+    #         OFFICIAL_CASES_THAT_WORK, reparse=True)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import copy
 
 from sap.pcdf import VentilationTypes
 from .dwelling import DwellingResultsWrapper
-from .sap_tables import CylinderInsulationTypes, GlazingTypes, do_sap_table_lookups, OvershadingTypes, HeatEmitters, \
+from .sap_tables import CylinderInsulationTypes, GlazingTypes, lookup_sap_tables, OvershadingTypes, HeatEmitters, \
     fuel_from_code, HeatingSystem, PVOvershading, hw_volume_factor
 from . import worksheet
 
@@ -38,7 +38,7 @@ def run_sap(dwelling):
     # dwelling = DwellingResultsWrapper(input_dwelling)
     dwelling.reduced_gains = False
 
-    do_sap_table_lookups(dwelling)
+    lookup_sap_tables(dwelling)
 
     perform_full_calc(dwelling)
 
@@ -49,7 +49,7 @@ def run_sap(dwelling):
 
 
 def run_fee(input_dwelling):
-    dwelling = DwellingResultsWrapper(input_dwelling)
+    dwelling = copy.deepcopy(input_dwelling)
     dwelling.reduced_gains = True
 
     dwelling.cooled_area = input_dwelling.GFA
@@ -69,7 +69,7 @@ def run_fee(input_dwelling):
         dwelling.overshading = OvershadingTypes.AVERAGE
 
     dwelling.main_heating_pcdf_id = None
-    dwelling.main_heating_type_code = 191
+    dwelling['main_heating_type_code'] = 191
     dwelling.main_sys_fuel = fuel_from_code(1)
     dwelling.heating_emitter_type = HeatEmitters.RADIATORS
     dwelling.control_type_code = 2106
@@ -90,7 +90,7 @@ def run_fee(input_dwelling):
     dwelling.main_heating_fraction = 1
     dwelling.main_heating_2_fraction = 0
 
-    do_sap_table_lookups(dwelling)
+    lookup_sap_tables(dwelling)
 
     dwelling.pump_gain = 0
     dwelling.heating_system_pump_gain = 0
@@ -109,7 +109,7 @@ def run_der(input_dwelling):
     if dwelling.overshading == OvershadingTypes.VERY_LITTLE:
         dwelling.overshading = OvershadingTypes.AVERAGE
 
-    do_sap_table_lookups(dwelling)
+    lookup_sap_tables(dwelling)
     perform_full_calc(dwelling)
     worksheet.der(dwelling)
     dwelling.report.build_report()
@@ -214,7 +214,7 @@ def run_ter(input_dwelling):
     else:
         dwelling.Nfansandpassivevents = 2
 
-    dwelling.main_heating_type_code = 102
+    dwelling['main_heating_type_code'] = 102
     dwelling.main_heating_pcdf_id = None
     dwelling.heating_emitter_type = HeatEmitters.RADIATORS
     dwelling.heating_emitter_type2 = None
@@ -263,7 +263,7 @@ def run_ter(input_dwelling):
 
     # Need to make sure no summer immersion and no renewables 
 
-    do_sap_table_lookups(dwelling)
+    lookup_sap_tables(dwelling)
     dwelling.main_sys_1.heating_effy_winter = 78 + .9
     dwelling.main_sys_1.heating_effy_summer = 78 - 9.2
 
@@ -400,7 +400,7 @@ def run_improvements(dwelling):
     base_dwelling_pcdf_prices.reduced_gains = False
     base_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
 
-    do_sap_table_lookups(base_dwelling_pcdf_prices)
+    lookup_sap_tables(base_dwelling_pcdf_prices)
     perform_full_calc(base_dwelling_pcdf_prices)
     worksheet.sap(base_dwelling_pcdf_prices)
 
@@ -435,11 +435,11 @@ def run_improvements(dwelling):
 
         improve(base_dwelling_pcdf_prices, dwelling_regular_prices)
 
-        do_sap_table_lookups(dwelling_pcdf_prices)
+        lookup_sap_tables(dwelling_pcdf_prices)
         perform_full_calc(dwelling_pcdf_prices)
         worksheet.sap(dwelling_pcdf_prices)
 
-        do_sap_table_lookups(dwelling_regular_prices)
+        lookup_sap_tables(dwelling_regular_prices)
         perform_full_calc(dwelling_regular_prices)
         worksheet.sap(dwelling_regular_prices)
 
@@ -463,7 +463,7 @@ def run_improvements(dwelling):
         name, min_val, improve = [x for x in IMPROVEMENTS if x[0] == improvement.tag][0]
         improve(base_dwelling_pcdf_prices, improved_dwelling)
 
-    do_sap_table_lookups(improved_dwelling)
+    lookup_sap_tables(improved_dwelling)
     perform_full_calc(improved_dwelling)
     worksheet.sap(improved_dwelling)
 

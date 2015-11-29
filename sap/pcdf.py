@@ -27,7 +27,7 @@ condensing = {'1': False,
 
 flue_types = {'0': 'unknown',
               '1': 'open', '2':
-    'room-sealed',
+                  'room-sealed',
               '3': 'open or room-sealed'}
 
 flue_fan = {'0': 'False',
@@ -55,6 +55,33 @@ mev_configurations = {'1': 'room_kitchen',
                       '4': 'duct_other',
                       '5': 'wall_kitchen',
                       '6': 'wall_other'}
+
+
+class VentilationTypes:
+    NATURAL = 0
+    MEV_CENTRALISED = 1
+    MEV_DECENTRALISED = 2
+    MVHR = 3
+    MV = 4
+    PIV_FROM_OUTSIDE = 5
+
+
+class DuctTypes:
+    FLEXIBLE = 1
+    RIGID = 2
+    FLEXIBLE_INSULATED = 3  # For use with mvhr
+    RIGID_INSULATED = 4  # For use with mvhr
+    NONE = 5
+
+
+MV_TYPE_MAPPING = {
+    "1": [VentilationTypes.MEV_CENTRALISED, ],
+    "2": [VentilationTypes.MEV_DECENTRALISED,
+          VentilationTypes.PIV_FROM_OUTSIDE],
+    "3": [VentilationTypes.MV,
+          VentilationTypes.MVHR, ],
+    "10": [],
+}
 
 
 def row_id(table_id, toks):
@@ -372,33 +399,6 @@ def get_fghr_system(id):
                     c=float_or_none(fields[29 + i * 7])))
 
     return sys
-
-
-class VentilationTypes:
-    NATURAL = 0
-    MEV_CENTRALISED = 1
-    MEV_DECENTRALISED = 2
-    MVHR = 3
-    MV = 4
-    PIV_FROM_OUTSIDE = 5
-
-
-class DuctTypes:
-    FLEXIBLE = 1
-    RIGID = 2
-    FLEXIBLE_INSULATED = 3  # For use with mvhr
-    RIGID_INSULATED = 4  # For use with mvhr
-    NONE = 5
-
-
-MV_TYPE_MAPPING = {
-    "1": [VentilationTypes.MEV_CENTRALISED, ],
-    "2": [VentilationTypes.MEV_DECENTRALISED,
-          VentilationTypes.PIV_FROM_OUTSIDE],
-    "3": [VentilationTypes.MV,
-          VentilationTypes.MVHR, ],
-    "10": [],
-}
 
 
 def get_in_use_factors():

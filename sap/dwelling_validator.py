@@ -1,5 +1,6 @@
 import logging
-from . import tables
+
+from sap.sap_tables import FuelTypes
 
 
 class SchemaValidator:
@@ -166,7 +167,7 @@ class one_of:
 def main_heating_is_oil_boiler(dwelling):
     # !!! need to also tests that system is a boiler - oil room heaters
     # !!! don't have a pump
-    return dwelling.main_sys_fuel.type() == tables.FuelTypes.OIL
+    return dwelling.main_sys_fuel.type() == FuelTypes.OIL
 
 
 def main_heating_uses_table_4d(dwelling):

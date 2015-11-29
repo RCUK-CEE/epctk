@@ -1,9 +1,12 @@
 import logging
 import copy
 
+from sap import worksheet
+from sap.pcdf import DuctTypes, VentilationTypes
 from sap.sap_tables import CylinderInsulationTypes, OpeningTypeDataSource, GlazingTypes, HeatEmitters, \
     ELECTRICITY_STANDARD, fuel_from_code, OvershadingTypes, CommunityDistributionTypes, HeatingSystem, PVOvershading, \
-    LoadCompensators
+    LoadCompensators, TerrainTypes, SHWCollectorTypes, FloorTypes, WallTypes, ELECTRICITY_7HR, ELECTRICITY_10HR, \
+    ThermalStoreTypes, ImmersionTypes
 
 
 class LambdaMapping(object):
@@ -16,28 +19,24 @@ class LambdaMapping(object):
         d[self.attr] = self.f(r)
 
 
-# Mapping functions for primary inputs
-def simple_mapping(attr):
-    return LambdaMapping(attr, lambda x: float(x.vals[0].value))
-
 
 class subtoken_mapping:
 
-    def __init__(self, attr, inputId, tokenId, converter=float):
+    def __init__(self, attr, input_id, token_id, converter=float):
         self.attr = attr
-        self.inputId = inputId
-        self.tokenId = tokenId
+        self.inputId = input_id
+        self.tokenId = token_id
         self.converter = converter
 
     def apply(self, d, r):
         if len(r.vals) <= self.inputId:
-            logging.warn(
+            logging.warning(
                 "Not enough values for subtoken mapping of %s\n", self.attr)
             return
 
         tokens = r.vals[self.inputId].value.split()
         if len(tokens) <= self.tokenId:
-            logging.warn(
+            logging.warning(
                 "Not enough tokens for subtoken mapping of %s\n", self.attr)
             return
 
@@ -45,12 +44,17 @@ class subtoken_mapping:
         d[self.attr] = val
 
 
+# Mapping functions for primary inputs
+def simple_mapping(attr):
+    return LambdaMapping(attr, lambda x: float(x.vals[0].value))
+
+
 def lookup_mapping(attr, dic):
     return LambdaMapping(attr, lambda x: dic[x.vals[0].value])
 
 
 def percent_to_float(x):
-    return float(x[:-1]) / 100.
+    return float(x[:-1]) / 100.0
 
 ORIENTATIONS = {'(Unspecified)': 90,
                 'unspecified': 90,
@@ -368,92 +372,114 @@ class MainHeatingSystemRule:
         else:
             pass
 
-    def apply(self, d, r):
-        if r.vals[0].value == 'Community heating scheme':
-            d[self.heating_type_code_attr] = "community"
-            d.community_heat_sources, d.sap_community_distribution_type = parse_community_heating_sources(
-                r)
-            return
+    def apply(self, dwelling, data):
+        """
 
+        :param dwelling:
+        :param data:
+        :return:
+        """
+        if data.vals[0].value == 'Community heating scheme':
+            dwelling[self.heating_type_code_attr] = "community"
+            heat_src, sap_dist_typ = parse_community_heating_sources(data)
+            dwelling['community_heat_sources'] = heat_src
+            dwelling['sap_community_distribution_type'] = sap_dist_typ
+            return
+        print(type(data))
+        data.pprint()
         v_prev = None
-        for v in r.vals:
+        for v in data.vals:
             if v.label != '':
                 if v.label == Labels.SYSTEM_FUEL:
                     fuel = get_fuel(v)
                     if fuel != None:
-                        d[self.fuel_attr] = fuel
+                        dwelling[self.fuel_attr] = fuel
                     else:
                         logging.warning("Unknown fuel: %s", v.vals[0].value)
                 elif v.label == Labels.MAIN_HEAT_FRACTION:
-                    setattr(
-                        d, self.heating_fraction_attr, float(v.vals[0].value))
+                    dwelling[self.heating_fraction_attr] = float(v.vals[0].value)
                 elif v.label == 'Database ':
-                    d[self.pcdf_id_attr] = v.note.split()[4]
+                    dwelling[self.pcdf_id_attr] = v.note.split()[4]
                 elif v.label == "Model qualifier":
                     if v.vals[0].value == "(regular boiler)":
                         # We are allowed to use store params from input
                         # data if this is a regular boiler
-                        d.parser_use_input_file_store_params = True
+                        dwelling.parser_use_input_file_store_params = True
                 else:
                     logging.warning("Unknown system input: %s", v)
             else:
                 try:
-                    type = int(v.value.split()[0])
-                    d[self.heating_type_code_attr] = type
+                    # Expects that there should be an int-valued bit of information in this line...
+                    value_type = int(v.value.split()[0])
+                    print("main_heating_type", value_type)
+                    dwelling[self.heating_type_code_attr] = value_type
+
                     if v.note == "HETAS Approved" or "HETAS" in v.value:
-                        d[self.hetas_attr] = True
+                        dwelling[self.hetas_attr] = True
+
                     continue
                 except ValueError as e:
-                    pass
+                    logging.warning("Could not extract main heating type from input: {}".format(v))
 
                 if v.value == Labels.CENTRAL_HEATING_PUMP:
-                    d.central_heating_pump_in_heated_space = True
+                    dwelling['central_heating_pump_in_heated_space'] = True
+
                 elif v.value == Labels.CENTRAL_HEATING_PUMP_NOT_IN_HEAT_SPACE:
-                    d.central_heating_pump_in_heated_space = False
+                    dwelling['central_heating_pump_in_heated_space'] = False
+
                 elif v.value == Labels.OIL_BOILER_PUMP_IN_HEATED_SPACE:
-                    d[self.oil_pump_location_attr] = True
+                    dwelling[self.oil_pump_location_attr] = True
+
                 elif v.value == Labels.OIL_BOILER_PUMP_NOT_IN_HEATED_SPACE:
-                    d[self.oil_pump_location_attr] = False
+                    dwelling[self.oil_pump_location_attr] = False
+
                 elif v.value == Labels.THERMAL_STORE_HW_ONLY:
-                    d.thermal_store_type = ThermalStoreTypes.HW_ONLY
+                    dwelling['thermal_store_type'] = ThermalStoreTypes.HW_ONLY
+
                 elif v.value == Labels.THERMAL_STORE_INTEGRATED:
-                    d.thermal_store_type = ThermalStoreTypes.INTEGRATED
+                    dwelling['thermal_store_type'] = ThermalStoreTypes.INTEGRATED
+
                 elif v.value in emitter_types:
-                    setattr(
-                        d, self.heating_emitter_attr, emitter_types[v.value])
+                    dwelling[self.heating_emitter_attr] = emitter_types[v.value]
+
                 elif v.value.split()[0] == 'Database':
                     if v.note != "":
-                        d[self.pcdf_id_attr] = v.note.split()[4]
+                        dwelling[self.pcdf_id_attr] = v.note.split()[4]
                     else:
-                        d[self.pcdf_id_attr] = v.value.split()[5][:-1]
+                        dwelling[self.pcdf_id_attr] = v.value.split()[5][:-1]
+
                 elif v.value == '(re-assigned following interchange of main 1 and secondary)':
-                    d.reassign_systems_for_test_case_30 = True
+                    dwelling['reassign_systems_for_test_case_30'] = True
+
                 elif v.value == 'Each system heats separate parts of house':
-                    d.heating_systems_heat_separate_areas = True
+                    dwelling['heating_systems_heat_separate_areas'] = True
+
                 elif v.value.split()[0] == "SEDBUK(2005)":
-                    d[self.sedbuk_2005_effy] = float(v.value.split()[1][0:-2])
-                    self.handle_sedbuk_system(d, v, v_prev)
+                    dwelling[self.sedbuk_2005_effy] = float(v.value.split()[1][0:-2])
+                    self.handle_sedbuk_system(dwelling, v, v_prev)
+
                 elif v.value.split()[0] == "SEDBUK(2009)":
-                    d[self.sedbuk_2009_effy] = float(v.value.split()[1][0:-2])
-                    self.handle_sedbuk_system(d, v, v_prev)
+                    dwelling[self.sedbuk_2009_effy] = float(v.value.split()[1][0:-2])
+                    self.handle_sedbuk_system(dwelling, v, v_prev)
+
                 elif "Case emission" in v.value:
                     # part of a sedbuk range cooker
                     toks = v.value.split()
-                    d[self.sedbuk_range_case_loss_at_full_output] = float(toks[2])
-                    d[self.sedbuk_range_full_output] = float(toks[8])
+                    dwelling[self.sedbuk_range_case_loss_at_full_output] = float(toks[2])
+                    dwelling[self.sedbuk_range_full_output] = float(toks[8])
+
                 else:
                     logging.warning("Unknown system field: %s", v)
 
             v_prev = v
 
-    def handle_sedbuk_system(self, d, v, v_prev):
-        toks = v.value.split()
-        d.parser_use_input_file_store_params = True
+    def handle_sedbuk_system(self, dwelling, v, v_prev):
+        dwelling.parser_use_input_file_store_params = True
 
         previn = v_prev.vals[0].vals[
             0].value if v_prev.value == "" else v_prev.value
-        d[self.sedbuk_type] = self.get_sedbuk_type(previn)
-        d[self.sedbuk_fan_assisted] = "fan-assisted" in previn
+        dwelling[self.sedbuk_type] = self.get_sedbuk_type(previn)
+        dwelling[self.sedbuk_fan_assisted] = "fan-assisted" in previn
 
     def get_sedbuk_type(self, typestr):
         if "Regular" in typestr or "Range cooker" in typestr:
@@ -772,14 +798,15 @@ class SolarPanelRule:
     def apply(self, d, r):
         if len(r.vals) != 1:
             for r in r.vals:
-                logging.warn("Unknown solar panel input: %s", r)
+                logging.warning("Unknown solar panel input: %s", r)
         else:
             if r.vals[0].value != "No":
                 if r.vals[0].label == "Yes - aperture area":
                     areaTokens = r.vals[0].vals[0].value.split()
                     d.solar_collector_aperture = float(areaTokens[0])
                 else:
-                    logging.warn("Unknown solar panel input: %s", r.vals[0])
+                    logging.warning("Unknown solar panel input: %s", r.vals[0])
+
 
 WATER_SYSTEM_RULES = {
     Labels.CYLINDER_VOLUME: subtoken_mapping('hw_cylinder_volume', 0, 0),
@@ -803,6 +830,7 @@ WATER_SYSTEM_RULES = {
     Labels.BOILER_INTERLOCK: lookup_mapping('hwsys_has_boiler_interlock', BOOLEANS),
     Labels.PV_OVERSHADING: lookup_mapping('collector_overshading', PV_OVERSHADING),
 }
+
 
 WWHR_SYSTEM_INPUTS = {
     "Total rooms with shower and/or bath",
@@ -916,7 +944,7 @@ class WaterHeatingSystemRule:
                     d.wwhr_total_rooms_with_shower_or_bath = int(
                         inp.vals[0].vals[0].value)
                 else:
-                    logging.warn("Unknown WWHRS input %s", inp)
+                    logging.warning("Unknown WWHRS input %s", inp)
             elif len(tokens) > 2 and tokens[0] == "Product" and tokens[1] == "index":
                 system = dict(pcdf_id=tokens[2][:-1])
                 if system != None:
@@ -1176,11 +1204,14 @@ SAP_REGIONS = {
     'Wales': 13,
 }
 
+
 DWELLING_TYPES = {
     'Flat': True,
     'House': False,
     'Bungalow': False,
 }
+
+
 INPUT_RULES = {
     Labels.DETACHMENT: NullRule(),
     Labels.DWELLING_TYPE: lookup_mapping('is_flat', DWELLING_TYPES),
@@ -1242,25 +1273,6 @@ INPUT_RULES = {
 
 }
 
-
-def process_table(dwelling, row):
-    if row.column_headings[1] == 'Gross area':
-        process_elements_table(dwelling, row)
-
-    elif row.column_headings[1] == 'Floor area':
-        process_floor_area_table(dwelling, row)
-
-    elif row.column_headings[1] == 'Source':
-        process_opening_types_part1_table(dwelling, row)
-
-    elif row.column_headings[1] == 'Gap':
-        process_opening_types_part2_table(dwelling, row)
-
-    elif row.column_headings[1] == 'Type-Name':
-        process_openings_table(dwelling, row)
-
-    else:
-        logging.warning("Unknown table: %s", row)
 
 
 def process_floor_area_table(d, r):
@@ -1497,9 +1509,9 @@ def process_opening_types_part2_table(d, r):
             logging.warning("unknown element type %s", row[0])
 
 
-def process_openings_table(d, r):
+def process_openings_table(dwelling, r):
     # Rely on fact that types table comes first in rtf!
-    types = d.opening_types
+    types = dwelling.opening_types
     openings = []
     for row in r.rows:
         if row[1] == "Doors":
@@ -1515,7 +1527,27 @@ def process_openings_table(d, r):
         else:
             logging.warning("Unrecognised opening type: %s", row[1])
 
-    d.openings = openings
+    dwelling.openings = openings
+
+
+def process_table(dwelling, row):
+    if row.column_headings[1] == 'Gross area':
+        process_elements_table(dwelling, row)
+
+    elif row.column_headings[1] == 'Floor area':
+        process_floor_area_table(dwelling, row)
+
+    elif row.column_headings[1] == 'Source':
+        process_opening_types_part1_table(dwelling, row)
+
+    elif row.column_headings[1] == 'Gap':
+        process_opening_types_part2_table(dwelling, row)
+
+    elif row.column_headings[1] == 'Type-Name':
+        process_openings_table(dwelling, row)
+
+    else:
+        logging.warning("Unknown table: %s", row)
 
 
 def process_inputs(dwelling, inputs):

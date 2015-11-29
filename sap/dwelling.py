@@ -14,8 +14,8 @@ class Dwelling(dict):
     def __init__(self, **kwargs):
         # allow attributes to be sorted
         super().__init__(**kwargs)
-        self._attrs = collections.OrderedDict()
-        self.wind_speed = WIND_SPEED
+        # self._attrs = collections.OrderedDict()
+        self['wind_speed'] = self.wind_speed = WIND_SPEED
 
         # apply_sap_hardcoded_values here to avoid setting attrs outside of __init__
         self.Texternal_heating = T_EXTERNAL_HEATING
@@ -27,29 +27,7 @@ class Dwelling(dict):
         self.er_results = self.results = CalculationResults()
         self.report = CalculationReport(self)
 
-    # def __iter__(self):
-    #     for attr, value in self._attrs.items():
-    #         yield attr, value
-
-
-    # def __getitem__(self, item):
-    #     try:
-    #         return self.__dict__[item]
-    #     except KeyError:
-    #         try:
-    #             return self.results[item]
-    #         except KeyError:
-    #             raise KeyError('%s is neither in dwelling properties nor results' % item)
-
-    # def __setattr__(self, key, value):
-    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
-    #     # FIXME: This is really fragile...
-    #     if key not in ['dwelling', 'results', 'report', '_attrs']:
-    #         self.results[key] = value
-    #     else:
-    #         self.__dict__[key] = value
-
-    # TODO: Dwelling had the ability to have attributes stored in OrderedDict. Unclear if this is necessary, disabled for now
+    # # TODO: Dwelling had the ability to have attributes stored in OrderedDict. Unclear if this is necessary, disabled for now
     # def __setattr__(self, name, value):
     #     # exclude _attrs so that we can acually set it during init
     #     # FIXME this is kinda hacky :/
@@ -71,23 +49,30 @@ class Dwelling(dict):
     #     except KeyError:
     #         raise AttributeError(name)
 
-    # def __getattr__(self, item):
-    #     """
-    #     Return own attribute, but if that is missing, return it from the results instead...
-    #
-    #     FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
-    #     """
-    #     try:
-    #         return self.__dict__[item]
-    #     except KeyError:
-    #         try:
-    #             return self.results[item]
-    #         except KeyError:
-    #             raise AttributeError(item)
+    def __getattr__(self, item):
+        """
+        Return own attribute, but if that is missing, return it from the results instead...
+
+        FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
+        """
+        try:
+            return self[item]
+        except KeyError:
+            try:
+                return self.__dict__[item]
+            except KeyError:
+                raise AttributeError(item)
+        # try:
+        #     return self[item]
+        # except KeyError:
+        #     try:
+        #         return self.results[item]
+        #     except KeyError:
+        #         raise AttributeError(item)
 
     def __str__(self):
         s = ''
-        for k, v in self:
+        for k, v in self.items():
             s += '{} - {} \n'.format(k, v)
         return s
 

@@ -6,9 +6,10 @@ from output_checker import check_monthly_result
 from output_checker import check_result
 from output_checker import check_summer_monthly_result
 from sap import runner
-from sap import worksheet, input_conversion_rules
+from sap import worksheet
 from sap.dwelling import Dwelling
 from sap.pcdf import VentilationTypes
+from sap.rtf_reader import input_conversion_rules
 from sap.sap_tables import GlazingTypes
 from tests import reference_case_parser
 

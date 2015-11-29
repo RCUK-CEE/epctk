@@ -16,7 +16,7 @@ def log_dwelling_params(dwelling, prefix=""):
     # FIXME dodgy use of global Calc_stage
     param_set = ALL_PARAMS[CALC_STAGE]
 
-    for k, v in dwelling:
+    for k, v in dwelling.items():
         # if k != "_attrs":
         pass
         # log_sap_obj(param_set, prefix, k, v)
