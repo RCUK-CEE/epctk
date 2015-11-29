@@ -6,11 +6,11 @@ import sys
 
 import output_checker
 import yaml_io
-from helpers import *
 from sap import pcdf
 from sap import runner
 from sap.io import input_conversion_rules
-from sap.utils import SAPCalculationError
+from sap.utils import SAPCalculationError, CALC_STAGE, ALL_PARAMS
+from sap.dwelling import log_dwelling_params, log_dwelling, ParamTrackerDwelling
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
@@ -32,7 +32,7 @@ def log_all_params(d, prefix=""):
 
     for k, v in list(d.items()):
         if k != "ordered_attrs":
-            log_sap_obj(param_set, prefix, k, v)
+            log_dwelling_params(param_set, prefix, k, v)
 
 
 def create_sap_dwelling(inputs):
@@ -43,7 +43,7 @@ def create_sap_dwelling(inputs):
         #logging.error("Bad inputs")
         # exit(0)
 
-    log_dwelling_params(dwelling.__dict__)
+    log_dwelling(dwelling.__dict__)
 
     dwelling.next_stage()
     return dwelling

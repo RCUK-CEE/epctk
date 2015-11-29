@@ -22,8 +22,7 @@ class SchemaValidator:
 
 
 class required:
-
-    """ 
+    """
     Checks that specified key exists in dwelling
     """
 
@@ -32,11 +31,11 @@ class required:
         self.vtype = vtype
 
     def validate(self, dwelling):
-        if not hasattr(dwelling, self.name):
+        if not dwelling.get(self.name):
             return False, ("Missing required attribute %s" % (self.name,),)
         else:
             try:
-                val = getattr(dwelling, self.name)
+                val = dwelling[self.name]
                 self.vtype(val)
                 print(("ok ", self.name))
             except:

@@ -1101,20 +1101,20 @@ def set_fuel_use(dwelling,
     primary_energy = sum_it(energy * primary_energy_factor)
 
     if dwelling.get("energy_use_%s" % label):
-        old_energy = getattr(dwelling, "energy_use_%s" % label)
-        old_emissions = getattr(dwelling, "emissions_%s" % label)
-        old_cost = getattr(dwelling, "cost_%s" % label)
-        old_pe = getattr(dwelling, "primary_energy_%s" % label)
+        old_energy = dwelling["energy_use_%s" % label]
+        old_emissions = dwelling["emissions_%s" % label]
+        old_cost = dwelling["cost_%s" % label]
+        old_pe = dwelling["primary_energy_%s" % label]
     else:
         old_energy = 0
         old_emissions = 0
         old_cost = 0
         old_pe = 0
 
-    setattr(dwelling, "energy_use_%s" % label, sum_it(energy) + old_energy)
-    setattr(dwelling, "emissions_%s" % label, emissions + old_emissions)
-    setattr(dwelling, "cost_%s" % label, fuel_cost + old_cost)
-    setattr(dwelling, "primary_energy_%s" % label, primary_energy + old_pe)
+    dwelling["energy_use_%s" % label] = sum_it(energy) + old_energy
+    dwelling["emissions_%s" % label] = emissions + old_emissions
+    dwelling["cost_%s" % label] = fuel_cost + old_cost
+    dwelling["primary_energy_%s" % label] = primary_energy + old_pe
 
     # Offset energy is always regulated?
     if sum_it(energy) < 0:

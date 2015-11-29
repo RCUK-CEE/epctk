@@ -1,5 +1,9 @@
 import csv
 
+CALC_STAGE = 0
+ALL_PARAMS = [set(), set(), set(), set(), set(), set(), set()]
+
+
 
 def float_or_none(val):
     return float(val) if val.strip() != "" else None
@@ -30,3 +34,17 @@ def csv_to_dict(filename, translator):
 
 def true_and_not_missing(d, attr):
     return hasattr(d, attr) and getattr(d, attr)
+
+# class TrackedDict(dict):
+#     def __init__(self, data, prefix):
+#         super(TrackedDict, self).__init__(data)
+#         self.prefix = prefix + "."
+#
+#         for key in list(data.keys()):
+#             ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
+#
+#     def __setitem__(self, key, value):
+#         dict.__setitem__(self, key, value)
+#         ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
+#
+

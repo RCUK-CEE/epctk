@@ -5,9 +5,9 @@ import re
 import types
 from enum import Enum
 import numpy
-# from . import pcdf
+
 # FIXME: had problems with relative imports when using sap as a library from ipython, always getting import errors...
-from .utils import float_or_zero, float_or_none, SAPCalculationError, csv_to_dict, true_and_not_missing
+from .utils import float_or_none, SAPCalculationError, csv_to_dict, true_and_not_missing, float_or_zero
 from .pcdf import get_fuel_prices, get_in_use_factors, get_mev_system, get_boiler, get_solid_fuel_boiler, \
     get_twin_burner_cooker_boiler, get_heat_pump, get_microchp, get_wwhr_system, get_fghr_system
 
@@ -1514,7 +1514,7 @@ def configure_ventilation(dwelling):
             sys = get_mev_system(dwelling.mev_sys_pcdf_id)
             get_sfp = lambda configuration: sys['configs'][configuration]['sfp']
         else:
-            get_sfp = lambda configuration: getattr(dwelling, "mev_fan_" + configuration + "_sfp")
+            get_sfp = lambda configuration: dwelling["mev_fan_" + configuration + "_sfp"]
 
         total_flow = 0
         sfp_sum = 0

@@ -1,9 +1,9 @@
 import logging
 import copy
 
-from sap import worksheet
-from sap.pcdf import DuctTypes, VentilationTypes
-from sap.sap_tables import CylinderInsulationTypes, OpeningTypeDataSource, GlazingTypes, HeatEmitters, \
+from .. import worksheet
+from ..pcdf import DuctTypes, VentilationTypes
+from ..sap_tables import CylinderInsulationTypes, OpeningTypeDataSource, GlazingTypes, HeatEmitters, \
     ELECTRICITY_STANDARD, fuel_from_code, OvershadingTypes, CommunityDistributionTypes, PVOvershading, \
     LoadCompensators, TerrainTypes, SHWCollectorTypes, FloorTypes, WallTypes, ELECTRICITY_7HR, ELECTRICITY_10HR, \
     ThermalStoreTypes, ImmersionTypes, HeatingTypes

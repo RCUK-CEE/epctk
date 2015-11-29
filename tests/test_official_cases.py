@@ -6,11 +6,10 @@ import unittest
 
 import output_checker
 import yaml_io
-from helpers import ALL_PARAMS, log_dwelling_params
 from sap import runner
-from sap.dwelling import Dwelling
+from sap.dwelling import Dwelling, log_dwelling
 from sap.io import input_conversion_rules
-from sap.utils import SAPCalculationError
+from sap.utils import SAPCalculationError, ALL_PARAMS
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
@@ -62,7 +61,7 @@ def create_sap_dwelling(inputs):
     # if not sap_dwelling_validator.validate(dwelling):
     # logging.error("Bad inputs")
     # exit(0)
-    log_dwelling_params(dwelling)
+    log_dwelling(dwelling)
 
     # dwelling.next_stage()
     return dwelling

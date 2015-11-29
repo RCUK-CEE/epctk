@@ -3,7 +3,7 @@ import copy
 from sap.pcdf import VentilationTypes
 from .dwelling import DwellingResultsWrapper
 from .sap_tables import CylinderInsulationTypes, GlazingTypes, lookup_sap_tables, OvershadingTypes, HeatEmitters, \
-    fuel_from_code, HeatingSystem, PVOvershading, hw_volume_factor, HeatingTypes
+    fuel_from_code, PVOvershading, hw_volume_factor, HeatingTypes
 from . import worksheet
 
 
