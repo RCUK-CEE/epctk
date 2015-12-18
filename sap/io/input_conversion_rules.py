@@ -1,12 +1,19 @@
-import logging
-import copy
+"""
+Input conversion rules
+----------------------
 
+Input conversion rules for converting from parsed input file
+(from RTF, Yaml, or pickled file) into a Dwelling object for use in calculations
+"""
+import copy
+import logging
+
+from ..sap_types import WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes, \
+    ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading, OpeningTypeDataSource
 from .. import worksheet
 from ..pcdf import DuctTypes, VentilationTypes
-from ..sap_tables import CylinderInsulationTypes, OpeningTypeDataSource, GlazingTypes, HeatEmitters, \
-    ELECTRICITY_STANDARD, fuel_from_code, OvershadingTypes, CommunityDistributionTypes, PVOvershading, \
-    LoadCompensators, TerrainTypes, SHWCollectorTypes, FloorTypes, WallTypes, ELECTRICITY_7HR, ELECTRICITY_10HR, \
-    ThermalStoreTypes, ImmersionTypes, HeatingTypes
+from ..sap_tables import HeatEmitters, CommunityDistributionTypes, LoadCompensators
+from ..fuels import ELECTRICITY_STANDARD, ELECTRICITY_7HR, ELECTRICITY_10HR, fuel_from_code
 
 
 class LambdaMapping(object):
@@ -1095,7 +1102,6 @@ class VentilationRule:
                 d.mev_sfp = float(v.vals[0].value)
             else:
                 logging.warning("Unknown MEV input: %s", v)
-                # print "here"
 
     def process_decentralised_mev(self, d, r):
         if r.vals[0].note != "":

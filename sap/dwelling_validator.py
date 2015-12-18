@@ -1,6 +1,5 @@
 import logging
-
-from sap.sap_tables import FuelTypes
+from sap.sap_types import FuelTypes
 
 
 class SchemaValidator:

@@ -1,12 +1,12 @@
 from .utils import ALL_PARAMS, CALC_STAGE
-from .sap_tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING, Fuel, ElectricityTariff
+from .sap_tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING, ElectricityTariff
+from sap.fuels import Fuel, ElectricityTariff
 
 
 class Dwelling(dict):
     def __init__(self, **kwargs):
         # allow attributes to be sorted
         super().__init__(**kwargs)
-        # self._attrs = collections.OrderedDict()
         self['wind_speed'] = self.wind_speed = WIND_SPEED
 
         # apply_sap_hardcoded_values here to avoid setting attrs outside of __init__
@@ -16,30 +16,9 @@ class Dwelling(dict):
         self.Tcooling = 24
 
         #TODO could just use a Dict, don't really need CalculationResults
-        self.er_results = self.results = CalculationResults()
+        self.results = dict()
+        self.er_results = dict()
         self.report = CalculationReport(self)
-
-    # # TODO: Dwelling had the ability to have attributes stored in OrderedDict. Unclear if this is necessary, disabled for now
-    # def __setattr__(self, name, value):
-    #     # exclude _attrs so that we can acually set it during init
-    #     # FIXME this is kinda hacky :/
-    #     if name == '_attrs':
-    #         return super().__setattr__(name, value)
-    #     self._attrs[name] = value
-
-    # # TODO: this allows to get dwelling properties as attributes, but this is rather fragile
-    # #
-    # def __getattr__(self, name):
-    #     """
-    #     return from results if k exists, otherwise return from wrapped
-    #     dwelling
-    #
-    #     FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
-    #     """
-    #     try:
-    #         return self._attrs[name]
-    #     except KeyError:
-    #         raise AttributeError(name)
 
     def __getattr__(self, item):
         """
@@ -54,13 +33,6 @@ class Dwelling(dict):
                 return self.__dict__[item]
             except KeyError:
                 raise AttributeError(item)
-        # try:
-        #     return self[item]
-        # except KeyError:
-        #     try:
-        #         return self.results[item]
-        #     except KeyError:
-        #         raise AttributeError(item)
 
     def __str__(self):
         s = ''
@@ -71,53 +43,62 @@ class Dwelling(dict):
     def __repr__(self):
         return self.__str__()
 
+    # @property
+    # def er_results(self):
+    #     return self.results
+    #
+    # @er_results.setter
+    # def er_results(self, value):
+    #     self.results = value
+
 
 # TODO: could probably rather subclass Dwelling
 # FIXME: seems that worksheet in any case depends on the dwelling object having report object. May better to just merge this into Dwelling
 class DwellingResultsWrapper(Dwelling):
-    pass
-    # def __init__(self, dwelling):
-    #     self.dwelling = dwelling
-    #
-    #     self.results = CalculationResults()  # just use a Dict, don't really need CalculationResults for now
-    #     self.results.report = CalculationReport(self)
-    #     self.report = self.results.report
-    #     # self.report = CalculationReport()
-    #     # self.results['report']
-    #
-    # def __setattr__(self, key, value):
-    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
-    #     # FIXME: This is really fragile...
-    #     if key not in ['dwelling', 'results', 'report']:
-    #         self.results[key] = value
-    #     else:
-    #         self.__dict__[key] = value
-    #
-    # def __getattr__(self, item):
-    #     """
-    #     return from results if k exists, otherwise return from wrapped
-    #     dwelling
-    #
-    #     FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
-    #     """
-    #     try:
-    #         return self.dwelling.__getattr__(item)
-    #     except AttributeError:
-    #         try:
-    #             return self.results[item]
-    #         except KeyError:
-    #             raise AttributeError(item)
-    #
-    # def true_and_not_missing(self, name):
-    #     return hasattr(self, name) and getattr(self, name)
+    """
+    This looks like a dwelling but redirects 'setter' operations
+    to a 'results' internal object. This is used to perform different variations of
+    SAP calculation on a dwelling and then assign only the results of those to the original
+    dwelling with an appropriate prefix, e.g. der_results, fee_results etc...
+
+    The idea being that the original dwelling is 'frozen' and some point in the calculation
+    """
+    def __init__(self, dwelling):
+        super().__init__(**dwelling)
+        self.results = dict()  # just use a Dict, don't really need CalculationResults for now
+        self.results.report = CalculationReport(self)
+        self.report = self.results.report
+
+    def __setattr__(self, key, value):
+        # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
+        # FIXME: This is really fragile...
+        if key not in ['dwelling', 'results', 'report']:
+            self.results[key] = value
+        else:
+            self.__dict__[key] = value
+
+    def __getattr__(self, item):
+        """
+        return from results if k exists, otherwise return from wrapped
+        dwelling
+
+        FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
+        """
+        try:
+            return self[item]
+        except KeyError:
+            try:
+                return self.results[item]
+            except KeyError:
+                raise AttributeError(item)
 
 
-class CalculationResults(dict):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.report = None
+# class CalculationResults(dict):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
 
 
+# TODO IDEA: instead of building strings, build a report as a data tree which can be formatted later
 class CalculationReport(object):
     def __init__(self, dwelling):
         self.dwelling = dwelling

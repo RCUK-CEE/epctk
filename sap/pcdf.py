@@ -132,7 +132,7 @@ def get_boiler(boiler_id):
         return None
     result = dict(
         sedbuk_idx=str(fields[0]),
-        manufacturer=str(fields[3], encoding='latin-1'),
+        manufacturer=str(fields[3]),
         brand=str(fields[4]),
         model=str(fields[5]),
         model_qualifier=str(fields[6]),
@@ -198,9 +198,9 @@ def get_solid_fuel_boiler(id):
     )
 
 
-def get_twin_burner_cooker_boiler(id):
+def get_twin_burner_cooker_boiler(product_id):
     try:
-        fields = get_product('131', id)
+        fields = get_product('131', product_id)
     except KeyError:
         return None
     return dict(
@@ -324,11 +324,11 @@ def get_microchp(id):
     return sys
 
 
-def get_mev_system(id):
-    fields = get_product('322', id)
+def get_mev_system(mev_id):
+    fields = get_product('322', mev_id)
     sys = dict(
         sedbuk_idx=str(fields[0]),
-        manufacturer=str(fields[3], encoding='latin-1'),
+        manufacturer=str(fields[3]),
         brand=str(fields[4]),
         model=str(fields[5]),
         main_type=fields[9],

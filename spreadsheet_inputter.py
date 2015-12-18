@@ -10,7 +10,7 @@ from sap import worksheet
 from sap.dwelling import Dwelling
 from sap.pcdf import VentilationTypes
 from sap.io import input_conversion_rules
-from sap.sap_tables import GlazingTypes
+from sap.sap_types import GlazingTypes
 from tests import reference_case_parser
 
 

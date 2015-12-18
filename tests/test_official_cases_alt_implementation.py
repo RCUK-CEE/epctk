@@ -17,8 +17,6 @@ from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 all_params = [set(), set(), set(), set(), set(), set(), set()]
 
 
-
-
 def dump_param_list():
     for i in range(len(ALL_PARAMS)):
         for k in ALL_PARAMS[i]:
