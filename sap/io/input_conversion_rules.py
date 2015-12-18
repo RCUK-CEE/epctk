@@ -8,11 +8,11 @@ Input conversion rules for converting from parsed input file
 import copy
 import logging
 
+import sap.sap_types
 from ..sap_types import WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes, \
-    ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading, OpeningTypeDataSource
+    ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading, OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes, DuctTypes
 from .. import worksheet
-from ..pcdf import DuctTypes, VentilationTypes
-from ..sap_tables import HeatEmitters, CommunityDistributionTypes, LoadCompensators
+from ..heating_systems import CommunityDistributionTypes
 from ..fuels import ELECTRICITY_STANDARD, ELECTRICITY_7HR, ELECTRICITY_10HR, fuel_from_code
 
 
@@ -28,7 +28,6 @@ class LambdaMapping(object):
 
 
 class subtoken_mapping:
-
     def __init__(self, attr, input_id, token_id, converter=float):
         self.attr = attr
         self.inputId = input_id
@@ -664,7 +663,7 @@ class ControlSystemRule:
                     type = int(v.value.split()[0])
                     dwelling[self.control_type_attr] = type
                     continue
-                except ValueError as e:
+                except ValueError:
                     pass
 
                 if v.value == "Enhanced load compensator":
@@ -1311,18 +1310,18 @@ def process_floor_area_table(d, r):
 
 class Elements:
     solid_external_elements = {
-        'Doors': worksheet.HeatLossElementTypes.OPAQUE_DOOR,
-        'Roof (1)': worksheet.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Roof (2)': worksheet.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Roof (3)': worksheet.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Roof (4)': worksheet.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Ground floor': worksheet.HeatLossElementTypes.EXTERNAL_FLOOR,
-        'Walls (1)': worksheet.HeatLossElementTypes.EXTERNAL_WALL,
-        'Walls (2)': worksheet.HeatLossElementTypes.EXTERNAL_WALL,
-        'Walls (3)': worksheet.HeatLossElementTypes.EXTERNAL_WALL,
-        'Walls (4)': worksheet.HeatLossElementTypes.EXTERNAL_WALL,
-        'Curtain Walls (1)': worksheet.HeatLossElementTypes.EXTERNAL_WALL,
-        'Exposed floor': worksheet.HeatLossElementTypes.EXTERNAL_FLOOR,
+        'Doors': sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
+        'Roof (1)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
+        'Roof (2)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
+        'Roof (3)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
+        'Roof (4)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
+        'Ground floor': sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
+        'Walls (1)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
+        'Walls (2)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
+        'Walls (3)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
+        'Walls (4)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
+        'Curtain Walls (1)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
+        'Exposed floor': sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
     }
 
     solid_internal_elements = [
@@ -1402,19 +1401,19 @@ def process_elements_table(dwelling, table):
             area = float(row[3])
             if area > 0 and row[4] != "":
                 heat_loss_elements.append(worksheet.HeatLossElement(area=float(row[3]),
-                                                   Uvalue=float(row[4]),
-                                                   is_external=False,
-                                                   element_type=worksheet.HeatLossElementTypes.PARTY_WALL,
-                                                   name=row[0]))
+                                                                    Uvalue=float(row[4]),
+                                                                    is_external=False,
+                                                                    element_type=sap.sap_types.HeatLossElementTypes.PARTY_WALL,
+                                                                    name=row[0]))
         elif row[0] in Elements.opening_elements:
             U = 1 / (1 / float(row[4]) + 0.04)
             area = float(row[3])
             if area > 0:
                 heat_loss_elements.append(worksheet.HeatLossElement(area=float(row[3]),
-                                                   Uvalue=U,
-                                                   is_external=True,
-                                                   element_type=worksheet.HeatLossElementTypes.GLAZING,
-                                                   name=row[0]))
+                                                                    Uvalue=U,
+                                                                    is_external=True,
+                                                                    element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
+                                                                    name=row[0]))
         elif row[0] in Elements.conservatory_elements:
             if row[0] == 'Conservatory walls':
                 # Annoying special case - missing one column
@@ -1423,10 +1422,10 @@ def process_elements_table(dwelling, table):
                 area = float(row[2])
                 if area > 0:
                     heat_loss_elements.append(worksheet.HeatLossElement(area=area,
-                                                       Uvalue=U,
-                                                       is_external=True,
-                                                       element_type=worksheet.HeatLossElementTypes.GLAZING,
-                                                       name=row[0]))
+                                                                        Uvalue=U,
+                                                                        is_external=True,
+                                                                        element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
+                                                                        name=row[0]))
 
                     dwelling.openings.append(worksheet.Opening(
                         area=area,
@@ -1439,10 +1438,10 @@ def process_elements_table(dwelling, table):
                 area = float(row[3])
                 if area > 0:
                     heat_loss_elements.append(worksheet.HeatLossElement(area=area,
-                                                       Uvalue=U,
-                                                       is_external=True,
-                                                       element_type=worksheet.HeatLossElementTypes.GLAZING,
-                                                       name=row[0]))
+                                                                        Uvalue=U,
+                                                                        is_external=True,
+                                                                        element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
+                                                                        name=row[0]))
                     import copy
                     window_type = copy.deepcopy(dwelling.opening_types["Windows (2)"])
                     window_type.roof_window = True
@@ -1456,10 +1455,10 @@ def process_elements_table(dwelling, table):
                 area = float(row[3])
                 if area > 0:
                     heat_loss_elements.append(worksheet.HeatLossElement(area=area,
-                                                       Uvalue=U,
-                                                       is_external=True,
-                                                       element_type=worksheet.HeatLossElementTypes.EXTERNAL_FLOOR,
-                                                       name=row[0]))
+                                                                        Uvalue=U,
+                                                                        is_external=True,
+                                                                        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
+                                                                        name=row[0]))
         elif not row[0].strip() in Elements.awkward_elements:
             logging.warning("unknown element type %s", row[0])
     dwelling.heat_loss_elements = heat_loss_elements
@@ -1489,7 +1488,7 @@ def process_opening_types_part1_table(d, r):
             glazing_type = GLAZING_TYPES[row[3].split(',')[0].upper()]
             window_type = row[2]
 
-            types[row[0]] = worksheet.OpeningType(
+            types[row[0]] = sap.sap_types.OpeningType(
                 glazing_type=glazing_type,
                 gvalue=0,  # Filled in from next table
                 frame_factor=0,

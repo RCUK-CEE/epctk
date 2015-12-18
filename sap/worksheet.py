@@ -1,18 +1,11 @@
 import math
+
 import numpy
-from .pcdf import VentilationTypes
-from .sap_tables import (DAYS_PER_MONTH, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
+
+from sap.sap_constants import DAYS_PER_MONTH
+from .sap_types import HeatingTypes, HeatLossElementTypes, OpeningType, VentilationTypes
+from .sap_tables import (MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
                          ELECTRICITY_SOLD, ELECTRICITY_OFFSET, TABLE_H5)
-from sap.sap_types import GlazingTypes, HeatingTypes
-
-
-class HeatLossElementTypes:
-    EXTERNAL_WALL = 1
-    PARTY_WALL = 2
-    EXTERNAL_FLOOR = 3
-    EXTERNAL_ROOF = 4
-    OPAQUE_DOOR = 5
-    GLAZING = 6
 
 
 class HeatLossElement:
@@ -29,31 +22,6 @@ class ThermalMassElement:
         self.area = area
         self.kvalue = kvalue
         self.name = name
-
-
-def light_transmittance_from_glazing_type(glazing_type):
-    if glazing_type == GlazingTypes.SINGLE:
-        return 0.9
-    elif glazing_type == GlazingTypes.DOUBLE:
-        return 0.8
-    elif glazing_type == GlazingTypes.TRIPLE:
-        return 0.7
-    elif glazing_type == GlazingTypes.SECONDARY:
-        return .8
-    else:
-        raise RuntimeError("unknown glazing type %s" % glazing_type)
-
-
-class OpeningType:
-    def __init__(self, glazing_type, gvalue, frame_factor, Uvalue, roof_window, bfrc_data=False):
-        self.gvalue = gvalue
-        self.light_transmittance = light_transmittance_from_glazing_type(
-            glazing_type)
-        self.frame_factor = frame_factor
-        self.Uvalue = Uvalue
-        self.roof_window = roof_window
-        self.bfrc_data = bfrc_data
-        self.glazing_type = glazing_type
 
 
 class Opening:
@@ -275,19 +243,27 @@ def ventilation(dwelling):
 
 
 def heat_loss(dwelling):
+    """
+    Set the attributes `h`, `hlp`, `h_fabric`, `h_bridging`, `h_vent`, `h_vent_annual`
+    on the given dwelling object
+    :param dwelling:
+    :return:
+    """
     if dwelling.get('hlp') is not None:
+        # TODO: what is "h"?
         dwelling.h = dwelling.hlp * dwelling.GFA
         return
 
     UA = sum(e.Uvalue * e.area for e in dwelling.heat_loss_elements)
-    Abridging = sum(
+    A_bridging = sum(
         e.area for e in dwelling.heat_loss_elements if e.is_external)
     if dwelling.get("Uthermalbridges") is not None:
-        h_bridging = dwelling.Uthermalbridges * Abridging
+        h_bridging = dwelling.Uthermalbridges * A_bridging
     else:
         h_bridging = sum(x['length'] * x['y'] for x in dwelling.y_values)
 
     h_vent = 0.33 * dwelling.infiltration_ach * dwelling.volume
+
     dwelling.h = UA + h_bridging + h_vent
     dwelling.hlp = dwelling.h / dwelling.GFA
 

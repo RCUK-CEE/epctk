@@ -32,7 +32,7 @@ def csv_to_dict(filename, translator):
     return results
 
 
-def true_and_not_missing(d, attr):
+def exists_and_true(d, attr):
     return hasattr(d, attr) and getattr(d, attr)
 
 # class TrackedDict(dict):

@@ -2,6 +2,7 @@ import logging
 
 import win32com.client
 
+import sap.sap_types
 from output_checker import check_monthly_result
 from output_checker import check_result
 from output_checker import check_summer_monthly_result
@@ -10,7 +11,7 @@ from sap import worksheet
 from sap.dwelling import Dwelling
 from sap.pcdf import VentilationTypes
 from sap.io import input_conversion_rules
-from sap.sap_types import GlazingTypes
+from sap.sap_types import GlazingTypes, VentilationTypes
 from tests import reference_case_parser
 
 
@@ -69,11 +70,11 @@ GLAZING_TYPES = {
 }
 
 ELEMENT_TYPES = {
-    worksheet.HeatLossElementTypes.EXTERNAL_WALL: "External wall",
-    worksheet.HeatLossElementTypes.PARTY_WALL: "Party wall",
-    worksheet.HeatLossElementTypes.EXTERNAL_FLOOR: "Ground floor",
-    worksheet.HeatLossElementTypes.EXTERNAL_ROOF: "Roof",
-    worksheet.HeatLossElementTypes.OPAQUE_DOOR: "Opaque door",
+    sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL: "External wall",
+    sap.sap_types.HeatLossElementTypes.PARTY_WALL: "Party wall",
+    sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR: "Ground floor",
+    sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF: "Roof",
+    sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR: "Opaque door",
 }
 
 
@@ -285,7 +286,7 @@ def process_envelope_elements(xlbook, d):
 
 
 def process_solid_elements(xlbook, d):
-    doors = [el for el in d.heat_loss_elements if el.element_type == worksheet.HeatLossElementTypes.OPAQUE_DOOR]
+    doors = [el for el in d.heat_loss_elements if el.element_type == sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR]
     assert len(doors) == 1
 
     xlbook.set_opaque_element(
@@ -296,8 +297,8 @@ def process_solid_elements(xlbook, d):
     idx = 1
 
     for el in [el for el in d.heat_loss_elements if not el.element_type in [
-        worksheet.HeatLossElementTypes.OPAQUE_DOOR,
-        worksheet.HeatLossElementTypes.GLAZING,
+        sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
+        sap.sap_types.HeatLossElementTypes.GLAZING,
     ]]:
         xlbook.set_opaque_element(
             idx,

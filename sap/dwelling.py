@@ -1,6 +1,6 @@
 from .utils import ALL_PARAMS, CALC_STAGE
-from .sap_tables import WIND_SPEED, T_EXTERNAL_HEATING, IGH_HEATING, ElectricityTariff
-from sap.fuels import Fuel, ElectricityTariff
+from .sap_constants import IGH_HEATING, T_EXTERNAL_HEATING, WIND_SPEED
+from .fuels import Fuel, ElectricityTariff
 
 
 class Dwelling(dict):
@@ -290,11 +290,11 @@ class CalculationReport(object):
         ]
 
         for label in end_uses:
-            if dwelling.get("energy_use_%s" % (label,)):
-                energy = dwelling["energy_use_%s" % (label,)]
-                emissions = dwelling["emissions_%s" % (label,)]
-                cost = dwelling["cost_%s" % (label,)]
-                primary_energy = dwelling["primary_energy_%s" % (label,)]
+            if dwelling.get("energy_use_%s" % label):
+                energy = dwelling["energy_use_%s" % label]
+                emissions = dwelling["emissions_%s" % label]
+                cost = dwelling["cost_%s" % label]
+                primary_energy = dwelling["primary_energy_%s" % label]
                 self.add_single_result(label, None, "%f | %f | %f | %f" %
                                        (energy, emissions, cost, primary_energy))
 

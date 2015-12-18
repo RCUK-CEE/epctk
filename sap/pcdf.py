@@ -1,4 +1,6 @@
 import os
+
+from sap.sap_types import VentilationTypes, DuctTypes
 from .utils import int_or_none, float_or_none
 
 PCDF_DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'pcdf2009.dat')
@@ -56,36 +58,18 @@ mev_configurations = {'1': 'room_kitchen',
                       '5': 'wall_kitchen',
                       '6': 'wall_other'}
 
-
-class VentilationTypes:
-    NATURAL = 0
-    MEV_CENTRALISED = 1
-    MEV_DECENTRALISED = 2
-    MVHR = 3
-    MV = 4
-    PIV_FROM_OUTSIDE = 5
-
-
-class DuctTypes:
-    FLEXIBLE = 1
-    RIGID = 2
-    FLEXIBLE_INSULATED = 3  # For use with mvhr
-    RIGID_INSULATED = 4  # For use with mvhr
-    NONE = 5
-
-
 MV_TYPE_MAPPING = {
-    "1": [VentilationTypes.MEV_CENTRALISED, ],
-    "2": [VentilationTypes.MEV_DECENTRALISED,
+    '1': [VentilationTypes.MEV_CENTRALISED, ],
+    '2': [VentilationTypes.MEV_DECENTRALISED,
           VentilationTypes.PIV_FROM_OUTSIDE],
-    "3": [VentilationTypes.MV,
+    '3': [VentilationTypes.MV,
           VentilationTypes.MVHR, ],
-    "10": [],
+    '10': [],
 }
 
 
 def row_id(table_id, toks):
-    if table_id == "191":
+    if table_id == '191':
         return toks[1]
     else:
         return toks[0]

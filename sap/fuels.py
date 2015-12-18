@@ -8,7 +8,7 @@ from sap.utils import float_or_none, csv_to_dict
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
 
 
-USE_PCDF_FUEL_PRICES = False
+PREFER_PCDF_FUEL_PRICES = False
 
 
 class FuelData:
@@ -266,14 +266,15 @@ def get_fuel_data_pcdf(fuel_id):
         return fuel_prices
 
     else:
-        raise RuntimeError("THERE IS NO PCDF DATA FOR THIS FUEL ID")
-        # return get_fuel_data_table_12(fuel_id)
+        print("THERE IS NO PCDF DATA FOR THIS FUEL ID")
+        # raise RuntimeError("THERE IS NO PCDF DATA FOR THIS FUEL ID")
+        return get_fuel_data_table_12(fuel_id)
 
 
 # FIXME!!! References Global Mutable Variable, which is a BIG ISSUE!
 # FIXME: USE_PCDF_FUEL_PRICES doesn't guarantee you get a PCDF fuel price, since it falls back to T12 anyway
 def get_fuel_data(fuel_id):
-    if USE_PCDF_FUEL_PRICES:
+    if PREFER_PCDF_FUEL_PRICES:
         return get_fuel_data_pcdf(fuel_id)
     else:
         return get_fuel_data_table_12(fuel_id)

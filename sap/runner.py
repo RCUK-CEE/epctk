@@ -1,11 +1,12 @@
 import copy
 
+import sap.sap_types
 from sap.pcdf import VentilationTypes
 from . import worksheet
 from .dwelling import DwellingResultsWrapper
-from .sap_tables import HeatEmitters, \
-    hw_volume_factor
-from sap.sap_configure import lookup_sap_tables
+from .sap_tables import hw_volume_factor
+from sap.sap_types import HeatEmitters, VentilationTypes
+from sap.configure import lookup_sap_tables
 from sap.fuels import fuel_from_code
 from .sap_types import CylinderInsulationTypes, GlazingTypes, OvershadingTypes, HeatingTypes, PVOvershading
 
@@ -170,9 +171,9 @@ def run_ter(input_dwelling):
 
     dwelling.reduced_gains = True
 
-    net_wall_area = element_type_area(worksheet.HeatLossElementTypes.EXTERNAL_WALL,
+    net_wall_area = element_type_area(sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
                                       dwelling.heat_loss_elements)
-    opaque_door_area = element_type_area(worksheet.HeatLossElementTypes.OPAQUE_DOOR,
+    opaque_door_area = element_type_area(sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
                                          dwelling.heat_loss_elements)
     window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == False)
     roof_window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == True)
@@ -181,9 +182,9 @@ def run_ter(input_dwelling):
     new_opening_area = min(dwelling.GFA * .25, gross_wall_area)
     new_window_area = max(new_opening_area - 1.85, 0)
 
-    floor_area = element_type_area(worksheet.HeatLossElementTypes.EXTERNAL_FLOOR,
+    floor_area = element_type_area(sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
                                    dwelling.heat_loss_elements)
-    net_roof_area = element_type_area(worksheet.HeatLossElementTypes.EXTERNAL_ROOF,
+    net_roof_area = element_type_area(sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
                                       dwelling.heat_loss_elements)
     roof_area = net_roof_area + roof_window_area
 
@@ -191,32 +192,32 @@ def run_ter(input_dwelling):
         area=gross_wall_area - new_window_area - 1.85,
         Uvalue=.35,
         is_external=True,
-        element_type=worksheet.HeatLossElementTypes.EXTERNAL_WALL,
+        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
     ), worksheet.HeatLossElement(
         area=1.85,
         Uvalue=2,
         is_external=True,
-        element_type=worksheet.HeatLossElementTypes.OPAQUE_DOOR,
+        element_type=sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
     ), worksheet.HeatLossElement(
         area=floor_area,
         Uvalue=.25,
         is_external=True,
-        element_type=worksheet.HeatLossElementTypes.EXTERNAL_FLOOR,
+        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
     ), worksheet.HeatLossElement(
         area=roof_area,
         Uvalue=.16,
         is_external=True,
-        element_type=worksheet.HeatLossElementTypes.EXTERNAL_ROOF,
+        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
     ), worksheet.HeatLossElement(
         area=new_window_area,
         Uvalue=1. / (1. / 2 + .04),
         is_external=True,
-        element_type=worksheet.HeatLossElementTypes.GLAZING,
+        element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
     )]
 
     dwelling.heat_loss_elements = heat_loss_elements
 
-    ter_opening_type = worksheet.OpeningType(
+    ter_opening_type = sap.sap_types.OpeningType(
         glazing_type=GlazingTypes.DOUBLE,
         gvalue=.72,
         frame_factor=0.7,
