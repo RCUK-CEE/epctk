@@ -2,7 +2,7 @@ import math
 
 import numpy
 
-from sap.sap_constants import DAYS_PER_MONTH
+from .sap_constants import DAYS_PER_MONTH
 from .sap_types import HeatingTypes, HeatLossElementTypes, OpeningType, VentilationTypes
 from .sap_tables import (MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
                          ELECTRICITY_SOLD, ELECTRICITY_OFFSET, TABLE_H5)
@@ -290,6 +290,7 @@ def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
 
     overshading_factor = dwelling.collector_overshading_factor
 
+    # print(dwelling.solar_collector_aperture)
     available_energy = dwelling.solar_collector_aperture * dwelling.collector_zero_loss_effy
     available_energy *= annual_radiation * overshading_factor
 
@@ -362,16 +363,19 @@ def hot_water_use(dwelling):
     if dwelling.get('instantaneous_pou_water_heating'):
         dwelling.distribution_loss = 0
         dwelling.storage_loss = 0
+
     else:
         dwelling.distribution_loss = 0.15 * dwelling.hw_energy_content
 
         if dwelling.get('measured_cylinder_loss') is not None:
             dwelling.storage_loss = dwelling.measured_cylinder_loss * \
                                     dwelling.temperature_factor * DAYS_PER_MONTH
+
         elif dwelling.get('hw_cylinder_volume') is not None:
             cylinder_loss = dwelling.hw_cylinder_volume * dwelling.storage_loss_factor * \
                             dwelling.volume_factor * dwelling.temperature_factor
             dwelling.storage_loss = cylinder_loss * DAYS_PER_MONTH
+
         else:
             dwelling.storage_loss = 0
 
@@ -387,15 +391,13 @@ def hot_water_use(dwelling):
     dwelling.primary_circuit_loss = (primary_circuit_loss_annual / 365.) * DAYS_PER_MONTH
 
     if dwelling.get('combi_loss') is not None:
-        dwelling.combi_loss_monthly = dwelling.combi_loss(
-            dwelling.hw_use_daily) * DAYS_PER_MONTH / 365
+        dwelling.combi_loss_monthly = dwelling.combi_loss(dwelling.hw_use_daily) * DAYS_PER_MONTH / 365
     else:
         dwelling.combi_loss_monthly = 0
 
-    if dwelling.get('use_immersion_heater_summer') is not None:
-        if dwelling.use_immersion_heater_summer:
-            for i in range(5, 9):
-                dwelling.primary_circuit_loss[i] = 0
+    if dwelling.get('use_immersion_heater_summer', False):
+        for i in range(5, 9):
+            dwelling.primary_circuit_loss[i] = 0
 
     if dwelling.get('wwhr_systems') is not None:
         dwelling.savings_from_wwhrs = wwhr_savings(dwelling)
@@ -412,8 +414,7 @@ def hot_water_use(dwelling):
     else:
         dwelling.input_from_solar = 0
 
-    if (dwelling.get('fghrs') is not None and
-            dwelling.fghrs['has_pv_module']):
+    if dwelling.get('fghrs') is not None and dwelling.fghrs['has_pv_module']:
         dwelling.fghrs_input_from_solar = fghrs_solar_input(dwelling,
                                                             dwelling.fghrs,
                                                             dwelling.hw_energy_content,
@@ -789,8 +790,7 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
         Texternal, dwelling.living_area_Theating, Tno_heat_living,
         tau, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m, living_space=True)
 
-    if dwelling.main_heating_fraction < 1 and hasattr(dwelling,
-                                                      'heating_systems_heat_separate_areas') and dwelling.heating_systems_heat_separate_areas:
+    if dwelling.main_heating_fraction < 1 and dwelling.get('heating_systems_heat_separate_areas'):
         if dwelling.main_heating_fraction > dwelling.living_area_fraction:
             # both systems contribute to rest of house
             weight_1 = 1 - dwelling.main_heating_2_fraction / \
@@ -1110,6 +1110,18 @@ def set_fuel_use(dwelling,
                  co2_factor,
                  cost,
                  primary_energy_factor):
+    """
+    Set the fuel use factors on the dwelling
+
+    :param dwelling:
+    :param label:
+    :param regulated:
+    :param energy:
+    :param co2_factor:
+    :param cost:
+    :param primary_energy_factor:
+    :return:
+    """
     emissions = sum_it(energy * co2_factor)
     fuel_cost = sum_it(energy * cost)
     primary_energy = sum_it(energy * primary_energy_factor)

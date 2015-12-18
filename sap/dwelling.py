@@ -4,20 +4,18 @@ from .fuels import Fuel, ElectricityTariff
 
 
 class Dwelling(dict):
+    # apply_sap_hardcoded_values here to avoid setting attrs outside of __init__
+    wind_speed = WIND_SPEED
+    Texternal_heating = T_EXTERNAL_HEATING
+    Igh_heating = IGH_HEATING
+    living_area_Theating = 21
+    Tcooling = 24
+
     def __init__(self, **kwargs):
-        # allow attributes to be sorted
+        # TODO: allow attributes to be sorted
         super().__init__(**kwargs)
-        self['wind_speed'] = self.wind_speed = WIND_SPEED
-
-        # apply_sap_hardcoded_values here to avoid setting attrs outside of __init__
-        self.Texternal_heating = T_EXTERNAL_HEATING
-        self.Igh_heating = IGH_HEATING
-        self.living_area_Theating = 21
-        self.Tcooling = 24
-
-        #TODO could just use a Dict, don't really need CalculationResults
         self.results = dict()
-        self.er_results = dict()
+        # self.er_results = dict()
         self.report = CalculationReport(self)
 
     def __getattr__(self, item):
@@ -54,7 +52,7 @@ class Dwelling(dict):
 
 # TODO: could probably rather subclass Dwelling
 # FIXME: seems that worksheet in any case depends on the dwelling object having report object. May better to just merge this into Dwelling
-class DwellingResultsWrapper(Dwelling):
+class DwellingResults(Dwelling):
     """
     This looks like a dwelling but redirects 'setter' operations
     to a 'results' internal object. This is used to perform different variations of
@@ -64,33 +62,38 @@ class DwellingResultsWrapper(Dwelling):
     The idea being that the original dwelling is 'frozen' and some point in the calculation
     """
     def __init__(self, dwelling):
-        super().__init__(**dwelling)
+
         self.results = dict()  # just use a Dict, don't really need CalculationResults for now
-        self.results.report = CalculationReport(self)
-        self.report = self.results.report
+        self.report = CalculationReport(self)
+        self.update(dwelling)
+        # self.report = self.results.report
 
     def __setattr__(self, key, value):
         # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
         # FIXME: This is really fragile...
-        if key not in ['dwelling', 'results', 'report']:
+        if key not in ['results', 'report']:
             self.results[key] = value
         else:
             self.__dict__[key] = value
 
     def __getattr__(self, item):
         """
-        return from results if k exists, otherwise return from wrapped
-        dwelling
+        Return own attribute, but if that is missing, return it from the results instead...
 
         FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
         """
         try:
-            return self[item]
+            return self.results[item]
         except KeyError:
             try:
-                return self.results[item]
+                return self[item]
             except KeyError:
-                raise AttributeError(item)
+                try:
+                    return self.__dict__[item]
+                except KeyError:
+                    # print(self)
+                    raise AttributeError(item)
+
 
 
 # class CalculationResults(dict):

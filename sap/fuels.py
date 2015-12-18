@@ -1,5 +1,6 @@
 import copy
-import os
+import os.path
+import logging
 
 from sap.pcdf import get_fuel_prices
 from sap.sap_types import FuelTypes
@@ -266,7 +267,8 @@ def get_fuel_data_pcdf(fuel_id):
         return fuel_prices
 
     else:
-        print("THERE IS NO PCDF DATA FOR THIS FUEL ID")
+        # print()
+        logging.warning("fuels.py: THERE IS NO PCDF DATA FOR THIS FUEL ID %d" % fuel_id)
         # raise RuntimeError("THERE IS NO PCDF DATA FOR THIS FUEL ID")
         return get_fuel_data_table_12(fuel_id)
 

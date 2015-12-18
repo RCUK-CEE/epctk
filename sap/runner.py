@@ -3,7 +3,7 @@ import copy
 import sap.sap_types
 from sap.pcdf import VentilationTypes
 from . import worksheet
-from .dwelling import DwellingResultsWrapper
+from .dwelling import DwellingResults
 from .sap_tables import hw_volume_factor
 from sap.sap_types import HeatEmitters, VentilationTypes
 from sap.configure import lookup_sap_tables
@@ -44,13 +44,14 @@ def perform_full_calc(dwelling):
     worksheet.fuel_use(dwelling)
 
 
-def run_sap(dwelling):
+def run_sap(input_dwelling):
     """
     Run SAP on the input dwelling
     :param input_dwelling:
     :return:
     """
-    # dwelling = DwellingResultsWrapper(input_dwelling)
+    # dwelling = DwellingResults(input_dwelling)
+    dwelling = input_dwelling
     dwelling.reduced_gains = False
 
     lookup_sap_tables(dwelling)
@@ -59,7 +60,9 @@ def run_sap(dwelling):
 
     worksheet.sap(dwelling)
 
-    dwelling.report.build_report()
+    input_dwelling.er_results = dwelling.results
+
+    # dwelling.report.build_report()
 
 
 def run_fee(input_dwelling):
@@ -69,7 +72,7 @@ def run_fee(input_dwelling):
     :param input_dwelling:
     :return:
     """
-    dwelling = copy.deepcopy(input_dwelling)
+    dwelling = DwellingResults(input_dwelling)
     dwelling.reduced_gains = True
 
     dwelling.cooled_area = input_dwelling.GFA
@@ -129,7 +132,7 @@ def run_der(input_dwelling):
     :param input_dwelling:
     :return:
     """
-    dwelling = copy.deepcopy(input_dwelling)
+    dwelling = DwellingResults(input_dwelling)
     dwelling.reduced_gains = True
 
     if dwelling.overshading == OvershadingTypes.VERY_LITTLE:
@@ -167,14 +170,16 @@ def run_ter(input_dwelling):
     :return: copy of input dwelling with TER results
     """
     # Note this previously wrapped dwelling in Dwelling Wrapper
-    dwelling = copy.deepcopy(input_dwelling)
+    dwelling = DwellingResults(input_dwelling)
 
     dwelling.reduced_gains = True
 
     net_wall_area = element_type_area(sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
                                       dwelling.heat_loss_elements)
+
     opaque_door_area = element_type_area(sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
                                          dwelling.heat_loss_elements)
+
     window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == False)
     roof_window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == True)
     gross_wall_area = net_wall_area + window_area + opaque_door_area
@@ -443,10 +448,16 @@ def apply_previous_improvements(base, target, previous):
 
 
 def run_improvements(dwelling):
-    # Need to run the dwelling twice: once with pcdf fuel prices to
-    # get cost chage, once with normal SAP fuel prices to get change
-    # in SAP rating
-    base_dwelling_pcdf_prices = copy.deepcopy(dwelling)
+    """
+    Need to run the dwelling twice: once with pcdf fuel prices to
+    get cost chage, once with normal SAP fuel prices to get change
+    in SAP rating
+
+    :param dwelling:
+    :return:
+    """
+
+    base_dwelling_pcdf_prices = DwellingResults(dwelling)
     base_dwelling_pcdf_prices.reduced_gains = False
     base_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
 

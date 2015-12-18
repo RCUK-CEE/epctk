@@ -166,7 +166,7 @@ def get_solid_fuel_boiler(id):
         return None
     return dict(
         sedbuk_idx=str(fields[0]),
-        manufacturer=str(fields[3], encoding='latin-1'),
+        manufacturer=str(fields[3]),
         brand=str(fields[4]),
         model=str(fields[5]),
         fuel=FUELS[fields[10]],
@@ -334,7 +334,7 @@ def get_wwhr_system(id):
     fields = get_product('351', id)
     sys = dict(
         idx=str(fields[0]),
-        manufacturer=str(fields[3], encoding='latin-1'),
+        manufacturer=str(fields[3]),
         brand=str(fields[4]),
         model=str(fields[5]),
         effy_mixer_shower=float(fields[9]),
@@ -346,7 +346,7 @@ def get_fghr_system(id):
     fields = get_product('312', id)
     sys = dict(
         idx=str(fields[0]),
-        manufacturer=str(fields[3], encoding='latin-1'),
+        manufacturer=str(fields[3]),
         brand=str(fields[4]),
         model=str(fields[5]),
         applicable_fuel=fields[9],

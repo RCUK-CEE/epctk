@@ -131,10 +131,30 @@ def run_dwelling(fname, dwelling):
         dwelling['sap_region'] = 11
 
     runner.run_sap(dwelling)
+    print(dwelling['storage_loss_factor'])
     runner.run_improvements(dwelling)
     runner.run_fee(dwelling)
     runner.run_der(dwelling)
     runner.run_ter(dwelling)
+
+
+def run_sap_only(fname, dwelling):
+    """
+    Run dwelling that was loaded from fname
+
+    :param fname: file name needed to lookup SAP region
+    :param dwelling: dwelling definition loaded from file
+    :return:
+    """
+
+    # FIXME !!! Bit of a hack here because our tests case files don't include sap region
+    if fname in SAP_REGIONS:
+        dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
+    elif not dwelling.get("sap_region"):
+        dwelling['sap_region'] = 11
+
+    runner.run_sap(dwelling)
+
 
 
 def run_case(fname, reparse):

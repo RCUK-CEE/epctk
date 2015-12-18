@@ -2,23 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7350501f-e420-4216-851c-d82d56f040b6" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix_n.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/sap_constants.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/sap_tables_helpers.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/sap_configure.py" afterPath="$PROJECT_DIR$/sap/configure.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix_f.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix_g.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix_h.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix_m.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/appendix_n.py" afterPath="$PROJECT_DIR$/sap/appendix_n.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/configure.py" afterPath="$PROJECT_DIR$/sap/configure.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/dwelling.py" afterPath="$PROJECT_DIR$/sap/dwelling.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/fuels.py" afterPath="$PROJECT_DIR$/sap/fuels.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/heating_systems.py" afterPath="$PROJECT_DIR$/sap/heating_systems.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/io/input_conversion_rules.py" afterPath="$PROJECT_DIR$/sap/io/input_conversion_rules.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/pcdf.py" afterPath="$PROJECT_DIR$/sap/pcdf.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/runner.py" afterPath="$PROJECT_DIR$/sap/runner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_tables.py" afterPath="$PROJECT_DIR$/sap/sap_tables.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_types.py" afterPath="$PROJECT_DIR$/sap/sap_types.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/utils.py" afterPath="$PROJECT_DIR$/sap/utils.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/worksheet.py" afterPath="$PROJECT_DIR$/sap/worksheet.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spreadsheet_inputter.py" afterPath="$PROJECT_DIR$/spreadsheet_inputter.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/yaml_io.py" afterPath="$PROJECT_DIR$/yaml_io.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases.py" afterPath="$PROJECT_DIR$/tests/test_official_cases.py" />
     </list>
     <ignored path="sapcalc.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -33,7 +30,7 @@
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/sapcalc$Unnamed.coverage" NAME="build doc Coverage Results" MODIFIED="1448836955571" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/sapcalc$Test_SAP.coverage" NAME="Test SAP Coverage Results" MODIFIED="1450447844076" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sapcalc$Test_SAP.coverage" NAME="Test SAP Coverage Results" MODIFIED="1450454448106" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -51,33 +48,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dwelling.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dwelling.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.052083332">
-              <caret line="2" column="5" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="worksheet.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
-          <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="5" column="5" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sap_tables.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="11" column="24" selection-start-line="11" selection-start-column="24" selection-end-line="11" selection-end-column="24" />
+              <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
               <folding>
-                <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#0#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -87,7 +64,7 @@
         <entry file="file://$PROJECT_DIR$/sap/configure.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="143" column="12" selection-start-line="143" selection-start-column="12" selection-end-line="143" selection-end-column="12" />
+              <caret line="420" column="31" selection-start-line="420" selection-start-column="31" selection-end-line="420" selection-end-column="31" />
               <folding>
                 <element signature="e#1#20#0" expanded="true" />
               </folding>
@@ -95,12 +72,58 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="appendix_n.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/appendix_n.py">
+      <file leaf-file-name="test_official_cases.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.30729166">
+              <caret line="133" column="42" selection-start-line="133" selection-start-column="42" selection-end-line="133" selection-end-column="42" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="worksheet.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="13" column="5" selection-start-line="13" selection-start-column="5" selection-end-line="13" selection-end-column="5" />
+              <caret line="371" column="0" selection-start-line="371" selection-start-column="0" selection-end-line="371" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="heating_systems.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/heating_systems.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="28" column="48" selection-start-line="28" selection-start-column="48" selection-end-line="28" selection-end-column="48" />
+              <folding>
+                <element signature="e#88#100#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="runner.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/runner.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="54" column="29" selection-start-line="54" selection-start-column="29" selection-end-line="54" selection-end-column="29" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pcdf.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="156" column="28" selection-start-line="156" selection-start-column="28" selection-end-line="156" selection-end-column="28" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -109,7 +132,7 @@
         <entry file="file://$PROJECT_DIR$/sap/fuels.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="271" column="0" selection-start-line="271" selection-start-column="0" selection-end-line="271" selection-end-column="0" />
+              <caret line="258" column="65" selection-start-line="258" selection-start-column="65" selection-end-line="258" selection-end-column="65" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -132,11 +155,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/run_v0.py" />
-        <option value="$PROJECT_DIR$/sap/sap_pdf_4e_parser.py" />
-        <option value="$PROJECT_DIR$/eti_converter.py" />
-        <option value="$PROJECT_DIR$/saprun.py" />
-        <option value="$PROJECT_DIR$/tests/official_test_cases.py" />
         <option value="$PROJECT_DIR$/sap/sap_runner.py" />
         <option value="$PROJECT_DIR$/test_case_parser.py" />
         <option value="$PROJECT_DIR$/result_extractor.py" />
@@ -161,28 +179,33 @@
         <option value="$PROJECT_DIR$/doc/api.rst" />
         <option value="$PROJECT_DIR$/doc/conf.py" />
         <option value="$PROJECT_DIR$/doc/index.rst" />
-        <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
         <option value="$PROJECT_DIR$/sap/__init__.py" />
         <option value="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
-        <option value="$PROJECT_DIR$/sap/runner.py" />
         <option value="$PROJECT_DIR$/sap/sap_load.py" />
         <option value="$PROJECT_DIR$/sap/systems.py" />
         <option value="$PROJECT_DIR$/sap/sap_table_constants.py" />
         <option value="$PROJECT_DIR$/sap/sap_tables_helpers.py" />
         <option value="$PROJECT_DIR$/sap/sap_constants.py" />
         <option value="$PROJECT_DIR$/sap/sap_types.py" />
-        <option value="$PROJECT_DIR$/sap/pcdf.py" />
-        <option value="$PROJECT_DIR$/sap/worksheet.py" />
         <option value="$PROJECT_DIR$/sap/utils.py" />
         <option value="$PROJECT_DIR$/sap/io/input_conversion_rules.py" />
         <option value="$PROJECT_DIR$/sap/sap_configure.py" />
         <option value="$PROJECT_DIR$/sap/heat_pumps.py" />
-        <option value="$PROJECT_DIR$/sap/heating_systems.py" />
-        <option value="$PROJECT_DIR$/sap/appendix_n.py" />
         <option value="$PROJECT_DIR$/sap/sap_tables.py" />
-        <option value="$PROJECT_DIR$/sap/configure.py" />
         <option value="$PROJECT_DIR$/sap/fuels.py" />
+        <option value="$PROJECT_DIR$/sap/appendix_n.py" />
+        <option value="$PROJECT_DIR$/sap/appendix_m.py" />
+        <option value="$PROJECT_DIR$/sap/appendix_h.py" />
+        <option value="$PROJECT_DIR$/sap/appendix_g.py" />
+        <option value="$PROJECT_DIR$/tests/yaml_test_cases/EW-1p-detached.rtf.yml" />
+        <option value="$PROJECT_DIR$/sap/appendix_f.py" />
+        <option value="$PROJECT_DIR$/sap/configure.py" />
+        <option value="$PROJECT_DIR$/sap/worksheet.py" />
+        <option value="$PROJECT_DIR$/sap/heating_systems.py" />
+        <option value="$PROJECT_DIR$/sap/pcdf.py" />
         <option value="$PROJECT_DIR$/sap/dwelling.py" />
+        <option value="$PROJECT_DIR$/sap/runner.py" />
+        <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
       </list>
     </option>
   </component>
@@ -264,24 +287,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="tests" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="yaml_test_cases" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sapcalc" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="sap" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -291,7 +296,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/sap/heat_pumps.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/sap/appendix_f.py" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
@@ -612,34 +617,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Test_SAP - 2015.11.30 at 17h 43m 33s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 54m 11s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.17 at 22h 43m 08s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 54m 20s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 11h 10m 54s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 54m 52s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 11h 12m 05s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 56m 11s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 11h 47m 29s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 57m 01s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 11h 51m 05s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 57m 40s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 12h 14m 56s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 58m 20s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 12h 15m 32s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 15h 59m 53s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 14h 10m 19s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 16h 00m 18s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.18 at 14h 10m 45s.xml">
+    <history-entry file="Test_SAP - 2015.12.18 at 16h 00m 48s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
   </component>
@@ -688,35 +693,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/sap/data/pcdf2009.dat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.31746033">
-          <caret line="32" column="29" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda/lib/python3.5/imp.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.39124486">
-          <caret line="171" column="0" selection-start-line="171" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/spreadsheet_inputter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="14.146241">
-          <caret line="948" column="18" selection-start-line="948" selection-start-column="18" selection-end-line="948" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda/lib/python3.5/enum.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2708548">
-          <caret line="446" column="6" selection-start-line="446" selection-start-column="6" selection-end-line="446" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/data/table_10c.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -756,14 +732,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.45171338">
           <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/rdsap.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.51652175">
-          <caret line="26" column="9" selection-start-line="26" selection-start-column="9" selection-end-line="26" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -907,30 +875,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1n-detached.rtf.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="6" selection-start-line="0" selection-start-column="5" selection-end-line="0" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/runner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="162" column="58" selection-start-line="162" selection-start-column="58" selection-end-line="162" selection-end-column="58" />
-          <folding>
-            <element signature="e#0#11#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1p-detached.rtf.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="63" column="24" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/data/pcdf2009_short.dat">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -946,29 +890,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="58" column="4" selection-start-line="58" selection-start-column="4" selection-end-line="58" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/sap_tables_helpers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1022,32 +948,120 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/fuels.py">
+    <entry file="file://$PROJECT_DIR$/sap/rdsap.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="271" column="0" selection-start-line="271" selection-start-column="0" selection-end-line="271" selection-end-column="0" />
+        <state vertical-scroll-proportion="4.3017454">
+          <caret line="230" column="26" selection-start-line="230" selection-start-column="26" selection-end-line="230" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix_m.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.13092269">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix_h.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.20573565">
+          <caret line="11" column="65" selection-start-line="11" selection-start-column="65" selection-end-line="11" selection-end-column="65" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix_n.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.18703242">
+          <caret line="15" column="46" selection-start-line="15" selection-start-column="46" selection-end-line="15" selection-end-column="46" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#194#206#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/heating_systems.py">
+    <entry file="file://$PROJECT_DIR$/sap/appendix_g.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.16832918">
+          <caret line="9" column="31" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1n-detached.rtf.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-1.0833334">
+          <caret line="0" column="6" selection-start-line="0" selection-start-column="5" selection-end-line="0" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix_f.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.84375">
+          <caret line="39" column="14" selection-start-line="39" selection-start-column="14" selection-end-line="39" selection-end-column="14" />
+          <folding>
+            <element signature="e#63#75#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/fuels.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="333" column="0" selection-start-line="333" selection-start-column="0" selection-end-line="333" selection-end-column="0" />
+          <caret line="258" column="65" selection-start-line="258" selection-start-column="65" selection-end-line="258" selection-end-column="65" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="11" column="24" selection-start-line="11" selection-start-column="24" selection-end-line="11" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.33333334">
+          <caret line="341" column="4" selection-start-line="341" selection-start-column="4" selection-end-line="341" selection-end-column="4" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1p-detached.rtf.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.90338165">
+          <caret line="63" column="24" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/heating_systems.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="28" column="48" selection-start-line="28" selection-start-column="48" selection-end-line="28" selection-end-column="48" />
+          <folding>
+            <element signature="e#88#100#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="371" column="0" selection-start-line="371" selection-start-column="0" selection-end-line="371" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="156" column="28" selection-start-line="156" selection-start-column="28" selection-end-line="156" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1055,33 +1069,35 @@
     <entry file="file://$PROJECT_DIR$/sap/configure.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="143" column="12" selection-start-line="143" selection-start-column="12" selection-end-line="143" selection-end-column="12" />
+          <caret line="420" column="31" selection-start-line="420" selection-start-column="31" selection-end-line="420" selection-end-column="31" />
           <folding>
             <element signature="e#1#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_n.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="13" column="5" selection-start-line="13" selection-start-column="5" selection-end-line="13" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="5" column="5" selection-start-line="5" selection-start-column="5" selection-end-line="5" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.052083332">
-          <caret line="2" column="5" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/runner.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="54" column="29" selection-start-line="54" selection-start-column="29" selection-end-line="54" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.30729166">
+          <caret line="133" column="42" selection-start-line="133" selection-start-column="42" selection-end-line="133" selection-end-column="42" />
           <folding />
         </state>
       </provider>

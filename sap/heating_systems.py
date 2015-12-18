@@ -1,8 +1,14 @@
+"""
+Defining heating systems
+
+Encorporates parts of SAP main body and appendicies
+
+
+"""
 import numpy
 
-
+from .appendix_f import appendix_f_cpsu_on_peak
 from .fuels import ELECTRICITY_7HR, ELECTRICITY_10HR, Fuel
-from .sap_constants import DAYS_PER_MONTH
 from .sap_types import FuelTypes, HeatingTypes, ImmersionTypes
 
 
@@ -160,158 +166,6 @@ class DedicatedWaterSystem(object):
         return dhw_fuel_cost(dwelling)
 
 
-def weighted_effy(Q_space, Q_water, wintereff, summereff):
-    # If there is no space or water demand then divisor will be zero
-    water_effy = numpy.zeros(12)
-    divisor = Q_space / wintereff + Q_water / summereff
-    for i in range(12):
-        if divisor[i] != 0:
-            water_effy[i] = (Q_space[i] + Q_water[i]) / divisor[i]
-        else:
-            water_effy[i] = 100
-    return water_effy
-
-
-def space_heat_on_peak_fraction(sys, dwelling):
-    if sys.system_type == HeatingTypes.off_peak_only:
-        return 0
-    elif sys.system_type == HeatingTypes.integrated_system:
-        assert sys.fuel == ELECTRICITY_7HR
-        return .2
-    elif sys.system_type == HeatingTypes.storage_heater:
-        return 0
-    elif sys.system_type == HeatingTypes.cpsu:
-        return appendix_f_cpsu_on_peak(sys, dwelling)
-    elif sys.system_type == HeatingTypes.electric_boiler:
-        if sys.fuel == ELECTRICITY_7HR:
-            return 0.9
-        elif sys.fuel == ELECTRICITY_10HR:
-            return .5
-        else:
-            return 1
-    elif sys.system_type in [HeatingTypes.pcdf_heat_pump,
-                             HeatingTypes.microchp]:
-        return .8
-    elif sys.system_type == HeatingTypes.heat_pump:
-        return 0.6
-    # !!! underfloor heating
-    # !!! ground source heat pump
-    # !!! air source heat pump
-    # !!! other direct acting heating (incl secondary)
-    else:
-        if sys.fuel == ELECTRICITY_10HR:
-            return .5
-        else:
-            return 1
-
-
-def heating_fuel_cost(sys, dwelling):
-    if sys.fuel.is_electric:
-        on_peak = space_heat_on_peak_fraction(sys, dwelling)
-        return sys.fuel.unit_price(on_peak)
-    else:
-        return sys.fuel.unit_price()
-
-
-def appendix_f_cpsu_on_peak(system, dwelling):
-    """
-    39m=dwelling.h
-    45m=hw_energy_content
-    93m=Tmean
-    95m=useful gains
-    98m=Q_required
-
-    :param dwelling:
-    :param system:
-    """
-
-    Vcs = dwelling.hw_cylinder_volume
-    Tw = dwelling.water_sys.cpsu_Tw
-    Cmax = .1456 * Vcs * (Tw - 48)
-    nm = DAYS_PER_MONTH
-    Tmin = ((dwelling.h * dwelling.heat_calc_results['Tmean']) - Cmax + (
-        1000 * dwelling.hw_energy_content / (24 * nm)) -
-            dwelling.heat_calc_results['useful_gain']) / dwelling.h
-
-    Text = dwelling.Texternal_heating
-    Eonpeak = numpy.where(
-            Tmin - Text == 0,
-            0.024 * dwelling.h * nm,
-            (0.024 * dwelling.h * nm * (Tmin - Text)) / (1 - numpy.exp(-(Tmin - Text))))
-
-    F = Eonpeak / (dwelling.hw_energy_content + dwelling.Q_required)
-    for i in range(5, 9):
-        F[i] = 0
-    return F
-
-
-def dhw_fuel_cost(dwelling):
-    if dwelling.water_sys.fuel.is_electric and dwelling.get('immersion_type') and not dwelling.immersion_type is None:
-        # !!! Are there other places that should use non-solar cylinder volume?
-        non_solar_cylinder_volume = dwelling.hw_cylinder_volume - (
-            dwelling.solar_dedicated_storage_volume
-            if dwelling.get('solar_dedicated_storage_volume')
-            else 0)
-        on_peak = immersion_on_peak_fraction(dwelling.Nocc,
-                                             dwelling.electricity_tariff,
-                                             non_solar_cylinder_volume,
-                                             dwelling.immersion_type)
-        return dwelling.water_sys.fuel.unit_price(on_peak)
-    elif dwelling.water_sys.fuel.is_electric:
-        on_peak = dhw_on_peak_fraction(dwelling.water_sys, dwelling)
-        return dwelling.water_sys.fuel.unit_price(on_peak)
-    else:
-        return dwelling.water_sys.fuel.unit_price()
-
-
-# Table 12a
-def dhw_on_peak_fraction(water_sys, dwelling):
-    """
-    Function describing Table 12a, describing the fraction of district hot water on
-    peak
-    :param water_sys: type of hot water system
-    :param dwelling:
-    :return:
-    """
-    # !!! Need to complete this table
-    if water_sys.system_type == HeatingTypes.cpsu:
-        return appendix_f_cpsu_on_peak(water_sys, dwelling)
-    elif water_sys.system_type == HeatingTypes.heat_pump:
-        # !!! Need off-peak immersion option
-        return .7
-    elif water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
-                                   HeatingTypes.microchp]:
-        return .7
-    else:
-        return water_sys.fuel.general_elec_on_peak_fraction
-
-
-# Table 13
-def immersion_on_peak_fraction(N_occ, elec_tariff, cylinder_volume, immersion_type):
-    """
-
-    :param N_occ: number of occupants
-    :param elec_tariff:
-    :param cylinder_volume:
-    :param immersion_type:
-    :return:
-    """
-    if elec_tariff == ELECTRICITY_7HR:
-        if immersion_type == ImmersionTypes.SINGLE:
-            return max(0, ((14530 - 762 * N_occ) / cylinder_volume - 80 + 10 * N_occ) / 100)
-        else:
-            assert immersion_type == ImmersionTypes.DUAL
-            return max(0, ((6.8 - 0.024 * cylinder_volume) * N_occ + 14 - 0.07 * cylinder_volume) / 100)
-    elif elec_tariff == ELECTRICITY_10HR:
-        if immersion_type == ImmersionTypes.SINGLE:
-            return max(0, ((14530 - 762 * N_occ) / (1.5 * cylinder_volume) - 80 + 10 * N_occ) / 100)
-        else:
-            assert immersion_type == ImmersionTypes.DUAL
-            return max(0, ((6.8 - 0.036 * cylinder_volume) * N_occ + 14 - 0.105 * cylinder_volume) / 100)
-    else:
-        return 1
-
-
 class CommunityDistributionTypes:
     PRE_1990_UNINSULATED = 1
     PRE_1990_INSULATED = 2
@@ -446,3 +300,133 @@ class CommunityHeating:
 
     def water_fuel_price(self, dwelling):
         return self.fuel_price_
+
+def weighted_effy(Q_space, Q_water, wintereff, summereff):
+    """
+    Calculate monthly efficiencies given the space and water heating requirements
+    and the winter and summer efficiencies
+
+    :param Q_space: space heating demand
+    :param Q_water: water heating demand
+    :param wintereff: winter efficiency
+    :param summereff: summer efficiency
+    :return: array with 12 monthly efficiences
+    """
+    # If there is no space or water demand then divisor will be zero
+    water_effy = numpy.zeros(12)
+    divisor = Q_space / wintereff + Q_water / summereff
+    for i in range(12):
+        if divisor[i] != 0:
+            water_effy[i] = (Q_space[i] + Q_water[i]) / divisor[i]
+        else:
+            water_effy[i] = 100
+    return water_effy
+
+
+def space_heat_on_peak_fraction(sys, dwelling):
+    if sys.system_type == HeatingTypes.off_peak_only:
+        return 0
+    elif sys.system_type == HeatingTypes.integrated_system:
+        assert sys.fuel == ELECTRICITY_7HR
+        return .2
+    elif sys.system_type == HeatingTypes.storage_heater:
+        return 0
+    elif sys.system_type == HeatingTypes.cpsu:
+        return appendix_f_cpsu_on_peak(sys, dwelling)
+    elif sys.system_type == HeatingTypes.electric_boiler:
+        if sys.fuel == ELECTRICITY_7HR:
+            return 0.9
+        elif sys.fuel == ELECTRICITY_10HR:
+            return .5
+        else:
+            return 1
+    elif sys.system_type in [HeatingTypes.pcdf_heat_pump,
+                             HeatingTypes.microchp]:
+        return .8
+    elif sys.system_type == HeatingTypes.heat_pump:
+        return 0.6
+    # !!! underfloor heating
+    # !!! ground source heat pump
+    # !!! air source heat pump
+    # !!! other direct acting heating (incl secondary)
+    else:
+        if sys.fuel == ELECTRICITY_10HR:
+            return .5
+        else:
+            return 1
+
+
+def heating_fuel_cost(sys, dwelling):
+    if sys.fuel.is_electric:
+        on_peak = space_heat_on_peak_fraction(sys, dwelling)
+        return sys.fuel.unit_price(on_peak)
+    else:
+        return sys.fuel.unit_price()
+
+
+def dhw_fuel_cost(dwelling):
+    if dwelling.water_sys.fuel.is_electric and dwelling.get('immersion_type') and not dwelling.immersion_type is None:
+        # !!! Are there other places that should use non-solar cylinder volume?
+        non_solar_cylinder_volume = dwelling.hw_cylinder_volume - (
+            dwelling.solar_dedicated_storage_volume
+            if dwelling.get('solar_dedicated_storage_volume')
+            else 0)
+        on_peak = immersion_on_peak_fraction(dwelling.Nocc,
+                                             dwelling.electricity_tariff,
+                                             non_solar_cylinder_volume,
+                                             dwelling.immersion_type)
+        return dwelling.water_sys.fuel.unit_price(on_peak)
+    elif dwelling.water_sys.fuel.is_electric:
+        on_peak = dhw_on_peak_fraction(dwelling.water_sys, dwelling)
+        return dwelling.water_sys.fuel.unit_price(on_peak)
+    else:
+        return dwelling.water_sys.fuel.unit_price()
+
+
+# Table 12a
+def dhw_on_peak_fraction(water_sys, dwelling):
+    """
+    Function describing Table 12a, describing the fraction of district hot water on
+    peak
+    :param water_sys: type of hot water system
+    :param dwelling:
+    :return:
+    """
+    # !!! Need to complete this table
+    if water_sys.system_type == HeatingTypes.cpsu:
+        return appendix_f_cpsu_on_peak(water_sys, dwelling)
+    elif water_sys.system_type == HeatingTypes.heat_pump:
+        # !!! Need off-peak immersion option
+        return .7
+    elif water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
+                                   HeatingTypes.microchp]:
+        return .7
+    else:
+        return water_sys.fuel.general_elec_on_peak_fraction
+
+
+# Table 13
+def immersion_on_peak_fraction(N_occ, elec_tariff, cylinder_volume, immersion_type):
+    """
+
+    :param N_occ: number of occupants
+    :param elec_tariff:
+    :param cylinder_volume:
+    :param immersion_type:
+    :return:
+    """
+    if elec_tariff == ELECTRICITY_7HR:
+        if immersion_type == ImmersionTypes.SINGLE:
+            return max(0, ((14530 - 762 * N_occ) / cylinder_volume - 80 + 10 * N_occ) / 100)
+        else:
+            assert immersion_type == ImmersionTypes.DUAL
+            return max(0, ((6.8 - 0.024 * cylinder_volume) * N_occ + 14 - 0.07 * cylinder_volume) / 100)
+    elif elec_tariff == ELECTRICITY_10HR:
+        if immersion_type == ImmersionTypes.SINGLE:
+            return max(0, ((14530 - 762 * N_occ) / (1.5 * cylinder_volume) - 80 + 10 * N_occ) / 100)
+        else:
+            assert immersion_type == ImmersionTypes.DUAL
+            return max(0, ((6.8 - 0.036 * cylinder_volume) * N_occ + 14 - 0.105 * cylinder_volume) / 100)
+    else:
+        return 1
+

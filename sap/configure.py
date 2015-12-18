@@ -1,25 +1,28 @@
 
 from . import fuels
+from .appendix_n import micro_chp_from_pcdf, heat_pump_from_pcdf
 from .fuels import ELECTRICITY_STANDARD
 from .heating_systems import HeatingSystem, DedicatedWaterSystem, immersion_on_peak_fraction, \
     SecondarySystem, CommunityHeating
-from .pcdf import (get_wwhr_system, get_fghr_system, get_mev_system, get_boiler, get_solid_fuel_boiler,
+from .pcdf import (get_mev_system, get_boiler, get_solid_fuel_boiler,
                    get_twin_burner_cooker_boiler, get_heat_pump, get_microchp)
+from .sap_types import FuelTypes, HeatingTypes, WallTypes, ThermalStoreTypes, CylinderInsulationTypes, \
+    VentilationTypes, DuctTypes, LoadCompensators, HeatEmitters
+from .sap_constants import FLOOR_INFILTRATION
 from .sap_tables import (TABLE_3, TABLE_4A, TABLE_4B, TABLE_4D, TABLE_4E, TABLE_6D, TABLE_10, TABLE_10C, TABLE_D7,
-                         TABLE_H1, TABLE_H2, TABLE_H3, TABLE_H4, TABLE_4C3, T4C4_SPACE_EFFY_MULTIPLIERS,
+                         TABLE_4C3, T4C4_SPACE_EFFY_MULTIPLIERS,
                          get_seasonal_effy_offset,
                          combi_loss_table_3a, get_4a_system, hw_volume_factor, hw_storage_loss_factor, hw_temperature_factor,
                          fans_and_pumps_gain, fans_and_pumps_electricity,
-                         m1_correction_factor, occupancy, daily_hw_use,
+                         occupancy, daily_hw_use,
                          get_in_use_factor, default_in_use_factor, get_in_use_factor_hr,
                          default_hr_effy_factor, combi_loss_instant_without_keep_hot,
                          combi_loss_instant_with_timed_heat_hot, combi_loss_instant_with_untimed_heat_hot,
-                         combi_loss_table_3c, combi_loss_table_3b,
                          USE_TABLE_4D_FOR_RESPONSIVENESS, get_effy, system_type_from_sap_code, )
-from .sap_types import FuelTypes, HeatingTypes, WallTypes, ThermalStoreTypes, CylinderInsulationTypes, \
-    VentilationTypes, DuctTypes, LoadCompensators, HeatEmitters
-from .appendix_n import micro_chp_from_pcdf, heat_pump_from_pcdf
-from .sap_constants import FLOOR_INFILTRATION
+
+from .appendix_g import configure_wwhr, configure_fghr, configure_combi_loss
+from .appendix_h import configure_solar_hw
+from .appendix_m import configure_pv, configure_wind_turbines
 from .utils import exists_and_true
 
 
@@ -68,8 +71,7 @@ def apply_4c2(dwelling, sys):
 
     # TODO Need to check  main_sys_2 here as well?
     if (dwelling.main_sys_1.system_type == HeatingTypes.cpsu or
-            (dwelling.get('thermal_store_type') and
-                     dwelling.thermal_store_type == ThermalStoreTypes.INTEGRATED)):
+            (dwelling.get('thermal_store_type') == ThermalStoreTypes.INTEGRATED)):
         dwelling.temperature_adjustment -= 0.1
 
     # !!! Also check sys2!
@@ -417,6 +419,12 @@ def configure_water_system(dwelling):
 
 
 def configure_water_storage(dwelling):
+    """
+    Configure the water storage for the dwelling
+
+    :param dwelling:
+    :return:
+    """
     if dwelling.water_sys.is_community_heating:
         dwelling.has_cylinderstat = True
         dwelling.community_heating_dhw = True  # use for table 3
@@ -429,14 +437,17 @@ def configure_water_storage(dwelling):
         dwelling.instantaneous_pou_water_heating = True
         dwelling.has_hw_cylinder = False
         dwelling.primary_circuit_loss_annual = 0
+
     elif dwelling.has_hw_cylinder:
-        if dwelling.get("measured_cylinder_loss") and dwelling.measured_cylinder_loss != None:
+        if dwelling.get("measured_cylinder_loss") is not None:
             dwelling.temperature_factor = hw_temperature_factor(dwelling, True)
+
         else:
             # !!! Is this electric CPSU tests in the right place?
             if (dwelling.water_sys.system_type == HeatingTypes.cpsu and
                     dwelling.water_sys.fuel.is_electric):
                 dwelling.storage_loss_factor = 0.022
+
             elif not dwelling.get('storage_loss_factor'):
                 # This is already set for community heating dhw
                 dwelling.storage_loss_factor = hw_storage_loss_factor(dwelling.hw_cylinder_insulation_type,
@@ -534,109 +545,6 @@ def configure_cooling_system(dwelling):
         dwelling.cooling_seer = 1  # Need a number, but doesn't matter what
 
 
-def configure_wwhr(dwelling):
-    if dwelling.get('wwhr_systems') and not dwelling.wwhr_systems is None:
-        for sys in dwelling.wwhr_systems:
-            sys['pcdf_sys'] = get_wwhr_system(sys['pcdf_id'])
-
-
-def configure_fghr(dwelling):
-    """
-    Configure Flue Gas Heat Recovery (FGHR) for this dwelling
-
-    :param dwelling:
-    :return:
-    """
-    # TODO: Should check that fghr is allowed for this system
-
-    if dwelling.get('fghrs') is not None:
-        # !!! Need to add electrical power G1.4
-        # !!! Entire fghrs calc is unfinished really
-        dwelling.fghrs.update(
-                dict(get_fghr_system(dwelling.fghrs['pcdf_id'])))
-
-        if dwelling.fghrs["heat_store"] == "3":
-            assert dwelling.water_sys.system_type == HeatingTypes.combi
-            assert not dwelling.get('hw_cylinder_volume')
-            assert not dwelling.has_hw_cylinder
-
-            dwelling.has_hw_cylinder = True
-            dwelling.has_cylinderstat = True
-            dwelling.has_hw_time_control = True
-            dwelling.hw_cylinder_volume = dwelling.fghrs['heat_store_total_volume']
-            dwelling.measured_cylinder_loss = dwelling.fghrs['heat_store_loss_rate']
-            dwelling.water_sys.table2b_row = 5
-
-            # !!! This ideally wouldn't be here!  Basically combi loss
-            # !!! has already been calculated, but now we are adding a
-            # !!! thermal store, so need to recalculate it
-            if hasattr(dwelling.water_sys, 'pcdf_data'):
-                configure_combi_loss(dwelling,
-                                     dwelling.water_sys,
-                                     dwelling.water_sys.pcdf_data)
-            else:
-                dwelling.water_sys.combi_loss = combi_loss_table_3a(
-                        dwelling, dwelling.water_sys)
-
-            if dwelling.fghrs["has_pv_module"]:
-                assert "PV_kWp" in dwelling.fghrs
-                configure_pv_system(dwelling.fghrs)
-                dwelling.fghrs['monthly_solar_hw_factors'] = TABLE_H3[dwelling.fghrs['pitch']]
-        else:
-            assert not "PV_kWp" in dwelling.fghrs
-
-        if (dwelling.water_sys.system_type in [HeatingTypes.combi,
-                                               HeatingTypes.storage_combi]
-            and exists_and_true(dwelling.water_sys, 'has_no_keep_hot')
-            and not dwelling.has_hw_cylinder):
-            dwelling.fghrs['equations'] = dwelling.fghrs['equations_combi_without_keephot_without_ext_store']
-        else:
-            dwelling.fghrs['equations'] = dwelling.fghrs['equations_other']
-
-
-def configure_pv_system(pv_system):
-    pv_system['overshading_factor'] = TABLE_H4[pv_system['overshading_category']]
-
-    if str(pv_system['pitch']).lower() != "Horizontal".lower():
-        pv_system['Igh'] = TABLE_H2[pv_system['pitch']][pv_system['orientation']]
-    else:
-        pv_system['Igh'] = TABLE_H2[pv_system['pitch']]
-
-
-def configure_pv(dwelling):
-    if dwelling.get('photovoltaic_systems'):
-        for pv_system in dwelling.photovoltaic_systems:
-            configure_pv_system(pv_system)
-
-
-def configure_solar_hw(dwelling):
-    if dwelling.get('solar_collector_aperture') is not None:
-        dwelling.collector_overshading_factor = TABLE_H4[dwelling.collector_overshading]
-        if str(dwelling.collector_pitch).lower() != "Horizontal".lower():
-            dwelling.collector_Igh = TABLE_H2[dwelling.collector_pitch][dwelling.collector_orientation]
-        else:
-            dwelling.collector_Igh = TABLE_H2[dwelling.collector_pitch]
-
-        dwelling.monthly_solar_hw_factors = TABLE_H3[dwelling.collector_pitch]
-        if dwelling.solar_storage_combined_cylinder:
-            dwelling.solar_effective_storage_volume = dwelling.solar_dedicated_storage_volume + 0.3 * (
-                dwelling.hw_cylinder_volume - dwelling.solar_dedicated_storage_volume)
-        else:
-            dwelling.solar_effective_storage_volume = dwelling.solar_dedicated_storage_volume
-
-        if not dwelling.get('collector_zero_loss_effy'):
-            default_params = TABLE_H1[dwelling.collector_type]
-            dwelling.collector_zero_loss_effy = default_params[0]
-            dwelling.collector_heat_loss_coeff = default_params[1]
-
-
-def configure_wind_turbines(dwelling):
-    if dwelling.get('N_wind_turbines'):
-        dwelling.wind_turbine_speed_correction_factor = m1_correction_factor(
-                dwelling.terrain_type,
-                dwelling.wind_turbine_hub_height)
-
-
 def configure_ventilation(dwelling):
     if dwelling.ventilation_type == VentilationTypes.MEV_CENTRALISED:
         if dwelling.get('mev_sfp'):
@@ -649,6 +557,7 @@ def configure_ventilation(dwelling):
         dwelling.adjusted_fan_sfp = sfp * in_use_factor
         if exists_and_true(dwelling, 'mv_approved'):
             assert False
+
     elif dwelling.ventilation_type == VentilationTypes.MEV_DECENTRALISED:
         if dwelling.get('mev_sys_pcdf_id'):
             sys = get_mev_system(dwelling.mev_sys_pcdf_id)
@@ -828,17 +737,6 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
     return sys
 
 
-def configure_combi_loss(dwelling, sys, pcdf_data):
-    if 'storage_loss_factor_f2' in pcdf_data and pcdf_data['storage_loss_factor_f2'] != None:
-        sys.combi_loss = combi_loss_table_3c(dwelling, sys, pcdf_data)
-    elif 'storage_loss_factor_f1' in pcdf_data and pcdf_data['storage_loss_factor_f1'] != None:
-        sys.combi_loss = combi_loss_table_3b(pcdf_data)
-    else:
-        sys.combi_loss = combi_loss_table_3a(dwelling, sys)
-
-    sys.pcdf_data = pcdf_data  # !!! Needed if we later add a store to this boiler
-
-
 def solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer):
     # Appendix J
     if pcdf_data['seasonal_effy'] != '':
@@ -926,6 +824,14 @@ def pcdf_heating_system(dwelling,
 
 
 def get_table3_row(dwelling):
+    """
+    Get the row number from Table 3 for the given dwelling
+    by finding the row corresponding to the dwellings' combination of heating
+    type codes and thermal storage
+
+    :param dwelling:
+    :return:
+    """
     if dwelling.water_heating_type_code == 901:
         # !!! Also need to do this for second main system?
 
@@ -939,19 +845,24 @@ def get_table3_row(dwelling):
     if dwelling.water_sys.system_type in [HeatingTypes.combi,
                                           HeatingTypes.storage_combi]:
         return 6
+
     elif dwelling.water_heating_type_code == 903:
         # Immersion
         return 1
+
     elif dwelling.community_heating_dhw:
         # Community heating
         return 12
+
     elif exists_and_true(dwelling, 'cylinder_is_thermal_store'):
         # !!! Need to check length of pipework here and insulation
         return 10
+
     elif (dwelling.water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
                                              HeatingTypes.microchp]
           and dwelling.water_sys.has_integral_store):
         return 8
+
     elif dwelling.has_hw_cylinder:
         # Cylinder !!! Cylinderstat should be assumed to be present
         # for CPSU, electric immersion, etc - see 9.3.7
@@ -961,6 +872,7 @@ def get_table3_row(dwelling):
             return 3  # row 4 is the same
         else:
             return 2
+
     else:
         # Must be combi?
         raise Exception("WTF?")  # !!!
