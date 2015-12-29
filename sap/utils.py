@@ -1,5 +1,7 @@
 import csv
 
+from sap.sap_constants import DAYS_PER_MONTH
+
 CALC_STAGE = 0
 ALL_PARAMS = [set(), set(), set(), set(), set(), set(), set()]
 
@@ -48,3 +50,12 @@ def exists_and_true(d, attr):
 #         ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
 #
 
+def monthly_to_annual(var):
+    return sum(var * DAYS_PER_MONTH) / 365.
+
+
+def sum_it(x):
+    try:
+        return sum(x)
+    except TypeError:
+        return x

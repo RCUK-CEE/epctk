@@ -1,5 +1,6 @@
 import copy
 
+import sap.appendix_m
 import sap.sap_types
 from sap.pcdf import VentilationTypes
 from . import worksheet
@@ -37,9 +38,9 @@ def perform_full_calc(dwelling):
     """
     perform_demand_calc(dwelling)
     worksheet.systems(dwelling)
-    worksheet.pv(dwelling)
-    worksheet.wind_turbines(dwelling)
-    worksheet.hydro(dwelling)
+    sap.appendix_m.pv(dwelling)
+    sap.appendix_m.wind_turbines(dwelling)
+    sap.appendix_m.hydro(dwelling)
     worksheet.chp(dwelling)
     worksheet.fuel_use(dwelling)
 
@@ -193,27 +194,27 @@ def run_ter(input_dwelling):
                                       dwelling.heat_loss_elements)
     roof_area = net_roof_area + roof_window_area
 
-    heat_loss_elements = [worksheet.HeatLossElement(
+    heat_loss_elements = [sap.sap_types.HeatLossElement(
         area=gross_wall_area - new_window_area - 1.85,
         Uvalue=.35,
         is_external=True,
         element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
-    ), worksheet.HeatLossElement(
+    ), sap.sap_types.HeatLossElement(
         area=1.85,
         Uvalue=2,
         is_external=True,
         element_type=sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
-    ), worksheet.HeatLossElement(
+    ), sap.sap_types.HeatLossElement(
         area=floor_area,
         Uvalue=.25,
         is_external=True,
         element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
-    ), worksheet.HeatLossElement(
+    ), sap.sap_types.HeatLossElement(
         area=roof_area,
         Uvalue=.16,
         is_external=True,
         element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
-    ), worksheet.HeatLossElement(
+    ), sap.sap_types.HeatLossElement(
         area=new_window_area,
         Uvalue=1. / (1. / 2 + .04),
         is_external=True,
@@ -229,7 +230,7 @@ def run_ter(input_dwelling):
         Uvalue=2,
         roof_window=False)
 
-    new_openings = [worksheet.Opening(
+    new_openings = [sap.sap_types.Opening(
         area=new_window_area,
         orientation_degrees=90,
         opening_type=ter_opening_type)

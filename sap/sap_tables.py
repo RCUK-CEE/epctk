@@ -3,9 +3,10 @@ import os.path
 
 import numpy
 
+from .appendix_f import cpsu_store, elec_cpsu_store
 from .fuels import ElectricityTariff, ELECTRICITY_7HR, ELECTRICITY_10HR, ELECTRICITY_24HR
-from .pcdf import get_in_use_factors
-from .sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading, HeatEmitters,
+from .sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes,
+                        HeatingTypes, PVOvershading, HeatEmitters,
                         VentilationTypes, BoilerTypes)
 from .utils import SAPCalculationError, csv_to_dict, exists_and_true, float_or_zero
 
@@ -87,30 +88,6 @@ def cylinder_indirect(dwelling):
     return temperature_factor
 
 
-def cpsu_store(dwelling):
-    if dwelling.get('measured_cylinder_loss'):
-        temperature_factor = .89
-    else:
-        temperature_factor = 1.08
-
-    if exists_and_true(dwelling, 'has_hw_time_control'):
-        temperature_factor *= 0.81
-
-    # Check airing cupboard
-    if exists_and_true(dwelling.water_sys, 'cpsu_not_in_airing_cupboard'):
-        # !!! Actually this is if cpsu or thermal store not in airing cupboard
-        temperature_factor *= 1.1
-
-    return temperature_factor
-
-
-def elec_cpsu_store(dwelling):
-    if dwelling.get('measured_cylinder_loss'):
-        return 1.09 + 0.012 * (dwelling.water_sys.cpsu_Tw - 85)
-    else:
-        return 1
-
-
 def storage_combi_primary(d):
     return (.82
             if d.hw_cylinder_volume >= 115
@@ -151,6 +128,7 @@ TABLE_2b_table2 = {
 def hw_temperature_factor(dwelling, measured_loss):
     """
     Calculate the hot water temperature factor
+
     :param dwelling: dwelling object
     :param measured_loss: boolean, whether the losses are measured by manufacturer or must be assumed
     :return:
@@ -159,21 +137,79 @@ def hw_temperature_factor(dwelling, measured_loss):
     return table2b[dwelling.water_sys.table2b_row](dwelling)
 
 
-# Table 3
+# Table 3 Primary Circuit losses
 TABLE_3 = {
-    1: constant(0),
-    2: constant(1220),
-    3: constant(610),
+    1: 0,
+    2: 1220,
+    3: 610,
     4: 0,
-    5: constant(360),
-    6: constant(0),
-    7: constant(0),
-    8: constant(0),
+    5: 360,
+    6: 0,
+    7: 0,
+    8: 0,
     9: 0,
-    10: constant(280),  # !!! Different for insulated/not insulated pipework
+    10: 280,  # !!! Different for insulated/not insulated pipework
     11: 0,
-    12: constant(360),
+    12: 360,
 }
+
+
+# Table 3a
+# !!! Need to add the other options in here
+def combi_loss_instant_without_keep_hot(daily_hot_water_use):
+    fn = numpy.where(daily_hot_water_use > 100,
+                     1.0,
+                     daily_hot_water_use / 100)
+    return 600.0 * fn
+
+
+def combi_loss_instant_with_timed_heat_hot(daily_hot_water_use):
+    return 600.0
+
+
+def combi_loss_instant_with_untimed_heat_hot(daily_hot_water_use):
+    return 900.0
+
+
+def combi_loss_storage_combi_more_than_55l(daily_hot_water_use):
+    return 0
+
+
+def combi_loss_storage_combi_less_than_55l(Vc, daily_hot_water_use):
+    fn = numpy.where(daily_hot_water_use > 100,
+                     1.0,
+                     daily_hot_water_use / 100)
+    return (600 - (Vc - 15) * 15) * fn
+
+
+def combi_loss_table_3a(dwelling, system):
+    storage_volume = dwelling.get('hw_cylinder_volume', 0)
+
+    if storage_volume == 0:
+        if hasattr(system, "table3arow"):
+            return system.table3arow
+        else:
+            # !!! Need other keep hot types
+            return combi_loss_instant_without_keep_hot
+    elif storage_volume < 55:
+        return lambda hw_use: combi_loss_storage_combi_less_than_55l(dwelling.hw_cylinder_volume, hw_use)
+    else:
+        return combi_loss_storage_combi_more_than_55l
+
+
+# !!! Need to complete this table
+def combi_loss_table_3b(pcdf_data):
+    # !!! Need to set storage loss here
+    # dwelling.measured_cylinder_loss=0#pcdf_data['storage_loss_factor_f1']
+    # dwelling.has_hw_cylinder=True
+    # system.table2b_row=5
+    # dwelling.has_cylinderstat=True
+    return lambda x: 365 * pcdf_data['storage_loss_factor_f1']
+
+
+# !!! Need to complete this table
+def combi_loss_table_3c():
+    return None
 
 
 # Table 4a
@@ -261,7 +297,6 @@ TABLE_4D = {
 
 # Table 4e
 def translate_4e_row(controls, row):
-
     other_adjustments_str = row[5]
     if other_adjustments_str != "n/a":
         # table_no = re.match(r'Table 4c\((\d)\)', other_adjustments_str)
@@ -283,64 +318,6 @@ def translate_4e_row(controls, row):
 
 
 TABLE_4E = csv_to_dict(os.path.join(_DATA_FOLDER, 'table_4e.csv'), translate_4e_row)
-
-
-# Table 3a
-# !!! Need to add the other options in here
-def combi_loss_instant_without_keep_hot(daily_hot_water_use):
-    fn = numpy.where(daily_hot_water_use > 100,
-                     1.0,
-                     daily_hot_water_use / 100)
-    return 600.0 * fn
-
-
-def combi_loss_instant_with_timed_heat_hot(daily_hot_water_use):
-    return 600.0
-
-
-def combi_loss_instant_with_untimed_heat_hot(daily_hot_water_use):
-    return 900.0
-
-
-def combi_loss_storage_combi_more_than_55l(daily_hot_water_use):
-    return 0
-
-
-def combi_loss_storage_combi_less_than_55l(Vc, daily_hot_water_use):
-    fn = numpy.where(daily_hot_water_use > 100,
-                     1.0,
-                     daily_hot_water_use / 100)
-    return (600 - (Vc - 15) * 15) * fn
-
-
-def combi_loss_table_3a(dwelling, system):
-    storage_volume = dwelling.get('hw_cylinder_volume', 0)
-
-    if storage_volume == 0:
-        if hasattr(system, "table3arow"):
-            return system.table3arow
-        else:
-            # !!! Need other keep hot types
-            return combi_loss_instant_without_keep_hot
-    elif storage_volume < 55:
-        return lambda hw_use: combi_loss_storage_combi_less_than_55l(dwelling.hw_cylinder_volume, hw_use)
-    else:
-        return combi_loss_storage_combi_more_than_55l
-
-
-# !!! Need to complete this table
-def combi_loss_table_3b(pcdf_data):
-    # !!! Need to set storage loss here
-    # dwelling.measured_cylinder_loss=0#pcdf_data['storage_loss_factor_f1']
-    # dwelling.has_hw_cylinder=True
-    # system.table2b_row=5
-    # dwelling.has_cylinderstat=True
-    return lambda x: 365 * pcdf_data['storage_loss_factor_f1']
-
-
-# !!! Need to complete this table
-def combi_loss_table_3c():
-    return None
 
 
 def get_4a_system(electricity_tariff, code):
@@ -372,7 +349,6 @@ def get_effy(system_data, fuel):
             return system_data['effy_lpg']
 
     raise ValueError("Input error if we get here?")
-
 
 
 T4C4_SPACE_EFFY_MULTIPLIERS = {
@@ -465,38 +441,8 @@ def fans_and_pumps_electricity(dwelling):
 
 # Table 4h
 
+# FIXME: if it's possible to swap the PCDF file, make this explicit!
 # Lazy load these, to give a chance to swap the pcdf database file if necessary
-TABLE_4h_in_use = None
-TABLE_4h_in_use_approved_scheme = None
-TABLE_4h_hr_effy_approved_scheme = None
-
-
-def load_4h_tables():
-    global TABLE_4h_in_use, TABLE_4h_in_use_approved_scheme, TABLE_4h_hr_effy, TABLE_4h_hr_effy_approved_scheme
-
-    (TABLE_4h_in_use,
-     TABLE_4h_in_use_approved_scheme,
-     TABLE_4h_hr_effy,
-     TABLE_4h_hr_effy_approved_scheme
-     ) = get_in_use_factors()
-
-
-def get_in_use_factor(vent_type, duct_type, approved_scheme):
-    if TABLE_4h_in_use is None:
-        load_4h_tables()
-    if approved_scheme:
-        return TABLE_4h_in_use_approved_scheme[vent_type][duct_type]
-    else:
-        return TABLE_4h_in_use[vent_type][duct_type]
-
-
-def get_in_use_factor_hr(vent_type, duct_type, approved_scheme):
-    if TABLE_4h_in_use is None:
-        load_4h_tables()
-    if approved_scheme:
-        return TABLE_4h_hr_effy_approved_scheme[vent_type][duct_type]
-    else:
-        return TABLE_4h_hr_effy[vent_type][duct_type]
 
 
 def default_in_use_factor():
@@ -561,8 +507,6 @@ def fans_and_pumps_gain(dwelling):
 
 
 # Table 6d
-
-
 TABLE_6D = {
     OvershadingTypes.HEAVY: dict(
             solar_access_factor_winter=.3,
@@ -602,8 +546,6 @@ def translate_10_row(regions, row):
 
 
 TABLE_10 = csv_to_dict(os.path.join(_DATA_FOLDER, 'table_10.csv'), translate_10_row)
-
-2
 
 
 # Table 10c
@@ -806,32 +748,6 @@ TABLE_N8 = [
 ]
 
 
-def m1_correction_factor(terrain_type, wind_speed):
-    interpolation_vals = TABLE_M1[terrain_type]
-
-    closest_above = 999
-    closest_below = 0
-
-    for k in list(interpolation_vals.keys()):
-        if k >= wind_speed and k < closest_above:
-            closest_above = k
-        if k <= wind_speed and k > closest_below:
-            closest_below = k
-
-    if closest_above == 999:
-        # Outside of range, return largest
-        return interpolation_vals[closest_below]
-    elif closest_above == closest_below:
-        return interpolation_vals[closest_below]
-    else:
-        v1 = interpolation_vals[closest_below]
-        v2 = interpolation_vals[closest_above]
-        return v1 + (v2 - v1) * (wind_speed - closest_below) / (closest_above - closest_below)
-
-
-
-
-
 def table_n4_heating_days(psr):
     data = interpolate_psr_table(psr, TABLE_N4)
     N24_16 = int(0.5 + data[1])
@@ -856,8 +772,6 @@ def table_n8_secondary_fraction(psr, heating_duration):
     return int(interpolated * 1000 + .5) / 1000.
 
 
-
-
 # !!! Needs completing
 def get_seasonal_effy_offset(is_modulating_burner,
                              fuel,
@@ -878,6 +792,7 @@ class AppendixD:
         STORAGE_COMBI
         CPSU
 """
+
 
 def interpolate_psr_table(psr, table,
                           key=lambda x: x[0],

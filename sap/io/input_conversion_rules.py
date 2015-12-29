@@ -8,23 +8,21 @@ Input conversion rules for converting from parsed input file
 import copy
 import logging
 
-import sap.sap_types
-from ..sap_types import WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes, \
-    ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading, OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes, DuctTypes
-from .. import worksheet
-from ..heating_systems import CommunityDistributionTypes
+from ..sap_types import (WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes,
+                         ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading,
+                         OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes, DuctTypes,
+                         CommunityDistributionTypes, HeatLossElementTypes, OpeningType, HeatLossElement, Opening,
+                         ThermalMassElement)
 from ..fuels import ELECTRICITY_STANDARD, ELECTRICITY_7HR, ELECTRICITY_10HR, fuel_from_code
 
 
 class LambdaMapping(object):
-
     def __init__(self, attr, f):
         self.f = f
         self.attr = attr
 
     def apply(self, d, r):
         d[self.attr] = self.f(r)
-
 
 
 class subtoken_mapping:
@@ -37,13 +35,13 @@ class subtoken_mapping:
     def apply(self, d, r):
         if len(r.vals) <= self.inputId:
             logging.warning(
-                "Not enough values for subtoken mapping of %s\n", self.attr)
+                    "Not enough values for subtoken mapping of %s\n", self.attr)
             return
 
         tokens = r.vals[self.inputId].value.split()
         if len(tokens) <= self.tokenId:
             logging.warning(
-                "Not enough tokens for subtoken mapping of %s\n", self.attr)
+                    "Not enough tokens for subtoken mapping of %s\n", self.attr)
             return
 
         val = self.converter(tokens[self.tokenId])
@@ -61,6 +59,7 @@ def lookup_mapping(attr, dic):
 
 def percent_to_float(x):
     return float(x[:-1]) / 100.0
+
 
 ORIENTATIONS = {'(Unspecified)': 90,
                 'unspecified': 90,
@@ -204,14 +203,12 @@ class Labels:
 
 
 class NullRule:
-
     def apply(self, d, r):
         # This input does nothing
         pass
 
 
 class FixedValueRule:
-
     def __init__(self, val):
         self.expected_val = val
 
@@ -220,7 +217,7 @@ class FixedValueRule:
         if len(r.vals[0]) > 1:
             if len(r.vals[0]) != len(self.expected_val):
                 logging.warning(
-                    "Unexpected input value (mismatched length): %s", r)
+                        "Unexpected input value (mismatched length): %s", r)
                 return
             for i in range(len(r.vals[0])):
                 if r.vals[0][i] != self.expected_val[i]:
@@ -232,7 +229,6 @@ class FixedValueRule:
 
 
 class ThermalMassRule:
-
     def apply(self, d, r):
         toks = r.vals[0].value.split()
         if toks[0] == "TMP":
@@ -244,9 +240,9 @@ class ThermalMassRule:
 
 
 class ThermalBridgingRule:
-
     def apply(self, d, r):
-        if r.vals[0].value.split() == 'User-defined'.split() and r.vals[0].note.split() == 'individual Y -values'.split():
+        if r.vals[0].value.split() == 'User-defined'.split() and r.vals[
+            0].note.split() == 'individual Y -values'.split():
             y_table = r.vals[1]
             if y_table.column_headings[1] != "Length" or y_table.column_headings[2] != "Y -value":
                 logging.warning("Invalid thermal bridging table: %s", y_table)
@@ -274,10 +270,11 @@ def process_y_value_table(d, y_table):
         toks = row[1].split()
         y_val = float(toks[0])
         y_values.append(dict(
-            length=length,
-            y=y_val))
+                length=length,
+                y=y_val))
 
     d.y_values = y_values
+
 
 EMITTER_TYPES = {
     Labels.RADIATORS: HeatEmitters.RADIATORS,
@@ -332,6 +329,7 @@ def get_fuel(v):
         logging.warning("Unknown fuel type: \"%s\"" % (fullname,))
         return None
 
+
 COMMUNITY_FUELS = {
     # Here we are always setting the fuel as a boiler fuel instead of CHP
     'Mains gas ': fuel_from_code(51),
@@ -351,7 +349,6 @@ APPENDIX_D7_TYPES = {
 
 
 class MainHeatingSystemRule:
-
     def __init__(self, system_id):
         if system_id == 1:
             self.fuel_attr = 'main_sys_fuel'
@@ -502,13 +499,14 @@ class MainHeatingSystemRule:
         else:
             raise ValueError("Unknown sedbuk type")
 
+
 COMMUNITY_DISTRIBUTION_TYPES = {
     "Piping >= 1991, pre-insulated, low temp, variable flow":
-    CommunityDistributionTypes.MODERN_LOW_TEMP,
+        CommunityDistributionTypes.MODERN_LOW_TEMP,
     "Piping >= 1991, pre-insulated, medium temp, variable flow":
-    CommunityDistributionTypes.MODERN_HIGH_TEMP,
+        CommunityDistributionTypes.MODERN_HIGH_TEMP,
     "Piping <= 1990, not pre-ins, medium/high temp, full flow":
-    CommunityDistributionTypes.PRE_1990_UNINSULATED,
+        CommunityDistributionTypes.PRE_1990_UNINSULATED,
 }
 
 
@@ -525,7 +523,7 @@ def parse_community_heating_sources(r):
 
         elif v.label == "Fuel":
             current_heat_source['fuel'] = copy.deepcopy(
-                COMMUNITY_FUELS[v.vals[0].value])
+                    COMMUNITY_FUELS[v.vals[0].value])
 
         else:
             tokens = [x.split() for x in v.value.split(',')]
@@ -549,6 +547,7 @@ def parse_community_heating_sources(r):
         heat_sources.append(current_heat_source)
 
     return heat_sources, distribution_type
+
 
 PV_OVERSHADING = {
     'Heavy': PVOvershading.HEAVY,
@@ -581,7 +580,6 @@ PV_ORIENTATION = {
 
 
 class PVRule:
-
     def apply(self, d, r):
         if not hasattr(d, "photovoltaic_systems"):
             d.photovoltaic_systems = []
@@ -611,7 +609,6 @@ class PVRule:
 
 
 class WindTurbineRule:
-
     def apply(self, d, r):
         for v in r.vals:
             if v.label != '':
@@ -628,6 +625,7 @@ class WindTurbineRule:
                     return  # No wind turbines
                 logging.warning("Unknown wind turbine field: %s", v)
 
+
 TERRAIN = {
     'Rural': TerrainTypes.RURAL,
     'Low rise urban / Suburban': TerrainTypes.SUBURBAN,
@@ -636,7 +634,6 @@ TERRAIN = {
 
 
 class ControlSystemRule:
-
     def __init__(self, system_id):
         if system_id == 1:
             self.control_type_attr = 'control_type_code'
@@ -677,7 +674,6 @@ class ControlSystemRule:
 
 
 class CoolingSystemRule:
-
     def apply(self, d, r):
         if r.vals[0].value == "None":
             return
@@ -703,7 +699,6 @@ class CoolingSystemRule:
 
 
 class SecondaryHeatingSystemRule:
-
     def apply(self, d, r):
         is_using_manufacturer_data = False
         for v in r.vals:
@@ -730,15 +725,14 @@ class SecondaryHeatingSystemRule:
                 elif is_using_manufacturer_data and "efficiency" in v.value:
                     tokens = v.value.split()
                     effy_idx = [i for i, x in enumerate(
-                        tokens) if x == "efficiency"][0] + 1
+                            tokens) if x == "efficiency"][0] + 1
                     d.secondary_sys_manuf_effy = 100 * \
-                        percent_to_float(tokens[effy_idx])
+                                                 percent_to_float(tokens[effy_idx])
                 else:
                     logging.warning("Unknown secondary system field: %s", v)
 
 
 class AppendixQRule:
-
     def apply(self, d, r):
         sys = dict()
         ach_rates = None  # need to be assembled across two sub inputs
@@ -774,7 +768,6 @@ class AppendixQRule:
 
 
 class HWInsulationRule:
-
     def apply(self, d, inp):
         if len(inp.vals) != 1:
             logging.warning("Whoops: %s", inp)
@@ -795,21 +788,20 @@ class HWInsulationRule:
 
 
 class CPSUVolumeRule:
-
     def apply(self, d, inp):
         tokens = inp.vals[0].value.split()
         d.hw_cylinder_volume = float(tokens[0])
         if len(tokens) > 2:
             d.cpsu_Tw = float(tokens[2])
 
+
 IMMERSION_TYPES = dict(
-    Dual=ImmersionTypes.DUAL,
-    Single=ImmersionTypes.SINGLE,
+        Dual=ImmersionTypes.DUAL,
+        Single=ImmersionTypes.SINGLE,
 )
 
 
 class SolarPanelRule:
-
     def apply(self, d, r):
         if len(r.vals) != 1:
             for r in r.vals:
@@ -846,7 +838,6 @@ WATER_SYSTEM_RULES = {
     Labels.PV_OVERSHADING: lookup_mapping('collector_overshading', PV_OVERSHADING),
 }
 
-
 WWHR_SYSTEM_INPUTS = {
     "Total rooms with shower and/or bath",
     "Number of mixer showers in rooms with a bath",
@@ -855,7 +846,6 @@ WWHR_SYSTEM_INPUTS = {
 
 
 class WaterHeatingSystemRule:
-
     def apply(self, d, r):
         d.has_hw_cylinder = True
         for inp in r.vals:
@@ -866,7 +856,7 @@ class WaterHeatingSystemRule:
 
                 if type == 950:
                     d.community_heat_sources_dhw, d.sap_community_distribution_type_dhw = parse_community_heating_sources(
-                        r)
+                            r)
 
                 if toks[-2] == "summer" and toks[-1] == "immersion":
                     d.use_immersion_heater_summer = True
@@ -957,7 +947,7 @@ class WaterHeatingSystemRule:
             if inp.label == "Waste Water Heat Recovery System":
                 if inp.vals[0].label == "Total rooms with shower and/or bath":
                     d.wwhr_total_rooms_with_shower_or_bath = int(
-                        inp.vals[0].vals[0].value)
+                            inp.vals[0].vals[0].value)
                 else:
                     logging.warning("Unknown WWHRS input %s", inp)
             elif len(tokens) > 2 and tokens[0] == "Product" and tokens[1] == "index":
@@ -1012,12 +1002,12 @@ def apply_common_mv_rules(d, v):
 
 
 class VentilationRule:
-
     def apply(self, d, r):
         if len(r.vals) == 1 and r.vals[0].value == "Natural ventilation ":
             # natural ventilation
             d.ventilation_type = VentilationTypes.NATURAL
-        elif len(r.vals) == 1 and r.vals[0].value == "Mechanical extract ventilation, centralised " and r.vals[0].note == 'Table 4g':
+        elif len(r.vals) == 1 and r.vals[0].value == "Mechanical extract ventilation, centralised " and r.vals[
+            0].note == 'Table 4g':
             d.ventilation_type = VentilationTypes.MEV_CENTRALISED
         elif len(r.vals) == 1 and r.vals[0].value == "MVHR " and r.vals[0].note == 'Table 4g':
             d.ventilation_type = VentilationTypes.MVHR
@@ -1165,6 +1155,7 @@ class VentilationRule:
             d[basename + "_count"] = int(toks_val[0])
             d[basename + "_sfp"] = float(toks_val[5])
 
+
 WALL_TYPES = {
     'Masonry': WallTypes.MASONRY,
     'Steel/Timber frame': WallTypes.OTHER,
@@ -1172,7 +1163,6 @@ WALL_TYPES = {
 
 
 class FloorInfiltrationRule:
-
     def apply(self, d, r):
         if r.vals[0].value == 'Suspended timber ' and r.vals[0].note == 'unsealed':
             d.floor_type = FloorTypes.SUSPENDED_TIMBER_UNSEALED
@@ -1186,6 +1176,7 @@ class FloorInfiltrationRule:
         else:
             logging.warning("Unknown floor type: %s", r)
 
+
 TARIFFS = {
     'Standard tariff': ELECTRICITY_STANDARD,
     'Off-peak 7-hour': ELECTRICITY_7HR,
@@ -1194,7 +1185,6 @@ TARIFFS = {
 
 
 class ElectricityTariffRule:
-
     def apply(self, d, r):
         for v in r.vals:
             if v.value in TARIFFS:
@@ -1204,6 +1194,7 @@ class ElectricityTariffRule:
                     d.main_sys_fuel = copy.deepcopy(tariff)
             else:
                 logging.warning("Unknown electricity tariff: %s", v.value)
+
 
 SAP_REGIONS = {
     'South East England': 2,
@@ -1218,13 +1209,11 @@ SAP_REGIONS = {
     'Wales': 13,
 }
 
-
 DWELLING_TYPES = {
     'Flat': True,
     'House': False,
     'Bungalow': False,
 }
-
 
 INPUT_RULES = {
     Labels.DETACHMENT: NullRule(),
@@ -1288,7 +1277,6 @@ INPUT_RULES = {
 }
 
 
-
 def process_floor_area_table(d, r):
     gfa = 0
     volume = 0
@@ -1310,18 +1298,18 @@ def process_floor_area_table(d, r):
 
 class Elements:
     solid_external_elements = {
-        'Doors': sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
-        'Roof (1)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Roof (2)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Roof (3)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Roof (4)': sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
-        'Ground floor': sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
-        'Walls (1)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
-        'Walls (2)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
-        'Walls (3)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
-        'Walls (4)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
-        'Curtain Walls (1)': sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
-        'Exposed floor': sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
+        'Doors': HeatLossElementTypes.OPAQUE_DOOR,
+        'Roof (1)': HeatLossElementTypes.EXTERNAL_ROOF,
+        'Roof (2)': HeatLossElementTypes.EXTERNAL_ROOF,
+        'Roof (3)': HeatLossElementTypes.EXTERNAL_ROOF,
+        'Roof (4)': HeatLossElementTypes.EXTERNAL_ROOF,
+        'Ground floor': HeatLossElementTypes.EXTERNAL_FLOOR,
+        'Walls (1)': HeatLossElementTypes.EXTERNAL_WALL,
+        'Walls (2)': HeatLossElementTypes.EXTERNAL_WALL,
+        'Walls (3)': HeatLossElementTypes.EXTERNAL_WALL,
+        'Walls (4)': HeatLossElementTypes.EXTERNAL_WALL,
+        'Curtain Walls (1)': HeatLossElementTypes.EXTERNAL_WALL,
+        'Exposed floor': HeatLossElementTypes.EXTERNAL_FLOOR,
     }
 
     solid_internal_elements = [
@@ -1375,15 +1363,14 @@ def process_elements_table(dwelling, table):
                 kvalueStr = row[5]
             else:
                 kvalueStr = ""
-            areaStr = row[1] if row[
-                0].strip() in Elements.awkward_elements else row[3]
+            areaStr = row[1] if row[0].strip() in Elements.awkward_elements else row[3]
+
             if kvalueStr != "":
                 try:
-                    t.append(
-                        worksheet.ThermalMassElement(area=float(areaStr),
-                                                     kvalue=float(
-                                                             kvalueStr),
-                                                     name=row[0]))
+                    t.append(ThermalMassElement(area=float(areaStr),
+                                                kvalue=float(
+                                                        kvalueStr),
+                                                name=row[0]))
                 except ValueError:
                     # Original tests cases don't have kvalues in their sap_tables
                     pass
@@ -1391,29 +1378,29 @@ def process_elements_table(dwelling, table):
         if row[0] in Elements.solid_external_elements:
             area = float(row[3])
             if area > 0:
-                heat_loss_elements.append(worksheet.HeatLossElement(area=area,
-                                                   Uvalue=float(row[4]),
-                                                   is_external=True,
-                                                   element_type=Elements.solid_external_elements[
-                                                           row[0]],
-                                                   name=row[0]))
+                heat_loss_elements.append(HeatLossElement(area=area,
+                                                          Uvalue=float(row[4]),
+                                                          is_external=True,
+                                                          element_type=Elements.solid_external_elements[
+                                                              row[0]],
+                                                          name=row[0]))
         elif row[0] in Elements.solid_internal_elements:
             area = float(row[3])
             if area > 0 and row[4] != "":
-                heat_loss_elements.append(worksheet.HeatLossElement(area=float(row[3]),
-                                                                    Uvalue=float(row[4]),
-                                                                    is_external=False,
-                                                                    element_type=sap.sap_types.HeatLossElementTypes.PARTY_WALL,
-                                                                    name=row[0]))
+                heat_loss_elements.append(HeatLossElement(area=float(row[3]),
+                                                          Uvalue=float(row[4]),
+                                                          is_external=False,
+                                                          element_type=HeatLossElementTypes.PARTY_WALL,
+                                                          name=row[0]))
         elif row[0] in Elements.opening_elements:
             U = 1 / (1 / float(row[4]) + 0.04)
             area = float(row[3])
             if area > 0:
-                heat_loss_elements.append(worksheet.HeatLossElement(area=float(row[3]),
-                                                                    Uvalue=U,
-                                                                    is_external=True,
-                                                                    element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
-                                                                    name=row[0]))
+                heat_loss_elements.append(HeatLossElement(area=float(row[3]),
+                                                          Uvalue=U,
+                                                          is_external=True,
+                                                          element_type=HeatLossElementTypes.GLAZING,
+                                                          name=row[0]))
         elif row[0] in Elements.conservatory_elements:
             if row[0] == 'Conservatory walls':
                 # Annoying special case - missing one column
@@ -1421,48 +1408,49 @@ def process_elements_table(dwelling, table):
                 U = 1 / (1 / float(row[3]) + 0.04)
                 area = float(row[2])
                 if area > 0:
-                    heat_loss_elements.append(worksheet.HeatLossElement(area=area,
-                                                                        Uvalue=U,
-                                                                        is_external=True,
-                                                                        element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
-                                                                        name=row[0]))
+                    heat_loss_elements.append(HeatLossElement(area=area,
+                                                              Uvalue=U,
+                                                              is_external=True,
+                                                              element_type=HeatLossElementTypes.GLAZING,
+                                                              name=row[0]))
 
-                    dwelling.openings.append(worksheet.Opening(
-                        area=area,
-                        orientation_degrees=90,
-                        opening_type=dwelling.opening_types["Windows (2)"]))
+                    dwelling.openings.append(Opening(
+                            area=area,
+                            orientation_degrees=90,
+                            opening_type=dwelling.opening_types["Windows (2)"]))
 
             elif row[0] == 'Conservatory roof':
                 # Note glazing U-value correction!
                 U = 1 / (1 / float(row[4]) + 0.04)
                 area = float(row[3])
                 if area > 0:
-                    heat_loss_elements.append(worksheet.HeatLossElement(area=area,
-                                                                        Uvalue=U,
-                                                                        is_external=True,
-                                                                        element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
-                                                                        name=row[0]))
+                    heat_loss_elements.append(HeatLossElement(area=area,
+                                                              Uvalue=U,
+                                                              is_external=True,
+                                                              element_type=HeatLossElementTypes.GLAZING,
+                                                              name=row[0]))
                     import copy
                     window_type = copy.deepcopy(dwelling.opening_types["Windows (2)"])
                     window_type.roof_window = True
-                    dwelling.openings.append(worksheet.Opening(
-                        area=area,
-                        orientation_degrees=90,
-                        opening_type=window_type))
+                    dwelling.openings.append(Opening(
+                            area=area,
+                            orientation_degrees=90,
+                            opening_type=window_type))
 
             else:
                 U = float(row[4])
                 area = float(row[3])
                 if area > 0:
-                    heat_loss_elements.append(worksheet.HeatLossElement(area=area,
-                                                                        Uvalue=U,
-                                                                        is_external=True,
-                                                                        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
-                                                                        name=row[0]))
+                    heat_loss_elements.append(HeatLossElement(area=area,
+                                                              Uvalue=U,
+                                                              is_external=True,
+                                                              element_type=HeatLossElementTypes.EXTERNAL_FLOOR,
+                                                              name=row[0]))
         elif not row[0].strip() in Elements.awkward_elements:
             logging.warning("unknown element type %s", row[0])
     dwelling.heat_loss_elements = heat_loss_elements
     dwelling.thermal_mass_elements = t
+
 
 OPENING_TYPE_DATA_SOURCES = {
     "SAP": OpeningTypeDataSource.SAP,
@@ -1488,12 +1476,12 @@ def process_opening_types_part1_table(d, r):
             glazing_type = GLAZING_TYPES[row[3].split(',')[0].upper()]
             window_type = row[2]
 
-            types[row[0]] = sap.sap_types.OpeningType(
-                glazing_type=glazing_type,
-                gvalue=0,  # Filled in from next table
-                frame_factor=0,
-                Uvalue=0,
-                roof_window=(window_type == "Roof window"))
+            types[row[0]] = OpeningType(
+                    glazing_type=glazing_type,
+                    gvalue=0,  # Filled in from next table
+                    frame_factor=0,
+                    Uvalue=0,
+                    roof_window=(window_type == "Roof window"))
         else:
             logging.warning("unknown element type %s", row[0])
 
@@ -1533,11 +1521,11 @@ def process_openings_table(dwelling, r):
         elif row[1] in types:
             orientationStr = row[3]
             orientation = ORIENTATIONS[row[3]] if orientationStr != '' else 90
-            openings.append(worksheet.Opening(
-                area=float(row[4]) * float(row[5]),
-                orientation_degrees=orientation,
-                opening_type=types[row[1]],
-                name=row[1]))
+            openings.append(Opening(
+                    area=float(row[4]) * float(row[5]),
+                    orientation_degrees=orientation,
+                    opening_type=types[row[1]],
+                    name=row[1]))
         else:
             logging.warning("Unrecognised opening type: %s", row[1])
 

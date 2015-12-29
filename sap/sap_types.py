@@ -170,3 +170,34 @@ class BoilerTypes:
     COMBI=2
     CPSU=3
     OTHER=4
+
+
+class CommunityDistributionTypes:
+    PRE_1990_UNINSULATED = 1
+    PRE_1990_INSULATED = 2
+    MODERN_HIGH_TEMP = 3
+    MODERN_LOW_TEMP = 4
+
+
+class HeatLossElement:
+    def __init__(self, area, Uvalue, is_external, element_type, name=""):
+        self.area = area
+        self.Uvalue = Uvalue
+        self.is_external = is_external
+        self.name = name
+        self.element_type = element_type
+
+
+class ThermalMassElement:
+    def __init__(self, area, kvalue, name=""):
+        self.area = area
+        self.kvalue = kvalue
+        self.name = name
+
+
+class Opening:
+    def __init__(self, area, orientation_degrees, opening_type, name=""):
+        self.area = area
+        self.orientation_degrees = orientation_degrees
+        self.opening_type = opening_type
+        self.name = name

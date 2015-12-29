@@ -2,9 +2,9 @@ import copy
 import os.path
 import logging
 
-from sap.pcdf import get_fuel_prices
-from sap.sap_types import FuelTypes
-from sap.utils import float_or_none, csv_to_dict
+from .pcdf import get_fuel_prices
+from .sap_types import FuelTypes
+from .utils import float_or_none, csv_to_dict
 
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -107,26 +107,37 @@ class Fuel(object):
     def fuel_data_table_12(self):
         return get_fuel_data_table_12(self.fuel_id)
 
-        # !!! Ideally instead of continually getting fuel data
-        # !!! (above), would just load it at beginning of calc, as
-        # !!! below, except that need to invalidate the fuel data in
-        # !!! between calcs
-        # if self._fuel_data is None:
-        #     self._fuel_data = get_fuel_data(self.fuel_id)
-        # return self._fuel_data
+
+class CommunityFuel(Fuel):
+    def __init__(self, fuel_factor, emission_factor_adjustment):
+        self._fuel_factor = fuel_factor
+        self._emission_factor_adjustment = emission_factor_adjustment
+
+    @property
+    def is_mains_gas(self):
+        return False
+
+    @property
+    def standing_charge(self):
+        return 106
+
+    def fuel_factor(self):
+        return self._fuel_factor
+
+    def emission_factor_adjustment(self):
+        return self._emission_factor_adjustment
 
 
 class ElectricityTariff(object):
     """
-    # !!! Assumes that emissions for on and off peak are same
-    # !!! Assumes that on and off peak standing charge is same
+    Assumes that emissions for on and off peak are same
+    Assumes that on and off peak standing charge is same
     """
+    # TODO: Similar setup to Fuel, decide whether to just subclass...
 
-    def __init__(self,
-                 on_peak_fuel_code,
-                 off_peak_fuel_code,
-                 general_elec_on_peak_fraction,
-                 mech_vent_on_peak_fraction):
+    def __init__(self, on_peak_fuel_code, off_peak_fuel_code,
+                 general_elec_on_peak_fraction, mech_vent_on_peak_fraction):
+
         self.is_electric = True
         self.type = FuelTypes.ELECTRIC
         self.is_mains_gas = False
@@ -185,6 +196,7 @@ class ElectricityTariff(object):
     def name(self):
         on_peak_name = self.on_peak_data.name
         return on_peak_name.split("(")[0].strip()
+
 
 
 def translate_12_row(fuels, row):
@@ -302,4 +314,5 @@ def fuel_from_code(code):
         return copy.deepcopy(_TABLE_12_ELEC[code])
     else:
         return Fuel(code)
+
 

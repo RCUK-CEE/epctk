@@ -1,28 +1,26 @@
-
 from . import fuels
-from .appendix_n import micro_chp_from_pcdf, heat_pump_from_pcdf
 from .fuels import ELECTRICITY_STANDARD
-from .heating_systems import HeatingSystem, DedicatedWaterSystem, immersion_on_peak_fraction, \
-    SecondarySystem, CommunityHeating
-from .pcdf import (get_mev_system, get_boiler, get_solid_fuel_boiler,
-                   get_twin_burner_cooker_boiler, get_heat_pump, get_microchp)
-from .sap_types import FuelTypes, HeatingTypes, WallTypes, ThermalStoreTypes, CylinderInsulationTypes, \
-    VentilationTypes, DuctTypes, LoadCompensators, HeatEmitters
+from .heating_systems import pcdf_heating_system
+from .appendix_a import sap_table_heating_system, configure_secondary_system
+from .appendix_c import CommunityHeating
+from .appendix_g import configure_wwhr, configure_fghr
+from .appendix_h import configure_solar_hw
+from .appendix_m import configure_pv, configure_wind_turbines
+# FIXME: we calculate on peak already inside
+from .heating_dump import immersion_on_peak_fraction
+from .heating_system_types import HeatingSystem, DedicatedWaterSystem
+from .pcdf import (get_mev_system)
 from .sap_constants import FLOOR_INFILTRATION
-from .sap_tables import (TABLE_3, TABLE_4A, TABLE_4B, TABLE_4D, TABLE_4E, TABLE_6D, TABLE_10, TABLE_10C, TABLE_D7,
+from .sap_tables import (TABLE_3, TABLE_4A, TABLE_4D, TABLE_4E, TABLE_6D, TABLE_10, TABLE_10C, TABLE_D7,
                          TABLE_4C3, T4C4_SPACE_EFFY_MULTIPLIERS,
                          get_seasonal_effy_offset,
                          combi_loss_table_3a, get_4a_system, hw_volume_factor, hw_storage_loss_factor, hw_temperature_factor,
                          fans_and_pumps_gain, fans_and_pumps_electricity,
                          occupancy, daily_hw_use,
-                         get_in_use_factor, default_in_use_factor, get_in_use_factor_hr,
-                         default_hr_effy_factor, combi_loss_instant_without_keep_hot,
-                         combi_loss_instant_with_timed_heat_hot, combi_loss_instant_with_untimed_heat_hot,
-                         USE_TABLE_4D_FOR_RESPONSIVENESS, get_effy, system_type_from_sap_code, )
-
-from .appendix_g import configure_wwhr, configure_fghr, configure_combi_loss
-from .appendix_h import configure_solar_hw
-from .appendix_m import configure_pv, configure_wind_turbines
+                         default_in_use_factor,
+                         default_hr_effy_factor, USE_TABLE_4D_FOR_RESPONSIVENESS, )
+from sap.pcdf import get_in_use_factor, get_in_use_factor_hr
+from .sap_types import FuelTypes, HeatingTypes, WallTypes, ThermalStoreTypes, VentilationTypes, DuctTypes, LoadCompensators, HeatEmitters
 from .utils import exists_and_true
 
 
@@ -175,6 +173,7 @@ def configure_fuel_costs(dwelling):
 
     if dwelling.water_sys.summer_immersion:
         # Should this be here or in worksheet.py?
+        # FIXME: we calculate on peak already inside
         on_peak = immersion_on_peak_fraction(dwelling.Nocc,
                                              dwelling.electricity_tariff,
                                              dwelling.hw_cylinder_volume,
@@ -223,7 +222,6 @@ def configure_responsiveness(dwelling):
         sys2_responsiveness * dwelling.main_heating_2_fraction)
 
     dwelling.heating_responsiveness_sys1 = sys1_responsiveness  # used for TER
-
 
 
 def configure_control_system1(dwelling, system):
@@ -290,33 +288,29 @@ def configure_main_system(dwelling):
                 dwelling,
                 dwelling.main_sys_fuel,
                 dwelling.sys1_sedbuk_2005_effy,
-                dwelling.sys1_sedbuk_range_case_loss_at_full_output if dwelling.get(
-                        'sys1_sedbuk_range_case_loss_at_full_output') else None,
-                dwelling.sys1_sedbuk_range_full_output if dwelling.get('sys1_sedbuk_range_full_output') else None,
+                dwelling.get('sys1_sedbuk_range_case_loss_at_full_output'),
+                dwelling.get('sys1_sedbuk_range_full_output'),
                 dwelling.sys1_sedbuk_type,
                 dwelling.sys1_sedbuk_fan_assisted,
-                dwelling.use_immersion_heater_summer if dwelling.get('use_immersion_heater_summer') else False)
+                dwelling.get('use_immersion_heater_summer', False))
 
-    elif dwelling.get('sys1_sedbuk_2009_effy') and dwelling.sys1_sedbuk_2009_effy is not None:
+    elif dwelling.get('sys1_sedbuk_2009_effy') is not None:
         dwelling.main_sys_1 = sedbuk_2009_heating_system(
                 dwelling,
                 dwelling.main_sys_fuel,
                 dwelling.sys1_sedbuk_2009_effy,
-                dwelling.sys1_sedbuk_range_case_loss_at_full_output if dwelling.get(
-                        'sys1_sedbuk_range_case_loss_at_full_output') else None,
-                dwelling.sys1_sedbuk_range_full_output if dwelling.get('sys1_sedbuk_range_full_output') else None,
+                dwelling.get('sys1_sedbuk_range_case_loss_at_full_output'),
+                dwelling.get('sys1_sedbuk_range_full_output'),
                 dwelling.sys1_sedbuk_type,
                 True,  # !!! Assumes condensing
                 dwelling.sys1_sedbuk_fan_assisted,
-                dwelling.use_immersion_heater_summer if dwelling.get('use_immersion_heater_summer') else False)
+                dwelling.get('use_immersion_heater_summer', False))
 
     elif dwelling.get('main_heating_type_code') == "community":
         # !!! Can Community can be second main system too?
         dwelling.main_sys_1 = CommunityHeating(
                 dwelling.community_heat_sources,
-                (dwelling.sap_community_distribution_type
-                 if dwelling.get('sap_community_distribution_type')
-                 else None))
+                dwelling.get('sap_community_distribution_type'))
         dwelling.main_sys_fuel = dwelling.main_sys_1.fuel
 
     else:
@@ -331,50 +325,26 @@ def configure_main_system(dwelling):
 
 
 def configure_main_system_2(dwelling):
-    # !!! Sedbuk systems
-
-    if dwelling.get('main_heating_2_pcdf_id') and dwelling.main_heating_2_pcdf_id is not None:
+    """
+    Load the 2nd main system from pcdf data if available, otherwise fallback to SAP table
+    :param dwelling:
+    :return:
+    """
+    # Sedbuk systems
+    if dwelling.get('main_heating_2_pcdf_id') is not None:
         dwelling.main_sys_2 = pcdf_heating_system(dwelling,
                                                   dwelling.main_heating_2_pcdf_id,
                                                   dwelling.main_sys_2_fuel,
-                                                  dwelling.use_immersion_heater_summer if dwelling.get(
-                                                          'use_immersion_heater_summer') else False)
-        # !!! Might need to enforce a secondary system?
-    elif dwelling.get('main_heating_2_type_code') and dwelling.main_heating_2_type_code is not None:
+                                                  dwelling.get('use_immersion_heater_summer', False))
+
+    # TODO: Might need to enforce a secondary system?
+    elif dwelling.get('main_heating_2_type_code') is not None:
         dwelling.main_sys_2 = sap_table_heating_system(
                 dwelling,
                 dwelling.main_heating_2_type_code,
                 dwelling.main_sys_2_fuel,
-                dwelling.use_immersion_heater_summer if dwelling.get('use_immersion_heater_summer') else False,
-                dwelling.sys2_hetas_approved if dwelling.get('sys2_hetas_approved') else False)
-
-
-def configure_secondary_system(dwelling):
-    # !!! Need to apply the rules from A4 here - need to do this
-    # before fraction_of_heat_from_main is set.  Also back boiler
-    # should have secondary system - see section 9.2.8
-
-    if dwelling.get('secondary_heating_type_code'):
-        dwelling.secondary_sys = get_4a_secondary_system(dwelling)
-    elif dwelling.get('secondary_sys_manuf_effy'):
-        dwelling.secondary_sys = get_manuf_data_secondary_system(dwelling)
-
-    # There must be a secondary system if electric storage heaters
-    # or off peak underfloor electric
-    if dwelling.get('main_heating_type_code'):
-        if not dwelling.get('secondary_sys') and (
-                    (401 <= dwelling.main_heating_type_code <= 408) or (
-                                    421 <= dwelling.main_heating_type_code <= 425 and
-                                dwelling.main_sys_fuel != ELECTRICITY_STANDARD)):
-            # !!! Does 24 hour tariff count as being offpeak?
-            dwelling.secondary_heating_type_code = 693
-            dwelling.secondary_sys_fuel = dwelling.electricity_tariff
-            dwelling.secondary_sys = get_4a_secondary_system(dwelling)
-
-    if not dwelling.get('secondary_sys') and exists_and_true(dwelling, 'force_secondary_heating'):
-        dwelling.secondary_heating_type_code = 693
-        dwelling.secondary_sys_fuel = dwelling.electricity_tariff
-        dwelling.secondary_sys = get_4a_secondary_system(dwelling)
+                dwelling.get('use_immersion_heater_summer', False),
+                dwelling.get('sys2_hetas_approved', False))
 
 
 def configure_water_system(dwelling):
@@ -633,201 +603,14 @@ def configure_ventilation(dwelling):
         dwelling.adjusted_fan_sfp = piv_sfp * in_use_factor
 
 
-def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
-    if pcdf_data['main_type'] == "Combi":
-        system_type = HeatingTypes.combi
-    elif pcdf_data['main_type'] == "CPSU":
-        system_type = HeatingTypes.cpsu
-    else:
-        system_type = HeatingTypes.regular_boiler
-
-    sys = HeatingSystem(system_type,
-                        pcdf_data['winter_effy'],
-                        pcdf_data['summer_effy'],
-                        False,  # summer immersion
-                        pcdf_data['fan_assisted_flue'] == 'True',
-                        True,  # ch pump
-                        -1,
-                        0.1,
-                        fuel)  # !!! Assumes 10% secondary fraction
-
-    # !!!
-    sys.has_warm_air_fan = False
-    sys.sap_appendixD_eqn = pcdf_data['sap_appendixD_eqn']
-    sys.is_condensing = pcdf_data['condensing']
-
-    if pcdf_data['subsidiary_type'] == "with integral PFGHRD":
-        if (pcdf_data['subsidiary_type_table'] == "" and
-                    pcdf_data['subsidiary_type_index'] == ""):
-            # integral PFGHRD, performance data included in boilerl data
-            assert not dwelling.get('fghrs')
-        else:
-            if (dwelling.get('fghrs') and
-                        dwelling.fghrs is None):
-                # inputs expliticly say there is no fghrs, so don't
-                # add one even if boiler specifies one
-                pass
-            else:
-                if dwelling.get('fghrs'):
-                    assert dwelling.fghrs['pcdf_id'] == pcdf_data['subsidiary_type_index']
-                else:
-                    dwelling.fghrs = dict(pcdf_id=pcdf_data['subsidiary_type_index'])
-
-    if pcdf_data['storage_type'] != "Unknown":
-        # Shouldn't have cylinder data specified if we are going to
-        # use pcdf cylinder info
-        assert not dwelling.get("hw_cylinder_volume")
-
-    if pcdf_data['main_type'] == 'Regular':
-        # !!! Also need to allow this for table 4a systems?
-        if exists_and_true(dwelling, 'cylinder_is_thermal_store'):
-            if dwelling.thermal_store_type == ThermalStoreTypes.HW_ONLY:
-                sys.table2b_row = 6
-            else:
-                sys.table2b_row = 7
-            dwelling.has_cylinderstat = True
-        else:
-            sys.table2b_row = 2  # !!! Assumes not electric
-    elif pcdf_data['main_type'] == 'Combi':
-        # !!! introduce a type for storage types
-        if pcdf_data['storage_type'] in ['storage combi with primary store', 'storage combi with secondary store']:
-            # !!! Should only do this if combi is the hw system - this
-            # !!! check for having a defined ins type works for now,
-            # !!! but will need improving
-            if not dwelling.get('hw_cylinder_insulation_type'):
-                dwelling.hw_cylinder_volume = pcdf_data["store_boiler_volume"]
-                dwelling.hw_cylinder_insulation = pcdf_data["store_insulation_mms"]
-                dwelling.hw_cylinder_insulation_type = CylinderInsulationTypes.FOAM
-                # Force calc to use the data from pcdf, don't use a user entered cylinder loss
-                dwelling.measured_cylinder_loss = None
-
-        if pcdf_data['storage_type'] == 'storage combi with primary store':
-            sys.table2b_row = 3
-            dwelling.has_cylinderstat = True
-        elif pcdf_data['storage_type'] == 'storage combi with secondary store':
-            sys.table2b_row = 4
-            dwelling.has_cylinderstat = True
-
-        if not 'keep_hot_facility' in pcdf_data or pcdf_data['keep_hot_facility'] == 'None':
-            sys.has_no_keep_hot = True
-            sys.table3arow = combi_loss_instant_without_keep_hot
-        elif pcdf_data['keep_hot_timer']:
-            sys.table3arow = combi_loss_instant_with_timed_heat_hot
-            if pcdf_data['keep_hot_facility'] == "elec" or pcdf_data[
-                'keep_hot_facility'] == "gas/oil and elec":  # !!! or mixed?
-                sys.keep_hot_elec_consumption = 600
-        else:
-            sys.table3arow = combi_loss_instant_with_untimed_heat_hot
-            if pcdf_data['keep_hot_facility'] == "elec" or pcdf_data[
-                'keep_hot_facility'] == "gas/oil and elec":  # !!! or mixed?
-                sys.keep_hot_elec_consumption = 900
-    elif pcdf_data['main_type'] == 'CPSU':
-        sys.table2b_row = 7  # !!! Assumes gas-fired
-        dwelling.has_cylinderstat = True
-        sys.cpsu_Tw = dwelling.cpsu_Tw
-        sys.cpsu_not_in_airing_cupboard = exists_and_true(dwelling, 'cpsu_not_in_airing_cupboard')
-    else:
-        # !!! What about other table rows?
-        raise ValueError("Unknown system type")
-
-    if sys.system_type == HeatingTypes.combi:
-        configure_combi_loss(dwelling, sys, pcdf_data)
-    # !!! Assumes gas/oil boiler
-    sys.responsiveness = USE_TABLE_4D_FOR_RESPONSIVENESS
-    return sys
-
-
-def solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer):
-    # Appendix J
-    if pcdf_data['seasonal_effy'] != '':
-        effy = float(pcdf_data['seasonal_effy'])
-    elif pcdf_data['part_load_fuel_use'] != '':
-        untested()  # !!!
-        # !!! Need to tests for inside/outside of heated space
-        nominal_effy = 100 * (pcdf_data['nominal_heat_to_water'] + pcdf_data['nominal_heat_to_room']) / pcdf_data[
-            'nominal_fuel_use']
-        part_load_effy = 100 * (pcdf_data['part_load_heat_to_water'] + pcdf_data['part_load_heat_to_room']) / pcdf_data[
-            'part_load_fuel_use']
-        effy = 0.5 * (nominal_effy + part_load_effy)
-    else:
-        nominal_effy = 100 * (
-            float(pcdf_data['nominal_heat_to_water']) + float(pcdf_data['nominal_heat_to_room'])) / float(
-                pcdf_data['nominal_fuel_use'])
-        effy = .975 * nominal_effy
-    sys = HeatingSystem(HeatingTypes.regular_boiler,  # !!!
-                        effy,
-                        effy,
-                        summer_immersion=use_immersion_in_summer,
-                        has_flue_fan=False,  # !!!
-                        has_ch_pump=True,
-                        table2b_row=2,  # !!! Solid fuel boilers can only have indirect boiler?
-                        default_secondary_fraction=0.1,  # !!! Assumes 10% secondary fraction
-                        fuel=fuel)
-
-    sys.responsiveness = .5  # !!! Needs to depend on "main type" input
-
-    # !!!
-    sys.has_warm_air_fan = False
-    return sys
-
-
-def twin_burner_cooker_boiler_from_pcdf(pcdf_data,
-                                        fuel,
-                                        use_immersion_in_summer):
-    winter_effy = pcdf_data['winter_effy']
-    summer_effy = pcdf_data['summer_effy']
-
-    sys = HeatingSystem(HeatingTypes.regular_boiler,  # !!!
-                        winter_effy,
-                        summer_effy,
-                        summer_immersion=use_immersion_in_summer,
-                        has_flue_fan=False,  # !!!
-                        has_ch_pump=True,
-                        table2b_row=2,  # !!! Solid fuel boilers can only have indirect boiler?
-                        default_secondary_fraction=0.1,  # !!! Assumes 10% secondary fraction
-                        fuel=fuel)
-
-    sys.range_cooker_heat_required_scale_factor = 1 - (
-        pcdf_data['case_loss_at_full_output'] / pcdf_data['full_output_power'])
-
-    # !!! Assumes we have a heat emitter - is that always the case?
-    sys.responsiveness = USE_TABLE_4D_FOR_RESPONSIVENESS
-
-    # !!!
-    sys.has_warm_air_fan = False
-    return sys
-
-
-def pcdf_heating_system(dwelling,
-                        pcdf_id,
-                        fuel,
-                        use_immersion_in_summer):
-    pcdf_data = get_boiler(pcdf_id)
-    if not pcdf_data is None:
-        return gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer)
-
-    pcdf_data = get_solid_fuel_boiler(pcdf_id)
-    if not pcdf_data is None:
-        return solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer)
-
-    pcdf_data = get_twin_burner_cooker_boiler(pcdf_id)
-    if not pcdf_data is None:
-        return twin_burner_cooker_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer)
-
-    pcdf_data = get_heat_pump(pcdf_id)
-    if not pcdf_data is None:
-        return heat_pump_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer)
-
-    pcdf_data = get_microchp(pcdf_id)
-    if not pcdf_data is None:
-        return micro_chp_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer)
-
-
 def get_table3_row(dwelling):
     """
     Get the row number from Table 3 for the given dwelling
     by finding the row corresponding to the dwellings' combination of heating
-    type codes and thermal storage
+    type codes and thermal storage.
+
+    This implements the logic of section 4.2 Storage loss, and is used through the
+    hw_primary_circuit_loss function
 
     :param dwelling:
     :return:
@@ -880,146 +663,15 @@ def get_table3_row(dwelling):
 
 
 def hw_primary_circuit_loss(dwelling):
+    """
+    Hot water primary circuit losses according to the logic described in
+    Section 4.2.
+
+    :param dwelling:
+    :return:
+    """
     table3row = get_table3_row(dwelling)
-    return TABLE_3[table3row](dwelling)
-
-
-def has_ch_pump(dwelling):
-    return (dwelling.get('heating_emitter_type', False) or
-            dwelling.get('heating_emitter_type2', False))
-
-
-def get_4a_main_system(dwelling,
-                       system_code,
-                       fuel,
-                       use_immersion_in_summer,
-                       hetas_approved):
-    """
-    Get the main heating system according to Table 4a for the given dwelling
-
-    :param dwelling:
-    :param system_code:
-    :param fuel:
-    :param use_immersion_in_summer:
-    :param hetas_approved:
-    :return: HeatingSystem object
-    """
-    system_data = get_4a_system(dwelling.electricity_tariff, system_code)
-
-    if hetas_approved and system_data['effy_hetas'] > 0:
-        effy = system_data["effy_hetas"]
-    else:
-        effy = get_effy(system_data, fuel)
-
-    system = HeatingSystem(system_type_from_sap_code(system_code, system_data),
-                           effy,
-                           effy,
-                           use_immersion_in_summer,
-                           system_data['flue_fan'] == 'TRUE',
-                           has_ch_pump(dwelling),
-                           system_data['table2b_row'],
-                           system_data['fraction_of_heat_from_secondary'],
-                           fuel)
-
-    system.has_warm_air_fan = system_data['warm_air_fan'] == "TRUE"
-    system.responsiveness = system_data['responsiveness']
-    if system_data['water_effy'] != "same":
-        system.water_effy = float(system_data['water_effy'])
-
-    if system.system_type in [HeatingTypes.combi,
-                              HeatingTypes.storage_combi]:
-        system.combi_loss = combi_loss_table_3a(dwelling, system)
-    elif system.system_type == HeatingTypes.cpsu:
-        system.cpsu_Tw = dwelling.cpsu_Tw
-        system.cpsu_not_in_airing_cupboard = exists_and_true(dwelling, 'cpsu_not_in_airing_cupboard')
-
-    return system
-
-
-def get_4a_secondary_system(dwelling):
-    """
-    Get the secondary heating system according to Table 4a for the
-    given dwelling
-
-    :param dwelling:
-    :return: SecondarySystem object
-    """
-    system_data = get_4a_system(dwelling.electricity_tariff, dwelling.secondary_heating_type_code)
-
-    if (exists_and_true(dwelling, 'secondary_hetas_approved') and
-                system_data['effy_hetas'] > 0):
-        effy = system_data["effy_hetas"]
-    else:
-        effy = get_effy(system_data, dwelling.secondary_sys_fuel)
-
-    sys = SecondarySystem(
-            system_type_from_sap_code(dwelling.secondary_heating_type_code,
-                                      system_data),
-            effy,
-            (dwelling.use_immersion_heater_summer
-             if dwelling.get('use_immersion_heater_summer')
-             else False))
-    sys.table2b_row = system_data['table2b_row']
-    sys.fuel = dwelling.secondary_sys_fuel
-
-    if system_data['water_effy'] != "same" and system_data['water_effy'] != "":
-        sys.water_effy = float(system_data['water_effy'])
-
-    return sys
-
-
-def get_manuf_data_secondary_system(dwelling):
-    effy = dwelling.secondary_sys_manuf_effy
-    sys = SecondarySystem(
-            HeatingTypes.misc,
-            effy,
-            dwelling.get('use_immersion_heater_summer', False))
-
-    # sys.table2b_row=system_data['table2b_row']
-    sys.fuel = dwelling.secondary_sys_fuel
-    return sys
-
-
-def get_4b_main_system(dwelling, system_code, fuel, use_immersion_in_summer):
-    system_data = TABLE_4B[system_code]
-    system = HeatingSystem(system_type_from_sap_code(system_code, system_data),
-                           system_data['effy_winter'],
-                           system_data['effy_summer'],
-                           use_immersion_in_summer,
-                           system_data['flue_fan'] == 'TRUE',
-                           has_ch_pump(dwelling),
-                           system_data['table2b_row'],
-                           system_data['fraction_of_heat_from_secondary'],
-                           fuel)
-
-    system.responsiveness = system_data['responsiveness']
-    system.is_condensing = system_data['condensing']
-    if system.system_type in [HeatingTypes.combi,
-                              HeatingTypes.storage_combi]:
-        system.combi_loss = combi_loss_table_3a(dwelling, system)
-    elif system.system_type == HeatingTypes.cpsu:
-        system.cpsu_not_in_airing_cupboard = exists_and_true(dwelling, 'cpsu_not_in_airing_cupboard')
-
-    return system
-
-
-def sap_table_heating_system(dwelling,
-                             system_code,
-                             fuel,
-                             use_immersion_in_summer,
-                             hetas_approved):
-    if system_code in TABLE_4A:
-        system = get_4a_main_system(dwelling,
-                                    system_code,
-                                    fuel,
-                                    use_immersion_in_summer,
-                                    hetas_approved)
-    else:
-        system = get_4b_main_system(dwelling,
-                                    system_code,
-                                    fuel,
-                                    use_immersion_in_summer)
-    return system
+    return TABLE_3[table3row]
 
 
 def sedbuk_2005_heating_system(dwelling,
@@ -1150,9 +802,10 @@ def lookup_sap_tables(dwelling):
         fuels.PREFER_PCDF_FUEL_PRICES = False
 
     # Fix up fuel types
-    if dwelling.get('water_sys_fuel') and dwelling.water_sys_fuel == ELECTRICITY_STANDARD:
+    if dwelling.get('water_sys_fuel') == ELECTRICITY_STANDARD:
         dwelling['water_sys_fuel'] = dwelling.electricity_tariff
-    if dwelling.get('secondary_sys_fuel') and dwelling.secondary_sys_fuel == ELECTRICITY_STANDARD:
+
+    if dwelling.get('secondary_sys_fuel') == ELECTRICITY_STANDARD:
         dwelling['secondary_sys_fuel'] = dwelling.electricity_tariff
 
     dwelling['Nocc'] = occupancy(dwelling.GFA)

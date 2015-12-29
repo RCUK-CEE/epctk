@@ -10,7 +10,8 @@ import types
 
 import numpy
 
-from .heating_systems import weighted_effy, HeatingSystem
+from sap.heating_system_types import HeatingSystem
+from sap.common import weighted_effy
 from .sap_tables import interpolate_efficiency, interpolate_psr_table, table_n8_secondary_fraction, \
     table_n4_heating_days, USE_TABLE_4D_FOR_RESPONSIVENESS
 from .sap_types import HeatingTypes, FuelTypes
@@ -92,6 +93,11 @@ def add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data):
     sys.space_heat_effy = types.MethodType(heat_pump_space_effy, sys)
 
 
+def sch3_calc(dwelling, sch2val, sch3val):
+    Vd = dwelling.daily_hot_water_use
+    return sch2val + (sch3val - sch2val) * (Vd - 100.2) / 99.6
+
+
 def add_appendix_n_equations_shared(dwelling, sys, pcdf_data):
     def longer_heating_days(self):
         h_mean = sum(dwelling.h) / 12
@@ -137,11 +143,6 @@ def add_appendix_n_equations_shared(dwelling, sys, pcdf_data):
         return numpy.array(N24_16_m), numpy.array(N24_9_m), numpy.array(N16_9_m),
 
     dwelling.longer_heating_days = types.MethodType(longer_heating_days, dwelling)
-
-
-def sch3_calc(dwelling, sch2val, sch3val):
-    Vd = dwelling.daily_hot_water_use
-    return sch2val + (sch3val - sch2val) * (Vd - 100.2) / 99.6
 
 
 def add_appendix_n_equations_microchp(dwelling, sys, pcdf_data):

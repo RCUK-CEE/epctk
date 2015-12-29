@@ -354,7 +354,7 @@ def process_glazing_elements(xlbook, d):
             if not roof_windows[0].orientation_degrees == rw.orientation_degrees:
                 raise CannotDoInSpreadsheetError("More than one roof window orientation")
 
-        combined_window = worksheet.Opening(
+        combined_window = sap.sap_types.Opening(
             sum(rw.area for rw in roof_windows),
             roof_windows[0].orientation_degrees,
             rtype)

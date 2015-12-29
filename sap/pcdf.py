@@ -1,6 +1,11 @@
+"""
+Module to load raw data from PCDF file
+
+"""
+
 import os
 
-from sap.sap_types import VentilationTypes, DuctTypes
+from .sap_types import VentilationTypes, DuctTypes
 from .utils import int_or_none, float_or_none
 
 PCDF_DATA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'pcdf2009.dat')
@@ -450,3 +455,36 @@ def get_fuel_prices():
             price=float(row[3])
         )
     return fuels
+
+
+TABLE_4h_in_use = None
+TABLE_4h_in_use_approved_scheme = None
+TABLE_4h_hr_effy_approved_scheme = None
+
+
+def load_4h_tables():
+    global TABLE_4h_in_use, TABLE_4h_in_use_approved_scheme, TABLE_4h_hr_effy, TABLE_4h_hr_effy_approved_scheme
+
+    (TABLE_4h_in_use,
+     TABLE_4h_in_use_approved_scheme,
+     TABLE_4h_hr_effy,
+     TABLE_4h_hr_effy_approved_scheme
+     ) = get_in_use_factors()
+
+
+def get_in_use_factor(vent_type, duct_type, approved_scheme):
+    if TABLE_4h_in_use is None:
+        load_4h_tables()
+    if approved_scheme:
+        return TABLE_4h_in_use_approved_scheme[vent_type][duct_type]
+    else:
+        return TABLE_4h_in_use[vent_type][duct_type]
+
+
+def get_in_use_factor_hr(vent_type, duct_type, approved_scheme):
+    if TABLE_4h_in_use is None:
+        load_4h_tables()
+    if approved_scheme:
+        return TABLE_4h_hr_effy_approved_scheme[vent_type][duct_type]
+    else:
+        return TABLE_4h_hr_effy[vent_type][duct_type]

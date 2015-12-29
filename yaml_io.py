@@ -4,8 +4,6 @@ import numpy
 
 import sap.fuels
 import sap.sap_types
-from sap import worksheet
-from sap import sap_tables
 from sap.dwelling import Dwelling
 
 
@@ -80,9 +78,9 @@ def configure_yaml():
     yaml.add_representer(sap.fuels.Fuel, fuel_representer)
     yaml.add_constructor('!fuel', fuel_constructor)
 
-    create_mapper(worksheet.HeatLossElement, "HeatLossElement")
-    create_mapper(worksheet.ThermalMassElement, "ThermalMassElement")
-    create_mapper(worksheet.Opening, "Opening")
+    create_mapper(sap.sap_types.HeatLossElement, "HeatLossElement")
+    create_mapper(sap.sap_types.ThermalMassElement, "ThermalMassElement")
+    create_mapper(sap.sap_types.Opening, "Opening")
 
     yaml.add_representer(sap.sap_types.OpeningType, opening_type_representer)
     yaml.add_constructor(

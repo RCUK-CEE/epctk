@@ -3,9 +3,13 @@ Appendix G: Flue gas heat recovery systems and Waste water heat recovery systems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
+import numpy
+
+from .sap_constants import DAYS_PER_MONTH
 from .appendix_m import configure_pv_system
 from .pcdf import get_wwhr_system, get_fghr_system
-from .sap_tables import TABLE_H3, combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c
+from .sap_tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
+                         combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
 from .sap_types import HeatingTypes
 from .utils import exists_and_true
 
@@ -94,3 +98,34 @@ def configure_combi_loss(dwelling, sys, pcdf_data):
         sys.combi_loss = combi_loss_table_3a(dwelling, sys)
 
     sys.pcdf_data = pcdf_data  # !!! Needed if we later add a store to this boiler
+
+
+def wwhr_savings(dwelling):
+    """
+    Calculate the savings (kWh/month) for mixer showers with WWHRS according to equation(G10)
+    :param dwelling:
+    :return:
+    """
+    # TODO: Variables were defined but not used
+    # savings = 0
+    # Nshower_with_bath = 1
+    # Nshower_without_bath = 0
+    Nshower_and_bath = dwelling.wwhr_total_rooms_with_shower_or_bath
+
+    S_sum = 0
+    for sys in dwelling.wwhr_systems:
+        effy = sys['pcdf_sys']['effy_mixer_shower'] / 100
+        util = sys['pcdf_sys']['utilisation_mixer_shower']
+        S_sum += (sys['Nshowers_with_bath'] * .635 * effy *
+                  util + sys['Nshowers_without_bath'] * effy * util)
+
+    Seff = S_sum / Nshower_and_bath
+    Tcoldm = numpy.array(
+        [11.1, 10.8, 11.8, 14.7, 16.1, 18.2, 21.3, 19.2, 18.8, 16.3, 13.3, 11.8])
+    Awm = .33 * 25 * MONTHLY_HOT_WATER_TEMPERATURE_RISE / (41 - Tcoldm) + 26.1
+    Bwm = .33 * 36 * MONTHLY_HOT_WATER_TEMPERATURE_RISE / (41 - Tcoldm)
+
+    savings = (dwelling.Nocc * Awm + Bwm) * Seff * (35 - Tcoldm) * \
+              4.18 * DAYS_PER_MONTH * MONTHLY_HOT_WATER_FACTORS / 3600.
+
+    return savings
