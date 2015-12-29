@@ -11,7 +11,7 @@ import types
 import numpy
 
 from sap.heating_system_types import HeatingSystem
-from sap.common import weighted_effy
+from sap.utils import weighted_effy
 from .sap_tables import interpolate_efficiency, interpolate_psr_table, table_n8_secondary_fraction, \
     table_n4_heating_days, USE_TABLE_4D_FOR_RESPONSIVENESS
 from .sap_types import HeatingTypes, FuelTypes

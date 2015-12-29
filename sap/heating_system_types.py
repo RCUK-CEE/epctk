@@ -1,7 +1,6 @@
 import numpy
 
-from .common import weighted_effy
-# from .heating_dump import heating_fuel_cost, dhw_fuel_cost
+from sap.utils import weighted_effy
 from .sap_types import FuelTypes, HeatingTypes
 
 
@@ -73,7 +72,7 @@ class HeatingSystem:
         :return:
         """
         # Import locally to avoid circular reference problems when importing main module
-        from .heating_dump import heating_fuel_cost
+        from sap.heating_systems import heating_fuel_cost
         return heating_fuel_cost(self, dwelling)
 
     def co2_factor(self):
@@ -89,7 +88,7 @@ class HeatingSystem:
         :return:
         """
         # Import locally to avoid circular reference problems when importing main module
-        from .heating_dump import dhw_fuel_cost
+        from sap.heating_systems import dhw_fuel_cost
         return dhw_fuel_cost(dwelling)
 
     def get(self, key, default=None):
@@ -136,7 +135,7 @@ class DedicatedWaterSystem(HeatingSystem):
     #     return dhw_fuel_cost(dwelling)
 
 
-class SecondarySystem(object):
+class SecondarySystem(HeatingSystem):
     """
     Defines a Secondary heating system. According to Appendix A:
 
@@ -167,14 +166,14 @@ class SecondarySystem(object):
 
         return water_effy
 
-    def fuel_price(self, dwelling):
-        return heating_fuel_cost(self, dwelling)
+    # def fuel_price(self, dwelling):
+    #     return heating_fuel_cost(self, dwelling)
 
-    def co2_factor(self):
-        return self.fuel.co2_factor
+    # def co2_factor(self):
+    #     return self.fuel.co2_factor
 
-    def primary_energy_factor(self):
-        return self.fuel.primary_energy_factor
+    # def primary_energy_factor(self):
+    #     return self.fuel.primary_energy_factor
 
-    def water_fuel_price(self, dwelling):
-        return dhw_fuel_cost(dwelling)
+    # def water_fuel_price(self, dwelling):
+    #     return dhw_fuel_cost(dwelling)

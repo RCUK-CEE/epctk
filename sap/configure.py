@@ -7,7 +7,7 @@ from .appendix_g import configure_wwhr, configure_fghr
 from .appendix_h import configure_solar_hw
 from .appendix_m import configure_pv, configure_wind_turbines
 # FIXME: we calculate on peak already inside
-from .heating_dump import immersion_on_peak_fraction
+from sap.heating_systems import immersion_on_peak_fraction
 from .heating_system_types import HeatingSystem, DedicatedWaterSystem
 from .pcdf import (get_mev_system)
 from .sap_constants import FLOOR_INFILTRATION
