@@ -1,10 +1,9 @@
 __author__ = 'jonathanchambers'
 
-import logging
-import yaml_io
 import argparse
 
 from sap import runner
+from sap.io import yaml_io
 
 
 def print_header(header):

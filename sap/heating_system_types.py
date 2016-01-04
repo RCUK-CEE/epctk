@@ -1,6 +1,8 @@
 import numpy
 
-from sap.utils import weighted_effy
+from .sap_constants import SUMMER_MONTHS
+from .fuels import ELECTRICITY_7HR, ELECTRICITY_10HR
+from .utils import weighted_effy
 from .sap_types import FuelTypes, HeatingTypes
 
 
@@ -8,6 +10,22 @@ class HeatingSystem:
     def __init__(self, system_type, winter_effy, summer_effy,
                  summer_immersion, has_flue_fan, has_ch_pump,
                  table2b_row, default_secondary_fraction, fuel):
+        """
+
+        Args:
+            system_type (HeatingTypes):
+            winter_effy (float):
+            summer_effy (float):
+            summer_immersion (bool):
+            has_flue_fan (bool):
+            has_ch_pump (bool):
+            table2b_row (int):
+            default_secondary_fraction (float): default fraction of energy from secondary heating
+            fuel (Fuel):
+
+        Returns:
+
+        """
         self.system_type = system_type
 
         self.heating_effy_winter = winter_effy
@@ -51,29 +69,36 @@ class HeatingSystem:
         # base_water_effy=(self.Q_space+Q_water)/(self.Q_space/self.heating_effy_winter+Q_water/self.heating_effy_summer)
         # water_effy=(base_water_effy+self.water_adj)*self.water_mult
 
-        # Looks like you apply effy adjustments before calculating the
-        # seasonal weight efficiency, but which adjustments do you use
-        # for winter?  Space or water heating?
+        # Looks like you apply effy adjustments before calculating the seasonal weight efficiency,
+        # but which adjustments do you use for winter?  Space or water heating?
         wintereff = (self.heating_effy_winter + self.water_adj) * self.water_mult
         summereff = (self.heating_effy_summer + self.water_adj) * self.water_mult
 
         water_effy = weighted_effy(self.Q_space, Q_water, wintereff, summereff)
 
         if self.summer_immersion:
-            for i in range(5, 9):
+            for i in SUMMER_MONTHS:
                 water_effy[i] = 100
 
         return water_effy
 
     def fuel_price(self, dwelling):
         """
-        Return the fuel price
-        :param dwelling:
-        :return:
+        Return the fuel price, which will be a function of the on-peak fraction
+        if the system is electric.
+
+        Args:
+            dwelling:
+
+        Returns:
+            float: fuel price for the given dwelling
         """
-        # Import locally to avoid circular reference problems when importing main module
-        from sap.heating_systems import heating_fuel_cost
-        return heating_fuel_cost(self, dwelling)
+
+        if self.fuel.is_electric:
+            on_peak = self._space_heat_on_peak_fraction(dwelling)
+            return self.fuel.unit_price(on_peak)
+        else:
+            return self.fuel.unit_price()
 
     def co2_factor(self):
         return self.fuel.co2_factor
@@ -107,6 +132,61 @@ class HeatingSystem:
         else:
             return default
 
+    def _space_heat_on_peak_fraction(self, dwelling):
+        """
+        Determine the fraction of heating which is on peak tariff
+        These values are constants for different kinds of heating types,
+        except for CPSU types which are calculated according to appendix f
+
+        Args:
+            self (HeatingSystem):
+            dwelling (Dwelling):
+
+        Returns:
+            float: fraction of heating on peak tariff
+        """
+
+        if self.system_type == HeatingTypes.cpsu:
+            # Import locally to avoid circular reference problems when importing main module
+            # FIXME: it should be possible to avoid this by better modularising the code.
+            from .appendix import appendix_f
+
+            return appendix_f.cpsu_on_peak(self, dwelling)
+
+        elif self.system_type == HeatingTypes.off_peak_only:
+            return 0
+
+        elif self.system_type == HeatingTypes.integrated_system:
+            assert self.fuel == ELECTRICITY_7HR
+            return 0.2
+
+        elif self.system_type == HeatingTypes.storage_heater:
+            return 0
+
+        elif self.system_type == HeatingTypes.electric_boiler:
+            if self.fuel == ELECTRICITY_7HR:
+                return 0.9
+            elif self.fuel == ELECTRICITY_10HR:
+                return 0.5
+            else:
+                return 1
+
+        elif self.system_type in [HeatingTypes.pcdf_heat_pump,
+                                  HeatingTypes.microchp]:
+            return 0.8
+
+        elif self.system_type == HeatingTypes.heat_pump:
+            return 0.6
+        # underfloor heating
+        # ground source heat pump
+        # air source heat pump
+        # other direct acting heating (incl secondary)
+        else:
+            if self.fuel == ELECTRICITY_10HR:
+                return 0.5
+            else:
+                return 1
+
 
 class DedicatedWaterSystem(HeatingSystem):
     def __init__(self, effy, summer_immersion):
@@ -120,19 +200,11 @@ class DedicatedWaterSystem(HeatingSystem):
         water_effy = self.base_effy * self.water_mult
 
         if self.summer_immersion:
-            for i in range(5, 9):
+            for i in SUMMER_MONTHS:
                 water_effy[i] = 100
 
         return water_effy
 
-    # def co2_factor(self):
-    #     return self.fuel.co2_factor
-
-    # def primary_energy_factor(self):
-    #     return self.fuel.primary_energy_factor
-
-    # def water_fuel_price(self, dwelling):
-    #     return dhw_fuel_cost(dwelling)
 
 
 class SecondarySystem(HeatingSystem):
@@ -161,19 +233,8 @@ class SecondarySystem(HeatingSystem):
             return self.water_effy
         water_effy = [self.effy, ] * 12
         if self.summer_immersion:
-            for i in range(5, 9):
+            for i in SUMMER_MONTHS:
                 water_effy[i] = 100
 
         return water_effy
 
-    # def fuel_price(self, dwelling):
-    #     return heating_fuel_cost(self, dwelling)
-
-    # def co2_factor(self):
-    #     return self.fuel.co2_factor
-
-    # def primary_energy_factor(self):
-    #     return self.fuel.primary_energy_factor
-
-    # def water_fuel_price(self, dwelling):
-    #     return dhw_fuel_cost(dwelling)

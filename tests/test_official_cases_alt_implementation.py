@@ -5,12 +5,11 @@ import pickle
 import sys
 
 import output_checker
-import yaml_io
 from sap import pcdf
 from sap import runner
-from sap.io import input_conversion_rules
-from sap.utils import SAPCalculationError, CALC_STAGE, ALL_PARAMS
 from sap.dwelling import log_dwelling_params, log_dwelling, ParamTrackerDwelling
+from sap.io import input_conversion_rules, yaml_io
+from sap.utils import SAPCalculationError, CALC_STAGE, ALL_PARAMS
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 

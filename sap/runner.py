@@ -1,14 +1,13 @@
 import copy
 
-import sap.appendix_m
+import sap.appendix.appendix_m
 import sap.sap_types
-from sap.pcdf import VentilationTypes
+from sap.configure import lookup_sap_tables
+from sap.fuels import fuel_from_code
+from sap.sap_types import HeatEmitters, VentilationTypes
 from . import worksheet
 from .dwelling import DwellingResults
 from .sap_tables import hw_volume_factor
-from sap.sap_types import HeatEmitters, VentilationTypes
-from sap.configure import lookup_sap_tables
-from sap.fuels import fuel_from_code
 from .sap_types import CylinderInsulationTypes, GlazingTypes, OvershadingTypes, HeatingTypes, PVOvershading
 
 
@@ -38,9 +37,9 @@ def perform_full_calc(dwelling):
     """
     perform_demand_calc(dwelling)
     worksheet.systems(dwelling)
-    sap.appendix_m.pv(dwelling)
-    sap.appendix_m.wind_turbines(dwelling)
-    sap.appendix_m.hydro(dwelling)
+    sap.appendix.appendix_m.pv(dwelling)
+    sap.appendix.appendix_m.wind_turbines(dwelling)
+    sap.appendix.appendix_m.hydro(dwelling)
     worksheet.chp(dwelling)
     worksheet.fuel_use(dwelling)
 

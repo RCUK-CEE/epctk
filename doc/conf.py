@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# SAPCalculator documentation build configuration file, created by
-# sphinx-quickstart on Sun Nov 29 22:36:18 2015.
+# SAPcalc documentation build configuration file, created by
+# sphinx-quickstart on Sat Jan  2 14:41:59 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -20,7 +20,7 @@ import shlex
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- General configuration ------------------------------------------------
 
@@ -33,11 +33,11 @@ import shlex
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -55,8 +55,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'SAPCalculator'
-copyright = '2015, Jonathan Chambers, Andy Stone'
+project = 'SAPcalc'
+copyright = '2016, Jonathan Chambers, Andy Stone'
 author = 'Jonathan Chambers, Andy Stone'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -209,7 +209,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'SAPCalculatordoc'
+htmlhelp_basename = 'SAPcalcdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -231,7 +231,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'SAPCalculator.tex', 'SAPCalculator Documentation',
+  (master_doc, 'SAPcalc.tex', 'SAPcalc Documentation',
    'Jonathan Chambers, Andy Stone', 'manual'),
 ]
 
@@ -261,7 +261,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'sapcalculator', 'SAPCalculator Documentation',
+    (master_doc, 'sapcalc', 'SAPcalc Documentation',
      [author], 1)
 ]
 
@@ -275,8 +275,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'SAPCalculator', 'SAPCalculator Documentation',
-   author, 'SAPCalculator', 'One line description of project.',
+  (master_doc, 'SAPcalc', 'SAPcalc Documentation',
+   author, 'SAPcalc', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -361,7 +361,3 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 #epub_use_index = True
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}

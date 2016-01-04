@@ -1,5 +1,5 @@
 from .utils import ALL_PARAMS, CALC_STAGE
-from .sap_constants import IGH_HEATING, T_EXTERNAL_HEATING, WIND_SPEED
+from .sap_constants import IGH_HEATING, T_EXTERNAL_HEATING, WIND_SPEED, LIVING_AREA_T_HEATING, COOLING_BASE_TEMPERATURE
 from .fuels import Fuel, ElectricityTariff
 
 
@@ -8,12 +8,13 @@ class Dwelling(dict):
     wind_speed = WIND_SPEED
     Texternal_heating = T_EXTERNAL_HEATING
     Igh_heating = IGH_HEATING
-    living_area_Theating = 21
-    Tcooling = 24
+    living_area_Theating = LIVING_AREA_T_HEATING
+    Tcooling = COOLING_BASE_TEMPERATURE
 
     def __init__(self, **kwargs):
         # TODO: allow attributes to be sorted
         super().__init__(**kwargs)
+        self.use_pcdf_fuel_prices = True
         self.results = dict()
         # self.er_results = dict()
         self.report = CalculationReport(self)
@@ -31,6 +32,26 @@ class Dwelling(dict):
                 return self.__dict__[item]
             except KeyError:
                 raise AttributeError(item)
+
+    def get(self, k, d=None):
+        """
+        The flip side of overloading getattr - if you use the dict-style "get" for a name
+        that was set dynamically as an attribute (dw.foo = 'bar'), this function will try to find it
+        by checking the dict object __dict__ as well as the normal dict elements.
+
+        Args:
+            k:
+            d: default value
+        Returns:
+            either the value of the key k or the attribute with name k
+        """
+        try:
+            return self[k]
+        except KeyError:
+            try:
+                return self.__dict__[k]
+            except KeyError:
+                return d
 
     def __str__(self):
         s = ''
@@ -67,6 +88,7 @@ class DwellingResults(Dwelling):
         self.report = CalculationReport(self)
         self.update(dwelling)
         # self.report = self.results.report
+        # self.use_pcdf_fuel_prices = True
 
     def __setattr__(self, key, value):
         # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
@@ -317,6 +339,12 @@ class CalculationReport(object):
 def log_dwelling_params(param_set, prefix, k, v):
     """
     Customized logging of SAP objects
+
+    Args:
+        param_set:
+        prefix:
+        k:
+        v:
     """
     param_set.add(prefix + k)
 

@@ -3,11 +3,11 @@ import math
 import numpy
 
 from .utils import sum_it, monthly_to_annual
-from .sap_constants import DAYS_PER_MONTH, HEATING_LATITUDE
+from .sap_constants import DAYS_PER_MONTH, HEATING_LATITUDE, SUMMER_MONTHS
 from .sap_tables import (MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
                          ELECTRICITY_SOLD, ELECTRICITY_OFFSET, TABLE_H5)
 from .sap_types import HeatingTypes, VentilationTypes
-from .appendix_g import wwhr_savings
+from .appendix import appendix_g
 
 
 def geometry(dwelling):
@@ -62,14 +62,14 @@ def geometry(dwelling):
                 dwelling.Aextwall = dwelling.GFA * dwelling.wall_ratio
             else:
                 dwelling_height = dwelling.storey_height * dwelling.Nstoreys
-                Atotalwall = dwelling_height * dwelling.average_perimeter
+                total_wall_A = dwelling_height * dwelling.average_perimeter
                 if dwelling.get('Apartywall') is not None:
-                    dwelling.Aextwall = Atotalwall - dwelling.Apartywall
+                    dwelling.Aextwall = total_wall_A - dwelling.Apartywall
                 elif dwelling.get('party_wall_fraction') is not None:
-                    dwelling.Aextwall = Atotalwall * (
+                    dwelling.Aextwall = total_wall_A * (
                         1 - dwelling.party_wall_fraction)
                 else:
-                    dwelling.Aextwall = Atotalwall - \
+                    dwelling.Aextwall = total_wall_A - \
                                         dwelling.party_wall_ratio * dwelling.GFA
 
         if not dwelling.get('Apartywall'):
@@ -145,11 +145,10 @@ def ventilation(dwelling):
         )
 
     if dwelling.get('appendix_q_systems') is not None:
-        for s in dwelling.appendix_q_systems:
-            if 'ach_rates' in s:
-                # !!! Should really check that we don't get two sets
-                # !!! of ach rates
-                dwelling.infiltration_ach = numpy.array(s['ach_rates'])
+        for appendix_q_system in dwelling.appendix_q_systems:
+            if 'ach_rates' in appendix_q_system:
+                # TODO: Should really check that we don't get two sets of ach rates
+                dwelling.infiltration_ach = numpy.array(appendix_q_system['ach_rates'])
 
     dwelling.infiltration_ach_annual = monthly_to_annual(
         dwelling.infiltration_ach)
@@ -246,8 +245,7 @@ def hot_water_use(dwelling):
     dwelling.hw_use_daily = dwelling.daily_hot_water_use * MONTHLY_HOT_WATER_FACTORS
 
     dwelling.hw_energy_content = (4.19 / 3600.) * dwelling.hw_use_daily * \
-                                 DAYS_PER_MONTH * \
-                                 MONTHLY_HOT_WATER_TEMPERATURE_RISE
+                                 DAYS_PER_MONTH * MONTHLY_HOT_WATER_TEMPERATURE_RISE
 
     if dwelling.get('instantaneous_pou_water_heating'):
         dwelling.distribution_loss = 0
@@ -277,7 +275,8 @@ def hot_water_use(dwelling):
     else:
         primary_circuit_loss_annual = dwelling.primary_circuit_loss_annual
 
-    dwelling.primary_circuit_loss = (primary_circuit_loss_annual / 365.) * DAYS_PER_MONTH
+    # This will produce and array Array
+    dwelling.primary_circuit_loss = (primary_circuit_loss_annual / 365.0) * DAYS_PER_MONTH  # type: numpy.array
 
     if dwelling.get('combi_loss') is not None:
         dwelling.combi_loss_monthly = dwelling.combi_loss(dwelling.hw_use_daily) * DAYS_PER_MONTH / 365
@@ -285,11 +284,11 @@ def hot_water_use(dwelling):
         dwelling.combi_loss_monthly = 0
 
     if dwelling.get('use_immersion_heater_summer', False):
-        for i in range(5, 9):
+        for i in SUMMER_MONTHS:
             dwelling.primary_circuit_loss[i] = 0
 
     if dwelling.get('wwhr_systems') is not None:
-        dwelling.savings_from_wwhrs = wwhr_savings(dwelling)
+        dwelling.savings_from_wwhrs = appendix_g.wwhr_savings(dwelling)
     else:
         dwelling.savings_from_wwhrs = 0
 
@@ -643,7 +642,7 @@ def heating_requirement(dwelling):
     dwelling.heat_calc_results = calc_heat_required(
         dwelling, dwelling.Texternal_heating, dwelling.winter_heat_gains)
     Q_required = dwelling.heat_calc_results['heat_required']
-    for i in range(5, 9):
+    for i in SUMMER_MONTHS:
         Q_required[i] = 0
         dwelling.heat_calc_results['loss'][i] = 0
         dwelling.heat_calc_results['utilisation'][i] = 0
@@ -1016,7 +1015,7 @@ def fuel_use(dwelling):
 
     immersion_months = numpy.array([0, ] * 12)
     if dwelling.get('use_immersion_heater_summer', False):
-        for i in range(5, 9):
+        for i in SUMMER_MONTHS:
             immersion_months[i] = 1
 
         Q_summer_immersion = dwelling.Q_waterheat * immersion_months

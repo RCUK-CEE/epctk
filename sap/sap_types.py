@@ -42,17 +42,18 @@ class GlazingTypes:
     SECONDARY = 4
 
 
-light_transmittance = {
+_light_transmittance = {
     GlazingTypes.SINGLE: 0.9,
     GlazingTypes.DOUBLE: 0.8,
     GlazingTypes.TRIPLE: 0.7,
     GlazingTypes.SECONDARY: 0.8
 }
 
+
 class OpeningType:
     def __init__(self, glazing_type, gvalue, frame_factor, Uvalue, roof_window, bfrc_data=False):
         self.gvalue = gvalue
-        self.light_transmittance = light_transmittance[glazing_type] # will raise KeyError if wrong glazing type
+        self.light_transmittance = _light_transmittance[glazing_type] # will raise KeyError if wrong glazing type
         self.frame_factor = frame_factor
         self.Uvalue = Uvalue
         self.roof_window = roof_window
@@ -117,18 +118,6 @@ class HeatLossElementTypes:
     OPAQUE_DOOR = 5
     GLAZING = 6
 
-#
-# def light_transmittance_from_glazing_type(glazing_type):
-#     if glazing_type == GlazingTypes.SINGLE:
-#         return 0.9
-#     elif glazing_type == GlazingTypes.DOUBLE:
-#         return 0.8
-#     elif glazing_type == GlazingTypes.TRIPLE:
-#         return 0.7
-#     elif glazing_type == GlazingTypes.SECONDARY:
-#         return .8
-#     else:
-#         raise RuntimeError("unknown glazing type %s" % glazing_type)
 
 # Table 4c
 class HeatEmitters(object):
@@ -166,10 +155,10 @@ class DuctTypes:
 
 
 class BoilerTypes:
-    REGULAR=1
-    COMBI=2
-    CPSU=3
-    OTHER=4
+    REGULAR = 1
+    COMBI = 2
+    CPSU = 3
+    OTHER = 4
 
 
 class CommunityDistributionTypes:

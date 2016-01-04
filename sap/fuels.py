@@ -2,7 +2,7 @@ import copy
 import os.path
 import logging
 
-from .pcdf import get_fuel_prices
+from .pcdf import pcdf_fuel_prices
 from .sap_types import FuelTypes
 from .utils import float_or_none, csv_to_dict
 
@@ -256,7 +256,7 @@ def get_fuel_data_pcdf(fuel_id):
     """
     global _PCDF_FUEL_PRICES_CACHE
     if _PCDF_FUEL_PRICES_CACHE is None:
-        _PCDF_FUEL_PRICES_CACHE = get_fuel_prices()
+        _PCDF_FUEL_PRICES_CACHE = pcdf_fuel_prices()
 
     if fuel_id in _PCDF_FUEL_PRICES_CACHE:
         pcdf_data = _PCDF_FUEL_PRICES_CACHE[fuel_id]

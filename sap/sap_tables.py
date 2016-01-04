@@ -3,12 +3,12 @@ import os.path
 
 import numpy
 
-from .appendix_f import cpsu_store, elec_cpsu_store
+from .utils import SAPCalculationError, csv_to_dict, float_or_zero
 from .fuels import ElectricityTariff, ELECTRICITY_7HR, ELECTRICITY_10HR, ELECTRICITY_24HR
 from .sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes,
                         HeatingTypes, PVOvershading, HeatEmitters,
-                        VentilationTypes, BoilerTypes)
-from .utils import SAPCalculationError, csv_to_dict, exists_and_true, float_or_zero
+                        VentilationTypes, BoilerTypes, FloorTypes)
+from .appendix.appendix_f import cpsu_store, elec_cpsu_store
 
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
 
@@ -47,7 +47,7 @@ MONTHLY_HOT_WATER_TEMPERATURE_RISE = numpy.array(
 def hw_storage_loss_factor(hw_cylinder_insulation_type, hw_cylinder_insulation):
     """
     Calculate Hot water storage loss factor according to equation in Note 1.
-    of Table 2 (rather than usring the tabulated values)
+    of Table 2 (rather than using the tabulated values)
 
     :param hw_cylinder_insulation_type: a CylinderInsulationTypes
     :param hw_cylinder_insulation: thickness of cylinder insulation
@@ -80,7 +80,7 @@ def constant(k):
 
 def cylinder_indirect(dwelling):
     temperature_factor = 0.6
-    if exists_and_true(dwelling, 'has_hw_time_control'):
+    if dwelling.get('has_hw_time_control') is True:
         temperature_factor *= 0.9
     if not dwelling.has_cylinderstat:
         temperature_factor *= 1.3
@@ -186,8 +186,8 @@ def combi_loss_table_3a(dwelling, system):
     storage_volume = dwelling.get('hw_cylinder_volume', 0)
 
     if storage_volume == 0:
-        if hasattr(system, "table3arow"):
-            return system.table3arow
+        if system.get("table3a_row"):
+            return system.table3a_row
         else:
             # !!! Need other keep hot types
             return combi_loss_instant_without_keep_hot
@@ -209,12 +209,11 @@ def combi_loss_table_3b(pcdf_data):
 
 # !!! Need to complete this table
 def combi_loss_table_3c():
-    return None
+    raise NotImplementedError("Combi Loss Table 3c not implemented")
 
 
 # Table 4a
-# !!! Electric storage systems - offpeak and 24 hour tariff systems
-# have same type codes!
+# FIXME Electric storage systems - offpeak and 24 hour tariff systems have same type codes!
 def translate_4a_row(systems, row):
     if row[6] != 'n/a':
         sys = dict(
@@ -233,7 +232,7 @@ def translate_4a_row(systems, row):
                 warm_air_fan=row[10],
                 water_effy=row[11])
     else:
-        # HW system
+        # Hot Water system
         sys = dict(
                 code=int(row[0]),
                 type=row[1],
@@ -337,8 +336,16 @@ def get_4a_system(electricity_tariff, code):
 
 
 def get_effy(system_data, fuel):
+    """
+    Try to get the efficiency
+
+    :param system_data: HeatingSystem
+    :param fuel: fuel of this heating system. TODO: why can't we just get the fuel from the system?
+    :return:
+    """
     if system_data['effy'] > 0:
         return system_data['effy']
+
     elif system_data['effy_gas'] > 0:
         if fuel.is_mains_gas:
             return system_data['effy_gas']
@@ -411,11 +418,10 @@ def heating_fans_and_pumps_electricity(dwelling):
     # Keep hot only applies for water sys?  What if you have a combi
     # boiler but it's not providing hw? No need for keep hot?  Or
     # maybe it's just not a combi boiler in that case?
-    if hasattr(dwelling.water_sys, "keep_hot_elec_consumption"):
+    if dwelling.water_sys.get("keep_hot_elec_consumption"):
         Qfansandpumps += dwelling.water_sys.keep_hot_elec_consumption
 
-    if exists_and_true(dwelling,
-                       'has_electric_shw_pump'):
+    if dwelling.get('has_electric_shw_pump'):
         Qfansandpumps += 75
 
     return Qfansandpumps
@@ -440,86 +446,85 @@ def fans_and_pumps_electricity(dwelling):
 
 
 # Table 4h
+def mech_vent_default_in_use_factor():
+    """
+    Default values for mechanical ventilation in use factor
 
-# FIXME: if it's possible to swap the PCDF file, make this explicit!
-# Lazy load these, to give a chance to swap the pcdf database file if necessary
-
-
-def default_in_use_factor():
+    :return:
+    """
     return 2.5
 
 
-def default_hr_effy_factor():
+def mech_vent_default_hr_effy_factor():
+    """
+    Default efficiency for mechanical ventilation with heat recovery
+
+    :return:
+    """
     return 0.7
 
 
 # Table 5a
-# !!! NEED TO FINISH THIS!
+# FIXME: NEED TO FINISH THIS!
 def has_oil_pump_inside(dwelling):
-    return (
-        exists_and_true(dwelling, 'main_heating_oil_pump_inside_dwelling')
-        or
-        exists_and_true(dwelling, 'main_heating_2_oil_pump_inside_dwelling'))
+    return (dwelling.get('main_heating_oil_pump_inside_dwelling') or
+            dwelling.get('main_heating_2_oil_pump_inside_dwelling'))
 
 
 def fans_and_pumps_gain(dwelling):
-    fansandpumps_gain = 0
-    gain_due_to_heating_system = 0
+    fans_pumps_gain = 0
+    heating_system_gain = 0
 
     # !!! Nope, this is for balanced without heat recovery
     # if dwelling.ventilation_type==VentilationTypes.MVHR:
     #    fansandpumps_gain+=dwelling.adjusted_fan_sfp*0.06*dwelling.volume
 
-    ch_pump_gain = (0
-                    if (dwelling.get('central_heating_pump_in_heated_space')
-                        and not dwelling.central_heating_pump_in_heated_space)
-                    else 10)
+    ch_pump_gain = 10 if dwelling.get('central_heating_pump_in_heated_space', False) else 0
+
     if (dwelling.main_sys_1.has_ch_pump or
             (dwelling.get('main_sys_2') and dwelling.main_sys_2.has_ch_pump)):
-        fansandpumps_gain += ch_pump_gain
-        gain_due_to_heating_system += ch_pump_gain
+        fans_pumps_gain += ch_pump_gain
+        heating_system_gain += ch_pump_gain
 
     if has_oil_pump_inside(dwelling):
-        fansandpumps_gain += 10
-        gain_due_to_heating_system += 10
-    if exists_and_true(dwelling,
-                       'has_fans_for_positive_input_vent_from_outside'):
-        assert (False)
-    if exists_and_true(dwelling,
-                       'has_fans_for_balanced_mech_vent_without_hr'):
-        assert (False)
+        fans_pumps_gain += 10
+        heating_system_gain += 10
+    if dwelling.get('has_fans_for_positive_input_vent_from_outside'):
+        assert False
+    if dwelling.get('has_fans_for_balanced_mech_vent_without_hr'):
+        assert False
 
-    if not dwelling.ventilation_type in [VentilationTypes.MVHR,
+    if dwelling.ventilation_type not in [VentilationTypes.MVHR,
                                          VentilationTypes.MV]:
         if dwelling.main_sys_1.has_warm_air_fan or (
                         dwelling.get('main_sys_2') and
                         dwelling.main_sys_2.has_warm_air_fan and
                         dwelling.main_heating_2_fraction > 0):
-            fansandpumps_gain += 0.06 * dwelling.volume
+            fans_pumps_gain += 0.06 * dwelling.volume
 
     if dwelling.ventilation_type == VentilationTypes.MV:
-        fansandpumps_gain += dwelling.adjusted_fan_sfp * .06 * dwelling.volume
+        fans_pumps_gain += dwelling.adjusted_fan_sfp * .06 * dwelling.volume
     elif dwelling.ventilation_type == VentilationTypes.PIV_FROM_OUTSIDE:
-        fansandpumps_gain += dwelling.adjusted_fan_sfp * .12 * dwelling.volume
+        fans_pumps_gain += dwelling.adjusted_fan_sfp * .12 * dwelling.volume
 
-    dwelling.pump_gain = fansandpumps_gain
-    dwelling.heating_system_pump_gain = gain_due_to_heating_system
+    dwelling.pump_gain = fans_pumps_gain
+    dwelling.heating_system_pump_gain = heating_system_gain
 
 
 # Table 6d
 TABLE_6D = {
     OvershadingTypes.HEAVY: dict(
-            solar_access_factor_winter=.3,
-            solar_access_factor_summer=.5,
-            light_access_factor=.5),
+            solar_access_factor_winter=0.3,
+            solar_access_factor_summer=0.5,
+            light_access_factor=0.5),
     OvershadingTypes.MORE_THAN_AVERAGE: dict(
-            solar_access_factor_winter=.54,
-            solar_access_factor_summer=.7,
-            light_access_factor=.67),
+            solar_access_factor_winter=0.54,
+            solar_access_factor_summer=0.7,
+            light_access_factor=0.67),
     OvershadingTypes.AVERAGE: dict(
-            solar_access_factor_winter=.77,
-            solar_access_factor_summer=.9,
-            light_access_factor=.83),
+            solar_access_factor_winter=0.77,
+            solar_access_factor_summer=0.9,
+            light_access_factor=0.83),
     OvershadingTypes.VERY_LITTLE: dict(
             solar_access_factor_winter=1,
             solar_access_factor_summer=1,
@@ -531,7 +536,7 @@ TABLE_6D = {
 
 
 def summer_to_annual(summer_vals):
-    return numpy.array([0, ] * 5 + [float(s) for s in summer_vals] + [0, ] * 4)
+    return numpy.array([0.0, ] * 5 + [float(s) for s in summer_vals] + [0.0, ] * 4)
 
 
 def translate_10_row(regions, row):
@@ -892,3 +897,11 @@ def system_type_from_sap_code(system_code, system_data):
         return HeatingTypes.warm_air
 
     return HeatingTypes.misc
+
+
+FLOOR_INFILTRATION = {
+    FloorTypes.SUSPENDED_TIMBER_UNSEALED: 0.2,
+    FloorTypes.SUSPENDED_TIMBER_SEALED: 0.1,
+    FloorTypes.NOT_SUSPENDED_TIMBER: 0,
+    FloorTypes.OTHER: 0,
+}

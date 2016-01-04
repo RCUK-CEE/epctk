@@ -2,14 +2,90 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7350501f-e420-4216-851c-d82d56f040b6" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sap/common.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sap/heating_dump.py" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix/appendix_b.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix/appendix_d.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix/appendix_e.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/configure_ventilation.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/sap_table_4e.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/Makefile" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/api.doctree" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/environment.pickle" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/index.doctree" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/modules.doctree" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/sap.doctree" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/sap.io.doctree" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/.buildinfo" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/api.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/index.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/modules.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/sap.io.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/sap.txt" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/ajax-loader.gif" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/alabaster.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/basic.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/comment-bright.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/comment-close.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/comment.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/doctools.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/down-pressed.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/down.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/file.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/jquery-1.11.1.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/jquery.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/minus.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/plus.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/pygments.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/searchtools.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/underscore-1.3.1.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/underscore.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/up-pressed.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/up.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/websupport.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/api.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/genindex.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/index.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/modules.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/objects.inv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/sap.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/sap.io.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/search.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/searchindex.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/conf.py" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/index.rst" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/make.bat" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/modules.rst" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/sap.io.rst" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/sap.rst" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_a.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_a.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_b.py" afterPath="$PROJECT_DIR$/sap/appendix/__init__.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_c.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_c.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_f.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_f.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_g.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_g.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_h.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_h.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_j.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_j.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_m.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_m.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_n.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_n.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/sap_tables_helpers.py" afterPath="$PROJECT_DIR$/doc/appendix_a.rst" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/yaml_io.py" afterPath="$PROJECT_DIR$/sap/io/yaml_io.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../doc/spcm.rst" afterPath="$PROJECT_DIR$/../doc/spcm.rst" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/sapcalc.iml" afterPath="$PROJECT_DIR$/.idea/sapcalc.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/appendix_n.py" afterPath="$PROJECT_DIR$/sap/appendix_n.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/configure.py" afterPath="$PROJECT_DIR$/sap/configure.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/dwelling.py" afterPath="$PROJECT_DIR$/sap/dwelling.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/fuels.py" afterPath="$PROJECT_DIR$/sap/fuels.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/heating_system_types.py" afterPath="$PROJECT_DIR$/sap/heating_system_types.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/heating_systems.py" afterPath="$PROJECT_DIR$/sap/heating_systems.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/io/input_conversion_rules.py" afterPath="$PROJECT_DIR$/sap/io/input_conversion_rules.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/pcdf.py" afterPath="$PROJECT_DIR$/sap/pcdf.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/runner.py" afterPath="$PROJECT_DIR$/sap/runner.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_constants.py" afterPath="$PROJECT_DIR$/sap/sap_constants.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_tables.py" afterPath="$PROJECT_DIR$/sap/sap_tables.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_types.py" afterPath="$PROJECT_DIR$/sap/sap_types.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/utils.py" afterPath="$PROJECT_DIR$/sap/utils.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/worksheet.py" afterPath="$PROJECT_DIR$/sap/worksheet.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sapcli.py" afterPath="$PROJECT_DIR$/sapcli.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases.py" afterPath="$PROJECT_DIR$/tests/test_official_cases.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" afterPath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
     </list>
     <ignored path="sapcalc.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -23,9 +99,9 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/sapcalc$build_doc.coverage" NAME="build doc Coverage Results" MODIFIED="1451404760458" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sapcalc$build_doc.coverage" NAME="build doc Coverage Results" MODIFIED="1451744395296" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/sapcalc$Unnamed.coverage" NAME="build doc Coverage Results" MODIFIED="1448836955571" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
-    <SUITE FILE_PATH="coverage/sapcalc$Test_SAP.coverage" NAME="Test SAP Coverage Results" MODIFIED="1451410537745" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/sapcalc$Test_SAP.coverage" NAME="Test SAP Coverage Results" MODIFIED="1451937713274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -43,31 +119,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="heating_systems.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/heating_systems.py">
+      <file leaf-file-name="dwelling.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="10" column="5" selection-start-line="10" selection-start-column="5" selection-end-line="10" selection-end-column="5" />
+              <caret line="338" column="32" selection-start-line="338" selection-start-column="32" selection-end-line="338" selection-end-column="32" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="heating_system_types.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/heating_system_types.py">
+      <file leaf-file-name="sap_tables.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="appendix_a.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/appendix_a.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="23" column="5" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
+              <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -76,32 +142,45 @@
       <file leaf-file-name="configure.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/sap/configure.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4915254">
-              <caret line="8" column="44" selection-start-line="8" selection-start-column="44" selection-end-line="8" selection-end-column="44" />
-              <caret line="175" column="52" selection-start-line="175" selection-start-column="52" selection-end-line="175" selection-end-column="52" />
+            <state vertical-scroll-proportion="0.3327645">
+              <caret line="130" column="4" selection-start-line="130" selection-start-column="4" selection-end-line="130" selection-end-column="4" />
               <folding>
-                <element signature="e#0#19#0" expanded="true" />
+                <element signature="e#0#54#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="utils.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/utils.py">
+      <file leaf-file-name="sap_table_4e.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/sap_table_4e.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="38" column="15" selection-start-line="38" selection-start-column="15" selection-end-line="38" selection-end-column="15" />
+              <caret line="160" column="12" selection-start-line="160" selection-start-column="12" selection-end-line="160" selection-end-column="12" />
+              <folding>
+                <element signature="e#0#65#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="heating_system_types.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/heating_system_types.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="8" column="14" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="appendix_j.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sap/appendix_j.py">
+      <file leaf-file-name="worksheet.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="14" column="41" selection-start-line="14" selection-start-column="41" selection-end-line="14" selection-end-column="41" />
-              <folding />
+              <caret line="286" column="28" selection-start-line="286" selection-start-column="28" selection-end-line="286" selection-end-column="28" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -121,57 +200,57 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/__init__.py" />
-        <option value="$PROJECT_DIR$/sap/tables.py" />
-        <option value="$PROJECT_DIR$/sap/test.py" />
-        <option value="$PROJECT_DIR$/tests/test_case_parser.py" />
-        <option value="$PROJECT_DIR$/spreadsheet_inputter.py" />
-        <option value="$PROJECT_DIR$/input_conversion_rules.py" />
-        <option value="$PROJECT_DIR$/sap/dwelling_validator.py" />
-        <option value="$PROJECT_DIR$/sap/input_conversion_rules.py" />
-        <option value="$PROJECT_DIR$/tests/test_parsing.py" />
-        <option value="$PROJECT_DIR$/tests/reference_case_parser.py" />
-        <option value="$PROJECT_DIR$/sap/rtf_reader/input_conversion_rules.py" />
-        <option value="$PROJECT_DIR$/helpers.py" />
-        <option value="$PROJECT_DIR$/doc/api.rst" />
-        <option value="$PROJECT_DIR$/doc/conf.py" />
-        <option value="$PROJECT_DIR$/doc/index.rst" />
-        <option value="$PROJECT_DIR$/sap/__init__.py" />
         <option value="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
         <option value="$PROJECT_DIR$/sap/sap_load.py" />
         <option value="$PROJECT_DIR$/sap/systems.py" />
         <option value="$PROJECT_DIR$/sap/sap_table_constants.py" />
         <option value="$PROJECT_DIR$/sap/sap_tables_helpers.py" />
-        <option value="$PROJECT_DIR$/sap/sap_constants.py" />
-        <option value="$PROJECT_DIR$/sap/utils.py" />
         <option value="$PROJECT_DIR$/sap/sap_configure.py" />
         <option value="$PROJECT_DIR$/sap/heat_pumps.py" />
         <option value="$PROJECT_DIR$/sap/appendix_h.py" />
         <option value="$PROJECT_DIR$/tests/yaml_test_cases/EW-1p-detached.rtf.yml" />
-        <option value="$PROJECT_DIR$/sap/dwelling.py" />
         <option value="$PROJECT_DIR$/sap/runner.py" />
-        <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
         <option value="$PROJECT_DIR$/sap/legacy.py" />
-        <option value="$PROJECT_DIR$/sap/io/input_conversion_rules.py" />
         <option value="$PROJECT_DIR$/sap/appendix_m.py" />
         <option value="$PROJECT_DIR$/sap/appendix_b.py" />
         <option value="$PROJECT_DIR$/sap/appendix_c.py" />
         <option value="$PROJECT_DIR$/sap/appendix_f.py" />
-        <option value="$PROJECT_DIR$/sap/worksheet.py" />
         <option value="$PROJECT_DIR$/sap/fuels.py" />
         <option value="$PROJECT_DIR$/yaml_io.py" />
         <option value="$PROJECT_DIR$/sap/appendix_g.py" />
-        <option value="$PROJECT_DIR$/sap/sap_tables.py" />
-        <option value="$PROJECT_DIR$/sap/sap_types.py" />
         <option value="$PROJECT_DIR$/sap/appendix_n.py" />
-        <option value="$PROJECT_DIR$/sap/pcdf.py" />
         <option value="$PROJECT_DIR$/sap/appendix_j.py" />
-        <option value="$PROJECT_DIR$/sap/heating_systems.py" />
-        <option value="$PROJECT_DIR$/sap/appendix_a.py" />
-        <option value="$PROJECT_DIR$/sap/configure.py" />
         <option value="$PROJECT_DIR$/sap/heating_dump.py" />
-        <option value="$PROJECT_DIR$/sap/heating_system_types.py" />
         <option value="$PROJECT_DIR$/sap/common.py" />
+        <option value="$PROJECT_DIR$/tests/test_official_cases.py" />
+        <option value="$PROJECT_DIR$/sap/appendix_a.py" />
+        <option value="$PROJECT_DIR$/sap/pcdf.py" />
+        <option value="$PROJECT_DIR$/sap/configure_ventilation.py" />
+        <option value="$PROJECT_DIR$/sap/appendix/appendix_d.py" />
+        <option value="$PROJECT_DIR$/sap/appendix/appendix_e.py" />
+        <option value="$PROJECT_DIR$/sap/appendix/appendix_f.py" />
+        <option value="$PROJECT_DIR$/sap/sap_types.py" />
+        <option value="$PROJECT_DIR$/sap/heating_systems.py" />
+        <option value="$PROJECT_DIR$/sap/dwelling.py" />
+        <option value="$PROJECT_DIR$/sap/utils.py" />
+        <option value="$PROJECT_DIR$/sap/appendix/appendix_g.py" />
+        <option value="$PROJECT_DIR$/sap/heating_system_types.py" />
+        <option value="$PROJECT_DIR$/doc/appendix_a.rst" />
+        <option value="$PROJECT_DIR$/doc/conf.py" />
+        <option value="$PROJECT_DIR$/sap/appendix/appendix_a.py" />
+        <option value="$PROJECT_DIR$/doc/index.rst" />
+        <option value="$PROJECT_DIR$/doc/appendix_b.rst" />
+        <option value="$PROJECT_DIR$/doc/appendix_c.rst" />
+        <option value="$PROJECT_DIR$/sap/io/yaml_io.py" />
+        <option value="$PROJECT_DIR$/sap/appendix/appendix_c.py" />
+        <option value="$PROJECT_DIR$/sap/appendix/appendix_b.py" />
+        <option value="$PROJECT_DIR$/sap/worksheet.py" />
+        <option value="$PROJECT_DIR$/sap/sap_constants.py" />
+        <option value="$PROJECT_DIR$/sap/sap_tables.py" />
+        <option value="$PROJECT_DIR$/sap/io/input_conversion_rules.py" />
+        <option value="$APPLICATION_HOME_DIR$/helpers/roman.py" />
+        <option value="$PROJECT_DIR$/sap/sap_table_4e.py" />
+        <option value="$PROJECT_DIR$/sap/configure.py" />
       </list>
     </option>
   </component>
@@ -181,8 +260,10 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="width" value="1440" />
-    <option name="height" value="900" />
+    <option name="x" value="4" />
+    <option name="y" value="23" />
+    <option name="width" value="1436" />
+    <option name="height" value="877" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -248,20 +329,19 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/sap/utils.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/sap/sap_table_4e.py" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="FullScreen" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/sap/io" />
+      <recent name="$PROJECT_DIR$/sap/appendix" />
       <recent name="$PROJECT_DIR$/sap/rtf_reader" />
       <recent name="$PROJECT_DIR$/sap/scripts" />
       <recent name="$PROJECT_DIR$/sap" />
-      <recent name="$PROJECT_DIR$/sap/data" />
-      <recent name="$PROJECT_DIR$/tests" />
     </key>
   </component>
   <component name="RunManager" selected="Python tests.Test SAP">
@@ -569,34 +649,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 05m 15s.xml">
+    <history-entry file="Test_SAP - 2015.12.29 at 19h 25m 07s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 05m 38s.xml">
+    <history-entry file="Test_SAP - 2015.12.29 at 19h 25m 26s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 07m 54s.xml">
+    <history-entry file="Test_SAP - 2015.12.29 at 19h 25m 50s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 17m 46s.xml">
+    <history-entry file="Test_SAP - 2015.12.29 at 19h 40m 49s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 23m 52s.xml">
+    <history-entry file="Test_SAP - 2016.01.02 at 12h 25m 42s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 24m 05s.xml">
+    <history-entry file="Test_SAP - 2016.01.02 at 14h 23m 16s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 26m 28s.xml">
+    <history-entry file="Test_SAP - 2016.01.02 at 14h 24m 01s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 30m 00s.xml">
+    <history-entry file="Test_SAP - 2016.01.02 at 14h 34m 18s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 34m 28s.xml">
+    <history-entry file="Test_SAP - 2016.01.02 at 15h 20m 23s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
-    <history-entry file="Test_SAP - 2015.12.29 at 18h 35m 38s.xml">
+    <history-entry file="Test_SAP - 2016.01.04 at 21h 01m 56s.xml">
       <configuration name="Test SAP" configurationId="tests" />
     </history-entry>
   </component>
@@ -610,23 +690,23 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="false" />
+    <frame x="4" y="23" width="1436" height="877" extended-state="0" />
+    <editor active="true" />
     <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20086083" sideWeight="0.47919875" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" x="100" y="100" width="1240" height="700" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32771084" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.39759037" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19742489" sideWeight="0.47919875" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23457676" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2180723" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2178344" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32738853" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30063695" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22889842" sideWeight="0.52080125" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32981133" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" x="100" y="100" width="1240" height="700" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -655,48 +735,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1e-detached.rtf.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="44" column="25" selection-start-line="44" selection-start-column="25" selection-end-line="44" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_parsing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.272">
-          <caret line="136" column="11" selection-start-line="136" selection-start-column="11" selection-end-line="136" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/reference_case_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-95.0">
-          <caret line="171" column="14" selection-start-line="171" selection-start-column="14" selection-end-line="171" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-2a-semi with semi-exposed elements-basic.rtf.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.57391304">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-2d-semi with WWHR+solar water heating+FGHRS.rtf.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.8869565">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1h-detached.rtf.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.104347825">
-          <caret line="38" column="26" selection-start-line="38" selection-start-column="26" selection-end-line="38" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1a-detached.rtf.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.66463417">
@@ -715,41 +753,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.9652174">
           <caret line="41" column="15" selection-start-line="41" selection-start-column="15" selection-end-line="41" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/doc/conf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.6666667">
-          <caret line="32" column="14" selection-start-line="32" selection-start-column="14" selection-end-line="32" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/doc/sap.rst">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33536586">
-          <caret line="11" column="10" selection-start-line="11" selection-start-column="10" selection-end-line="11" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/doc/sap.io.rst">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/doc/modules.rst">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/doc/index.rst">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.51829267">
-          <caret line="17" column="18" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
         </state>
       </provider>
     </entry>
@@ -778,13 +781,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.20833333">
           <caret line="8" column="3" selection-start-line="8" selection-start-column="3" selection-end-line="8" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_tables_helpers.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -823,18 +819,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_h.py">
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_h.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.20833333">
           <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_constants.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2173913">
-          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -847,88 +835,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/io/input_conversion_rules.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="25.567331">
-          <caret line="1367" column="12" selection-start-line="1367" selection-start-column="12" selection-end-line="1367" selection-end-column="12" />
-          <folding>
-            <element signature="e#197#208#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="93" column="33" selection-start-line="93" selection-start-column="33" selection-end-line="93" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#41#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/runner.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.018703243">
-          <caret line="54" column="29" selection-start-line="54" selection-start-column="29" selection-end-line="54" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_b.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_c.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="143" column="0" selection-start-line="143" selection-start-column="0" selection-end-line="143" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1176" column="14" selection-start-line="1176" selection-start-column="14" selection-end-line="1176" selection-end-column="14" />
-          <folding>
-            <element signature="e#0#11#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_g.py">
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_m.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_m.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -941,15 +851,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/yaml_io.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="4" column="0" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_n.py">
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_n.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
@@ -957,25 +859,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.6086956">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding>
-            <element signature="e#49#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/sap_types.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_j.py">
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_j.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="14" column="41" selection-start-line="14" selection-start-column="41" selection-end-line="14" selection-end-column="41" />
@@ -983,39 +867,258 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_f.py">
+    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1f-detached.rtf.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5720339">
-          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
-          <folding>
-            <element signature="e#510#522#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.31007752">
+          <caret line="52" column="5" selection-start-line="52" selection-start-column="5" selection-end-line="52" selection-end-column="5" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/appendix_a.py">
+    <entry file="file://$PROJECT_DIR$/tests/test_official_cases.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="23" column="5" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.27697262">
+          <caret line="231" column="0" selection-start-line="231" selection-start-column="0" selection-end-line="231" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/configure.py">
+    <entry file="file://$PROJECT_DIR$/sap/runner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4915254">
-          <caret line="8" column="44" selection-start-line="8" selection-start-column="44" selection-end-line="8" selection-end-column="44" />
-          <caret line="175" column="52" selection-start-line="175" selection-start-column="52" selection-end-line="175" selection-end-column="52" />
+        <state vertical-scroll-proportion="0.27697262">
+          <caret line="500" column="0" selection-start-line="500" selection-start-column="0" selection-end-line="500" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/yaml_test_cases/EW-1g-detached.rtf.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.40697673">
+          <caret line="16" column="12" selection-start-line="16" selection-start-column="11" selection-end-line="16" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/pcdf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="14.563953">
+          <caret line="501" column="0" selection-start-line="501" selection-start-column="0" selection-end-line="501" selection-end-column="0" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#49#58#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/configure_ventilation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="123" column="57" selection-start-line="123" selection-start-column="57" selection-end-line="123" selection-end-column="57" />
+          <folding>
+            <element signature="e#0#85#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_e.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.14492753">
+          <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/sap_types.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="3.8647344">
+          <caret line="160" column="12" selection-start-line="160" selection-start-column="12" selection-end-line="160" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_f.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.49501246">
+          <caret line="51" column="11" selection-start-line="51" selection-start-column="11" selection-end-line="51" selection-end-column="11" />
+          <folding>
+            <element signature="e#510#522#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gprof2dot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.28341386">
+          <caret line="260" column="6" selection-start-line="260" selection-start-column="6" selection-end-line="260" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sapcli.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.82191783">
+          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.4009662">
+          <caret line="58" column="4" selection-start-line="58" selection-start-column="4" selection-end-line="58" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_a.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7572464">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+          <folding>
+            <element signature="e#1221#1261#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doc/conf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4076087">
+          <caret line="17" column="12" selection-start-line="17" selection-start-column="12" selection-end-line="17" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doc/appendix_a.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.08152174">
+          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doc/appendix_c.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.10869565">
+          <caret line="4" column="39" selection-start-line="4" selection-start-column="39" selection-end-line="4" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doc/appendix_b.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.10869565">
+          <caret line="4" column="39" selection-start-line="4" selection-start-column="39" selection-end-line="4" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/doc/index.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4076087">
+          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/io/yaml_io.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="78" column="50" selection-start-line="78" selection-start-column="50" selection-end-line="78" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#11#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sap/heating_systems.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33816424">
+          <caret line="22" column="11" selection-start-line="22" selection-start-column="11" selection-end-line="22" selection-end-column="11" />
+          <folding>
+            <element signature="e#88#102#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_g.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5797101">
+          <caret line="92" column="33" selection-start-line="92" selection-start-column="33" selection-end-line="92" selection-end-column="33" />
+          <folding>
+            <element signature="e#171#183#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_c.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.072463766">
+          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_d.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.14492753">
+          <caret line="6" column="3" selection-start-line="6" selection-start-column="3" selection-end-line="6" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/appendix/appendix_b.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.12077295">
+          <caret line="5" column="11" selection-start-line="5" selection-start-column="11" selection-end-line="5" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/dwelling.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="10" column="5" selection-start-line="10" selection-start-column="5" selection-end-line="10" selection-end-column="5" />
+          <caret line="338" column="32" selection-start-line="338" selection-start-column="32" selection-end-line="338" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/sap_constants.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="11" column="33" selection-start-line="11" selection-start-column="33" selection-end-line="11" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/worksheet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="286" column="28" selection-start-line="286" selection-start-column="28" selection-end-line="286" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/roman.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.9293479">
+          <caret line="71" column="71" selection-start-line="71" selection-start-column="71" selection-end-line="71" selection-end-column="71" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/io/input_conversion_rules.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.27173913">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/sap_tables.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1023,16 +1126,28 @@
     <entry file="file://$PROJECT_DIR$/sap/heating_system_types.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <caret line="8" column="14" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sap/utils.py">
+    <entry file="file://$PROJECT_DIR$/sap/sap_table_4e.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="38" column="15" selection-start-line="38" selection-start-column="15" selection-end-line="38" selection-end-column="15" />
-          <folding />
+          <caret line="160" column="12" selection-start-line="160" selection-start-column="12" selection-end-line="160" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sap/configure.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3327645">
+          <caret line="130" column="4" selection-start-line="130" selection-start-column="4" selection-end-line="130" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#54#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

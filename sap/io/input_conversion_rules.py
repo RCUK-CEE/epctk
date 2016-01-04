@@ -8,6 +8,7 @@ Input conversion rules for converting from parsed input file
 import copy
 import logging
 
+
 from ..sap_types import (WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes,
                          ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading,
                          OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes, DuctTypes,
@@ -535,9 +536,11 @@ def parse_community_heating_sources(r):
                 current_heat_source = None
 
                 distribution_type = COMMUNITY_DISTRIBUTION_TYPES[v.value]
+
             elif tokens[0][0] == "heat" and tokens[0][1] == "fraction":
                 current_heat_source['fraction'] = float(tokens[0][2])
                 current_heat_source['efficiency'] = float(tokens[1][1]) / 100.
+
             elif tokens[0][0].lower() == "heat-to-power":
                 current_heat_source['heat_to_power'] = float(tokens[0][2])
             else:

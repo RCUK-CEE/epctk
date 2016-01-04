@@ -335,8 +335,8 @@ def get_mev_system(mev_id):
     return sys
 
 
-def get_wwhr_system(id):
-    fields = get_product('351', id)
+def get_wwhr_system(wwhr_id):
+    fields = get_product('351', wwhr_id)
     sys = dict(
         idx=str(fields[0]),
         manufacturer=str(fields[3]),
@@ -347,8 +347,9 @@ def get_wwhr_system(id):
     return sys
 
 
-def get_fghr_system(id):
-    fields = get_product('312', id)
+def get_fghr_system(fghr_id):
+    fields = get_product('312', fghr_id)
+
     sys = dict(
         idx=str(fields[0]),
         manufacturer=str(fields[3]),
@@ -390,12 +391,18 @@ def get_fghr_system(id):
     return sys
 
 
-def get_in_use_factors():
+def pcdf_mech_vent_in_use_factors():
+    """
+    Construct tables for mechanical ventilation in use factors
+
+    :return:
+    """
     factors_table = get_table("329")
     sfp_factor_table = dict()
     sfp_factor_table_approved = dict()
     hr_factor_table = dict()
     hr_factor_table_approved = dict()
+
     for row in list(factors_table.values()):
         vent_types = MV_TYPE_MAPPING[row[0]]
         sfp_flexible = float_or_none(row[1])
@@ -444,7 +451,7 @@ def get_in_use_factors():
     return sfp_factor_table, sfp_factor_table_approved, hr_factor_table, hr_factor_table_approved
 
 
-def get_fuel_prices():
+def pcdf_fuel_prices():
     fuel_table = get_table("191")
     fuels = dict()
     for row in list(fuel_table.values()):
@@ -456,6 +463,10 @@ def get_fuel_prices():
         )
     return fuels
 
+
+
+# Lazy load these, to give a chance to swap the pcdf database file if necessary
+# FIXME: if it's possible to swap the PCDF file, make this explicit!
 
 TABLE_4h_in_use = None
 TABLE_4h_in_use_approved_scheme = None
@@ -469,21 +480,39 @@ def load_4h_tables():
      TABLE_4h_in_use_approved_scheme,
      TABLE_4h_hr_effy,
      TABLE_4h_hr_effy_approved_scheme
-     ) = get_in_use_factors()
+     ) = pcdf_mech_vent_in_use_factors()
 
 
-def get_in_use_factor(vent_type, duct_type, approved_scheme):
+def mech_vent_in_use_factor(vent_type, duct_type, approved_scheme):
+    """
+    Table 4h: In-use factors for mechanical ventilation systems
+
+    :param vent_type:
+    :param duct_type:
+    :param approved_scheme:
+    :return:
+    """
     if TABLE_4h_in_use is None:
         load_4h_tables()
+
     if approved_scheme:
         return TABLE_4h_in_use_approved_scheme[vent_type][duct_type]
     else:
         return TABLE_4h_in_use[vent_type][duct_type]
 
 
-def get_in_use_factor_hr(vent_type, duct_type, approved_scheme):
+def mech_vent_in_use_factor_hr(vent_type, duct_type, approved_scheme):
+    """
+    Table 4h: In-use factors for mechanical ventilation systems with heat recovery
+
+    :param vent_type:
+    :param duct_type:
+    :param approved_scheme:
+    :return:
+    """
     if TABLE_4h_in_use is None:
         load_4h_tables()
+
     if approved_scheme:
         return TABLE_4h_hr_effy_approved_scheme[vent_type][duct_type]
     else:
