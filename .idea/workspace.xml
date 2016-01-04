@@ -2,90 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7350501f-e420-4216-851c-d82d56f040b6" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix/appendix_b.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix/appendix_d.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/appendix/appendix_e.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/configure_ventilation.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sap/sap_table_4e.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/Makefile" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/api.doctree" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/environment.pickle" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/index.doctree" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/modules.doctree" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/sap.doctree" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/doctrees/sap.io.doctree" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/.buildinfo" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/api.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/index.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/modules.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/sap.io.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_sources/sap.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/ajax-loader.gif" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/alabaster.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/basic.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/comment-bright.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/comment-close.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/comment.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/doctools.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/down-pressed.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/down.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/file.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/jquery-1.11.1.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/jquery.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/minus.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/plus.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/pygments.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/searchtools.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/underscore-1.3.1.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/underscore.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/up-pressed.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/up.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/_static/websupport.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/api.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/genindex.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/index.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/modules.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/objects.inv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/sap.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/sap.io.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/search.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/_build/html/searchindex.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/conf.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/index.rst" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/make.bat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/modules.rst" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/sap.io.rst" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/sap.rst" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_a.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_a.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_b.py" afterPath="$PROJECT_DIR$/sap/appendix/__init__.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_c.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_c.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_f.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_f.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_g.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_g.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_h.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_h.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_j.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_j.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_m.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_m.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/appendix_n.py" afterPath="$PROJECT_DIR$/sap/appendix/appendix_n.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/sap/sap_tables_helpers.py" afterPath="$PROJECT_DIR$/doc/appendix_a.rst" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/yaml_io.py" afterPath="$PROJECT_DIR$/sap/io/yaml_io.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../doc/spcm.rst" afterPath="$PROJECT_DIR$/../doc/spcm.rst" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/sapcalc.iml" afterPath="$PROJECT_DIR$/.idea/sapcalc.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/configure.py" afterPath="$PROJECT_DIR$/sap/configure.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/dwelling.py" afterPath="$PROJECT_DIR$/sap/dwelling.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/fuels.py" afterPath="$PROJECT_DIR$/sap/fuels.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/heating_system_types.py" afterPath="$PROJECT_DIR$/sap/heating_system_types.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/heating_systems.py" afterPath="$PROJECT_DIR$/sap/heating_systems.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/io/input_conversion_rules.py" afterPath="$PROJECT_DIR$/sap/io/input_conversion_rules.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/pcdf.py" afterPath="$PROJECT_DIR$/sap/pcdf.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/runner.py" afterPath="$PROJECT_DIR$/sap/runner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_constants.py" afterPath="$PROJECT_DIR$/sap/sap_constants.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_tables.py" afterPath="$PROJECT_DIR$/sap/sap_tables.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/sap_types.py" afterPath="$PROJECT_DIR$/sap/sap_types.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/utils.py" afterPath="$PROJECT_DIR$/sap/utils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sap/worksheet.py" afterPath="$PROJECT_DIR$/sap/worksheet.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sapcli.py" afterPath="$PROJECT_DIR$/sapcli.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases.py" afterPath="$PROJECT_DIR$/tests/test_official_cases.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" afterPath="$PROJECT_DIR$/tests/test_official_cases_alt_implementation.py" />
     </list>
     <ignored path="sapcalc.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -142,8 +60,8 @@
       <file leaf-file-name="configure.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/sap/configure.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3327645">
-              <caret line="130" column="4" selection-start-line="130" selection-start-column="4" selection-end-line="130" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.51519156">
+              <caret line="80" column="24" selection-start-line="80" selection-start-column="24" selection-end-line="80" selection-end-column="24" />
               <folding>
                 <element signature="e#0#54#0" expanded="true" />
               </folding>
@@ -697,7 +615,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32891566" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23457676" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2178344" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2178344" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32738853" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931423" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30063695" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -1143,8 +1061,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sap/configure.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3327645">
-          <caret line="130" column="4" selection-start-line="130" selection-start-column="4" selection-end-line="130" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.51519156">
+          <caret line="80" column="24" selection-start-line="80" selection-start-column="24" selection-end-line="80" selection-end-column="24" />
           <folding>
             <element signature="e#0#54#0" expanded="true" />
           </folding>

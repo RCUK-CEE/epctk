@@ -84,50 +84,6 @@ def configure_responsiveness(dwelling):
     dwelling.heating_responsiveness_sys1 = sys1_responsiveness  # used for TER
 
 
-def configure_control_system1(dwelling):
-    # TODO Need to check main sys 2 here
-    system = dwelling.main_sys_1
-    control = TABLE_4E[dwelling.control_type_code]
-    # dwelling.temperature_adjustment = control['Tadjustment']
-    # dwelling.has_room_thermostat = (control['thermostat'] == "TRUE")
-    # dwelling.has_trvs = control['trv'] == "TRUE"
-
-    dwelling.heating_control_type_sys1 = control['control_type']
-
-    system.heating_control_type = control['control_type']
-
-    other_adj_table = control.get('other_adj_table')
-    if other_adj_table is not None:
-        apply_table_4e(other_adj_table, dwelling, system, 1)
-
-        # if other_adj_table == 'Table 4c(2)':
-        #     apply_4c1(dwelling, system, load_compensator=dwelling.get("sys1_load_compensator"))
-
-    # TODO Special case table 4c4 for warm air heat pumps - needs to apply to sys2 too
-    # TODO Should only apply if water is from this system!!
-    if dwelling.get('main_heating_type_code') and 521 <= dwelling.main_heating_type_code <= 527:
-        system.water_mult = 0.7
-
-# def configure_control_system2(dwelling):
-#     system = dwelling.main_sys_2
-#     control = TABLE_4E[dwelling.control_2_type_code]
-#
-#     dwelling.heating_control_type_sys2 = control['control_type']
-#
-#     system.heating_control_type = control['control_type']
-#
-#     other_adj_table = control.get('other_adj_table')
-#     if other_adj_table is not None:
-#         apply_table_4e(other_adj_table, dwelling, system, 2)
-#
-#         # if other_adj_table == 'Table 4c(2)':
-#         #     apply_4c1(dwelling, system, load_compensator=dwelling.get("sys2_load_compensator"))
-#
-#     # TODO Should only apply if water is from this system!!
-#     if dwelling.get('main_heating_2_type_code') and 521 <= dwelling.main_heating_2_type_code <= 527:
-#         system.water_mult = 0.7
-
-
 def configure_control_system(dwelling, system_num):
     """
 
@@ -156,6 +112,7 @@ def configure_control_system(dwelling, system_num):
     if other_adj_table is not None:
         apply_table_4e(other_adj_table, dwelling, system, system_num)
 
+    # TODO Special case table 4c4 for warm air heat pumps - needs to apply to sys2 too
     # TODO Should only apply if water is from this system!!
     heat_type_code = dwelling.get('main_heating' + sub + '_type_code')
     if heat_type_code and 521 <= heat_type_code <= 527:
