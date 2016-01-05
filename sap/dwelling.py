@@ -1,5 +1,5 @@
 from .utils import ALL_PARAMS, CALC_STAGE
-from .sap_constants import IGH_HEATING, T_EXTERNAL_HEATING, WIND_SPEED, LIVING_AREA_T_HEATING, COOLING_BASE_TEMPERATURE
+from .constants import IGH_HEATING, T_EXTERNAL_HEATING, WIND_SPEED, LIVING_AREA_T_HEATING, COOLING_BASE_TEMPERATURE
 from .fuels import Fuel, ElectricityTariff
 
 
@@ -103,16 +103,56 @@ class DwellingResults(Dwelling):
     def __getattr__(self, item):
         """
         Return value from `results`, if missing return it from the Dwelling's original
-        properties
+        dict, then try the original attributes
 
         Args:
-            item: name of item to retreive
+            item: name of item to retrieve
+        Returns:
+            item
         """
         try:
             return self['results'][item]
         except KeyError:
-            super().__getattr__(item)
+            try:
+                return self[item]
+            except KeyError:
+                try:
+                    return self.__dict__[item]
+                except KeyError:
+                    raise AttributeError(item)
 
+    def __getitem__(self, item):
+        if item in super().__getitem__('results'):
+            return super().__getitem__('results')[item]
+        else:
+            return super().__getitem__(item)
+
+    def __setitem__(self, key, value):
+        self['results'][key] = value
+
+    def get(self, key, default=None):
+        """
+        Override get to also return from results first.
+        Important since otherwise if you overwrite an existing key from Dwelling
+        in Dwelling Results, only the original will be returned with get()
+
+        Args:
+            key:
+            default:
+
+        Returns:
+
+        """
+        try:
+            return self['results'][key]
+        except KeyError:
+            try:
+                return self[key]
+            except KeyError:
+                try:
+                    return self.__dict__[key]
+                except KeyError:
+                    return default
 
 
 
@@ -194,7 +234,7 @@ class CalculationReport(object):
                           dwelling.instantaneous_pou_water_heating)
         has_measured_loss = (dwelling.get('measured_cylinder_loss') and
                              dwelling.measured_cylinder_loss is not None)
-        if not is_pou_heating and not has_measured_loss and dwelling.get('hw_cylinder_volume', False):
+        if not is_pou_heating and not has_measured_loss and dwelling.get('hw_cylinder_volume') is not None:
             self.add_single_result(
                 "Cylinder volume", None, dwelling.hw_cylinder_volume)
             self.add_single_result(

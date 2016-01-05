@@ -10,20 +10,21 @@ or are categorised on the basis of the generic types in Tables 4a and 4b.
 
 
 A2.1 Identifying the main system
-1. If there is a central system that provides both space and water heating and
-    it is capable of heating at least 30% of the dwelling, select that system
-    as the main heating system. If there is no system that provides both space
-    and water heating, then select the system that has the capability of heating
-    the greatest part of the dwelling. For this purpose only habitable rooms should
-    be considered (i.e. ignore heaters in non-habitable rooms).
-2. If there is still doubt about which system should be selected as the main system,
-   select the system that supplies useful heat to the dwelling at lowest cost
-   (obtained by dividing fuel cost by conversion efficiency).
+
+    1. If there is a central system that provides both space and water heating and
+        it is capable of heating at least 30% of the dwelling, select that system
+        as the main heating system. If there is no system that provides both space
+        and water heating, then select the system that has the capability of heating
+        the greatest part of the dwelling. For this purpose only habitable rooms should
+        be considered (i.e. ignore heaters in non-habitable rooms).
+    2. If there is still doubt about which system should be selected as the main system,
+       select the system that supplies useful heat to the dwelling at lowest cost
+       (obtained by dividing fuel cost by conversion efficiency).
 
 """
+from ..tables import system_efficiency, system_type_from_sap_code, combi_loss_table_3a, TABLE_4A, TABLE_4B, get_4a_system
 from ..fuels import ELECTRICITY_STANDARD
 from ..heating_system_types import HeatingSystem, SecondarySystem
-from ..sap_tables import get_4a_system, get_effy, system_type_from_sap_code, combi_loss_table_3a, TABLE_4B, TABLE_4A
 from ..sap_types import HeatingTypes
 
 
@@ -36,6 +37,7 @@ def apply_appendix_a():
 
     a) If there is no heating system, assign electric heaters as the main
        system heating all rooms (no secondary system).
+
     b) If 25% or less of the habitable rooms are heated and their heating is by
        a room heater (not electric), assign electric heaters as the main system
        and the identified room heaters as the secondary system, applying the
@@ -52,12 +54,15 @@ def apply_appendix_a():
           divided by total habitable rooms
 
     c) Otherwise if there are any unheated habitable rooms and no secondary system
-       has been identified,
-    undertake the calculation with electric secondary heating (portable electric heaters).
+       has been identified, undertake the calculation with electric secondary heating
+      (portable electric heaters).
+
     d) If any fixed secondary heater has been identified, the calculation proceeds
        with the identified secondary heater, whether or not there are unheated habitable rooms.
+
     e) If there are no unheated habitable rooms and no fixed secondary heater
        in a habitable room, undertake the calculation with no secondary heating.
+
     f) An assumed heater, where main or secondary, is an electric portable heater.
        In case of main heating it does not have thermostatic control.
 
@@ -78,9 +83,9 @@ def configure_secondary_system(dwelling):
     elif dwelling.get('secondary_sys_manuf_effy'):
         dwelling.secondary_sys = get_manuf_data_secondary_system(dwelling)
 
-    # There must be a secondary system if electric storage heaters
-    # or off peak underfloor electric
-    if dwelling.get('main_heating_type_code'):
+    # There must be a secondary system if electric storage heaters or off peak underfloor electric
+    # But not if we use community heating
+    if dwelling.get('main_heating_type_code') and dwelling.get('main_heating_type_code') != 'community':
         # Check that the code is in range 401-408 OR that
         # the fuel is not ELECTRICITY_STANDARD and the code is in range 421-425
         type_code_in_range = (401 <= dwelling.main_heating_type_code <= 408) or (
@@ -149,7 +154,7 @@ def get_4a_main_system(dwelling, system_code, fuel,
     if hetas_approved and system_data['effy_hetas'] > 0:
         effy = system_data["effy_hetas"]
     else:
-        effy = get_effy(system_data, fuel)
+        effy = system_efficiency(system_data, fuel)
 
     system = HeatingSystem(system_type_from_sap_code(system_code, system_data),
                            effy,
@@ -163,12 +168,14 @@ def get_4a_main_system(dwelling, system_code, fuel,
 
     system.has_warm_air_fan = system_data['warm_air_fan'] == "TRUE"
     system.responsiveness = system_data['responsiveness']
+
     if system_data['water_effy'] != "same":
         system.water_effy = float(system_data['water_effy'])
 
     if system.system_type in [HeatingTypes.combi,
                               HeatingTypes.storage_combi]:
         system.combi_loss = combi_loss_table_3a(dwelling, system)
+
     elif system.system_type == HeatingTypes.cpsu:
         system.cpsu_Tw = dwelling.cpsu_Tw
         system.cpsu_not_in_airing_cupboard = dwelling.get('cpsu_not_in_airing_cupboard')
@@ -192,7 +199,7 @@ def get_4a_secondary_system(dwelling):
     if dwelling.get('secondary_hetas_approved') and system_data['effy_hetas'] > 0:
         effy = system_data["effy_hetas"]
     else:
-        effy = get_effy(system_data, dwelling.secondary_sys_fuel)
+        effy = system_efficiency(system_data, dwelling.secondary_sys_fuel)
 
     sys = SecondarySystem(
             system_type_from_sap_code(dwelling.secondary_heating_type_code, system_data),

@@ -1,0 +1,1020 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sap.sap_tables &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sap.sap_tables</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">USE_TABLE_4D_FOR_RESPONSIVENESS</span>
+<span class="kn">from</span> <span class="nn">.appendix.appendix_f</span> <span class="kn">import</span> <span class="n">cpsu_store</span><span class="p">,</span> <span class="n">elec_cpsu_store</span>
+<span class="kn">from</span> <span class="nn">.fuels</span> <span class="kn">import</span> <span class="n">ElectricityTariff</span><span class="p">,</span> <span class="n">ELECTRICITY_7HR</span><span class="p">,</span> <span class="n">ELECTRICITY_10HR</span><span class="p">,</span> <span class="n">ELECTRICITY_24HR</span>
+<span class="kn">from</span> <span class="nn">.sap_types</span> <span class="kn">import</span> <span class="p">(</span><span class="n">TerrainTypes</span><span class="p">,</span> <span class="n">FuelTypes</span><span class="p">,</span> <span class="n">CylinderInsulationTypes</span><span class="p">,</span> <span class="n">OvershadingTypes</span><span class="p">,</span> <span class="n">SHWCollectorTypes</span><span class="p">,</span>
+                        <span class="n">HeatingTypes</span><span class="p">,</span> <span class="n">PVOvershading</span><span class="p">,</span> <span class="n">HeatEmitters</span><span class="p">,</span>
+                        <span class="n">VentilationTypes</span><span class="p">,</span> <span class="n">BoilerTypes</span><span class="p">,</span> <span class="n">FloorTypes</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">SAPCalculationError</span><span class="p">,</span> <span class="n">csv_to_dict</span><span class="p">,</span> <span class="n">float_or_zero</span>
+
+<span class="n">_DATA_FOLDER</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&#39;data&#39;</span><span class="p">)</span>
+
+<span class="n">ELECTRICITY_OFFSET</span> <span class="o">=</span> <span class="n">ElectricityTariff</span><span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ELECTRICITY_SOLD</span> <span class="o">=</span> <span class="n">ElectricityTariff</span><span class="p">(</span><span class="mi">36</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="c"># ----------------------------</span>
+<span class="c"># SAP STANDARD NUMBERED TABLES</span>
+<span class="c"># ----------------------------</span>
+<div class="viewcode-block" id="table_1b_occupancy"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.table_1b_occupancy">[docs]</a><span class="k">def</span> <span class="nf">table_1b_occupancy</span><span class="p">(</span><span class="n">TFA</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Table 1b Part 1: Occupancy</span>
+
+<span class="sd">    if TFA &gt; 13.9: N = 1 + 1.76 × [1-exp (-0.000349 × (TFA-13.9)2 )] + 0.0013 × (TFA-13.9)</span>
+<span class="sd">    if TFA ≤ 13.9: N=1</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        TFA: Total Floor Area</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Assumed number of occupants</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">TFA</span> <span class="o">&gt;</span> <span class="mf">13.9</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="mf">1.76</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.000349</span> <span class="o">*</span> <span class="p">(</span><span class="n">TFA</span> <span class="o">-</span> <span class="mf">13.9</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.0013</span> <span class="o">*</span> <span class="p">(</span><span class="n">TFA</span> <span class="o">-</span> <span class="mf">13.9</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+</div>
+<div class="viewcode-block" id="table_1b_daily_hot_water"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.table_1b_daily_hot_water">[docs]</a><span class="k">def</span> <span class="nf">table_1b_daily_hot_water</span><span class="p">(</span><span class="n">low_water_use</span><span class="p">,</span> <span class="n">Nocc</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Table 1b part 2: Domestic hot water usage</span>
+
+
+<span class="sd">    (a) Annual average hot water usage in litres per day Vd,average = (25 × N) + 36</span>
+<span class="sd">    (b) Reduce the annual average hot water usage by 5% if the dwelling is designed</span>
+<span class="sd">        to achieve a water use target of not more that 125 litres per person per day</span>
+<span class="sd">        (all water use, hot and cold)</span>
+<span class="sd">    (c) For each month, multiply Vd,average by the factor from Table 1c to obtain</span>
+<span class="sd">        the daily volume in the month Vd,m</span>
+<span class="sd">    (d) The energy content of water used is</span>
+<span class="sd">            4.190 × Vd,m × nm × ∆Tm / 3600 kWh/month</span>
+<span class="sd">        where ∆Tm is the temperature rise for month m from Table 1d.</span>
+<span class="sd">    (e) Distribution loss is 0.15 times energy content calculated in (d).</span>
+
+<span class="sd">    This function calculates parts a) and b)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Nocc: Number of Occupants (from Table 1b part 1)</span>
+<span class="sd">        low_water_use (bool): Whether the dwelling is designed to save water (see point b)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Average daily hot water use</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">low_water_use</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">25.</span> <span class="o">*</span> <span class="n">Nocc</span> <span class="o">+</span> <span class="mf">36.</span><span class="p">)</span> <span class="o">*</span> <span class="o">.</span><span class="mi">95</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">25.</span> <span class="o">*</span> <span class="n">Nocc</span> <span class="o">+</span> <span class="mf">36.</span>
+
+
+<span class="c"># Table 1c</span></div>
+<span class="n">MONTHLY_HOT_WATER_FACTORS</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.06</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">,</span> <span class="mf">0.94</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.94</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="mf">1.06</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])</span>
+
+<span class="c"># Table 1d</span>
+<span class="n">MONTHLY_HOT_WATER_TEMPERATURE_RISE</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="mf">41.2</span><span class="p">,</span> <span class="mf">41.4</span><span class="p">,</span> <span class="mf">40.1</span><span class="p">,</span> <span class="mf">37.6</span><span class="p">,</span> <span class="mf">36.4</span><span class="p">,</span> <span class="mf">33.9</span><span class="p">,</span> <span class="mf">30.4</span><span class="p">,</span> <span class="mf">33.4</span><span class="p">,</span> <span class="mf">33.5</span><span class="p">,</span> <span class="mf">36.3</span><span class="p">,</span> <span class="mf">39.4</span><span class="p">,</span> <span class="mf">39.9</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="table_2_hot_water_store_loss_factor"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.table_2_hot_water_store_loss_factor">[docs]</a><span class="k">def</span> <span class="nf">table_2_hot_water_store_loss_factor</span><span class="p">(</span><span class="n">hw_cylinder_insulation_type</span><span class="p">,</span> <span class="n">hw_cylinder_insulation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Table 2</span>
+
+<span class="sd">    Calculate Hot water storage loss factor according to equation in Note 1.</span>
+<span class="sd">    of Table 2 (rather than using the tabulated values)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hw_cylinder_insulation_type (CylinderInsulationTypes):</span>
+<span class="sd">        hw_cylinder_insulation: thickness of cylinder insulation in mm</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        hot water storage loss factor in kWh/litre/day</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">hw_cylinder_insulation_type</span> <span class="o">==</span> <span class="n">CylinderInsulationTypes</span><span class="o">.</span><span class="n">FOAM</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.005</span> <span class="o">+</span> <span class="mf">0.55</span> <span class="o">/</span> <span class="p">(</span><span class="n">hw_cylinder_insulation</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.005</span> <span class="o">+</span> <span class="mf">1.76</span> <span class="o">/</span> <span class="p">(</span><span class="n">hw_cylinder_insulation</span> <span class="o">+</span> <span class="mf">12.8</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="table_2a_hot_water_vol_factor"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.table_2a_hot_water_vol_factor">[docs]</a><span class="k">def</span> <span class="nf">table_2a_hot_water_vol_factor</span><span class="p">(</span><span class="n">cylinder_volume</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Table 2a</span>
+
+<span class="sd">    Calculate the volume factor according to equation in Note 2. of Table 2a</span>
+<span class="sd">    When using Table 2, the loss is to be multiplied by the volume factor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cylinder_volume: volume of hot water cylinder</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        hot water volume factor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">120.</span> <span class="o">/</span> <span class="n">cylinder_volume</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+
+
+<span class="c"># Table 2b</span>
+<span class="c"># Table 2b is actually a table of functions. Define the functions first and add them</span>
+<span class="c"># to a dict lookup to give the table</span>
+</div>
+<span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">k</span>
+
+
+<span class="k">def</span> <span class="nf">cylinder_indirect</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="n">temperature_factor</span> <span class="o">=</span> <span class="mf">0.6</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;has_hw_time_control&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">temperature_factor</span> <span class="o">*=</span> <span class="mf">0.9</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">has_cylinderstat</span><span class="p">:</span>
+        <span class="n">temperature_factor</span> <span class="o">*=</span> <span class="mf">1.3</span>
+
+    <span class="k">return</span> <span class="n">temperature_factor</span>
+
+
+<span class="k">def</span> <span class="nf">storage_combi_primary</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">0.82</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">&gt;=</span> <span class="mi">115</span>
+            <span class="k">else</span> <span class="o">.</span><span class="mi">82</span> <span class="o">+</span> <span class="mf">0.0022</span> <span class="o">*</span> <span class="p">(</span><span class="mi">115</span> <span class="o">-</span> <span class="n">d</span><span class="o">.</span><span class="n">hw_cylinder_volume</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">storage_combi_secondary</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">0.6</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">&gt;=</span> <span class="mi">115</span>
+            <span class="k">else</span> <span class="mf">0.6</span> <span class="o">+</span> <span class="mf">0.0016</span> <span class="o">*</span> <span class="p">(</span><span class="mi">115</span> <span class="o">-</span> <span class="n">d</span><span class="o">.</span><span class="n">hw_cylinder_volume</span><span class="p">))</span>
+
+
+<span class="c"># Table 2b format:</span>
+<span class="c"># Row number: (With Manufacturers data, Table 2 fallback)</span>
+<span class="n">_TABLE_2b</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="p">(</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>          <span class="p">,</span> <span class="n">constant</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)),</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="p">(</span><span class="n">cylinder_indirect</span>      <span class="p">,</span> <span class="n">cylinder_indirect</span><span class="p">),</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span>                      <span class="p">,</span> <span class="n">storage_combi_primary</span><span class="p">),</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="n">storage_combi_secondary</span><span class="p">,</span> <span class="n">storage_combi_secondary</span><span class="p">),</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="p">(</span><span class="n">cylinder_indirect</span>      <span class="p">,</span> <span class="n">cylinder_indirect</span><span class="p">),</span>  <span class="c"># same equations as indirect cylinder</span>
+    <span class="mi">6</span><span class="p">:</span> <span class="p">(</span><span class="n">cpsu_store</span>             <span class="p">,</span> <span class="n">cpsu_store</span><span class="p">),</span>
+    <span class="mi">7</span><span class="p">:</span> <span class="p">(</span><span class="n">cpsu_store</span>             <span class="p">,</span> <span class="n">cpsu_store</span><span class="p">),</span>
+    <span class="mi">8</span><span class="p">:</span> <span class="p">(</span><span class="n">elec_cpsu_store</span>        <span class="p">,</span> <span class="n">elec_cpsu_store</span><span class="p">),</span>
+    <span class="mi">9</span><span class="p">:</span> <span class="p">(</span><span class="n">constant</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>            <span class="p">,</span> <span class="n">constant</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="table_2b_hot_water_temp_factor"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.table_2b_hot_water_temp_factor">[docs]</a><span class="k">def</span> <span class="nf">table_2b_hot_water_temp_factor</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">measured_loss</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the hot water temperature factor according to Table 2b</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dwelling (Dwelling):</span>
+<span class="sd">        measured_loss: boolean, whether the losses are measured by manufacturer or must be assumed</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">measured_loss</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_TABLE_2b</span><span class="p">[</span><span class="n">dwelling</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">table2b_row</span><span class="p">][</span><span class="mi">0</span><span class="p">](</span><span class="n">dwelling</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_TABLE_2b</span><span class="p">[</span><span class="n">dwelling</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">table2b_row</span><span class="p">][</span><span class="mi">1</span><span class="p">](</span><span class="n">dwelling</span><span class="p">)</span>
+
+
+<span class="c"># Table 3 Primary Circuit losses</span></div>
+<span class="n">TABLE_3</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="mi">1220</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="mi">610</span><span class="p">,</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="mi">360</span><span class="p">,</span>
+    <span class="mi">6</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">7</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">8</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">9</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">10</span><span class="p">:</span> <span class="mi">280</span><span class="p">,</span>  <span class="c"># !!! Different for insulated/not insulated pipework</span>
+    <span class="mi">11</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">12</span><span class="p">:</span> <span class="mi">360</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="c"># Table 3a</span>
+<span class="c"># !!! Need to add the other options in here</span>
+<span class="k">def</span> <span class="nf">combi_loss_instant_without_keep_hot</span><span class="p">(</span><span class="n">daily_hot_water_use</span><span class="p">):</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">daily_hot_water_use</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">,</span>
+                     <span class="mf">1.0</span><span class="p">,</span>
+                     <span class="n">daily_hot_water_use</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">600.0</span> <span class="o">*</span> <span class="n">fn</span>
+
+
+<span class="k">def</span> <span class="nf">combi_loss_instant_with_timed_heat_hot</span><span class="p">(</span><span class="n">daily_hot_water_use</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">600.0</span>
+
+
+<span class="k">def</span> <span class="nf">combi_loss_instant_with_untimed_heat_hot</span><span class="p">(</span><span class="n">daily_hot_water_use</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">900.0</span>
+
+
+<span class="k">def</span> <span class="nf">combi_loss_storage_combi_more_than_55l</span><span class="p">(</span><span class="n">daily_hot_water_use</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">combi_loss_storage_combi_less_than_55l</span><span class="p">(</span><span class="n">Vc</span><span class="p">,</span> <span class="n">daily_hot_water_use</span><span class="p">):</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">daily_hot_water_use</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">,</span>
+                     <span class="mf">1.0</span><span class="p">,</span>
+                     <span class="n">daily_hot_water_use</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">600</span> <span class="o">-</span> <span class="p">(</span><span class="n">Vc</span> <span class="o">-</span> <span class="mi">15</span><span class="p">)</span> <span class="o">*</span> <span class="mi">15</span><span class="p">)</span> <span class="o">*</span> <span class="n">fn</span>
+
+
+<span class="k">def</span> <span class="nf">combi_loss_table_3a</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+    <span class="n">storage_volume</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hw_cylinder_volume&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">storage_volume</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;table3a_row&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">system</span><span class="o">.</span><span class="n">table3a_row</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># !!! Need other keep hot types</span>
+            <span class="k">return</span> <span class="n">combi_loss_instant_without_keep_hot</span>
+    <span class="k">elif</span> <span class="n">storage_volume</span> <span class="o">&lt;</span> <span class="mi">55</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">hw_use</span><span class="p">:</span> <span class="n">combi_loss_storage_combi_less_than_55l</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span><span class="p">,</span> <span class="n">hw_use</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">combi_loss_storage_combi_more_than_55l</span>
+
+
+<span class="c"># FIXME Need to complete this table</span>
+<span class="k">def</span> <span class="nf">combi_loss_table_3b</span><span class="p">(</span><span class="n">pcdf_data</span><span class="p">):</span>
+    <span class="c"># !!! Need to set storage loss here</span>
+    <span class="c"># dwelling.measured_cylinder_loss=0#pcdf_data[&#39;storage_loss_factor_f1&#39;]</span>
+    <span class="c"># dwelling.has_hw_cylinder=True</span>
+    <span class="c"># system.table2b_row=5</span>
+    <span class="c"># dwelling.has_cylinderstat=True</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">365</span> <span class="o">*</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;storage_loss_factor_f1&#39;</span><span class="p">]</span>
+
+
+<span class="c"># !!! Need to complete this table</span>
+<span class="k">def</span> <span class="nf">combi_loss_table_3c</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Combi Loss Table 3c not implemented&quot;</span><span class="p">)</span>
+
+
+<span class="c"># Table 4a</span>
+<span class="c"># FIXME Electric storage systems - offpeak and 24 hour tariff systems have same type codes!</span>
+<span class="k">def</span> <span class="nf">translate_4a_row</span><span class="p">(</span><span class="n">systems</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;n/a&#39;</span><span class="p">:</span>
+        <span class="n">sys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="c"># type=row[1],</span>
+                <span class="n">effy</span><span class="o">=</span><span class="n">float_or_zero</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+                <span class="n">effy_hetas</span><span class="o">=</span><span class="n">float_or_zero</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+                <span class="n">effy_gas</span><span class="o">=</span><span class="n">float_or_zero</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+                <span class="n">effy_lpg</span><span class="o">=</span><span class="n">float_or_zero</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
+                <span class="n">responsiveness</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+                                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;emitter&#39;</span>
+                                <span class="k">else</span> <span class="n">USE_TABLE_4D_FOR_RESPONSIVENESS</span><span class="p">),</span>
+                <span class="n">table2b_row</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span> <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">fraction_of_heat_from_secondary</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">8</span><span class="p">]),</span>
+                <span class="n">flue_fan</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span>
+                <span class="n">warm_air_fan</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
+                <span class="n">water_effy</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># Hot Water system</span>
+        <span class="n">sys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">effy</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+                <span class="n">table2b_row</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span> <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">systems</span><span class="p">:</span>
+        <span class="n">systems</span><span class="p">[</span><span class="n">sys</span><span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sys</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">systems</span><span class="p">[</span><span class="n">sys</span><span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sys</span><span class="p">,</span> <span class="p">]</span>
+
+
+<span class="n">TABLE_4A</span> <span class="o">=</span> <span class="n">csv_to_dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_DATA_FOLDER</span><span class="p">,</span> <span class="s">&#39;table_4a.csv&#39;</span><span class="p">),</span> <span class="n">translate_4a_row</span><span class="p">)</span>
+
+
+<span class="c"># Table 4b</span>
+<span class="k">def</span> <span class="nf">translate_4b_row</span><span class="p">(</span><span class="n">systems</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="nb">type</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">effy_winter</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">effy_summer</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="n">table2b_row</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+            <span class="n">fraction_of_heat_from_secondary</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">responsiveness</span><span class="o">=</span><span class="n">USE_TABLE_4D_FOR_RESPONSIVENESS</span><span class="p">,</span>
+            <span class="n">flue_fan</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+            <span class="n">boiler_type</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
+            <span class="n">condensing</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;TRUE&quot;</span><span class="p">,</span>
+            <span class="n">warm_air_fan</span><span class="o">=</span><span class="s">&quot;FALSE&quot;</span><span class="p">)</span>
+    <span class="n">systems</span><span class="p">[</span><span class="n">sys</span><span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">sys</span>
+
+
+<span class="n">TABLE_4B</span> <span class="o">=</span> <span class="n">csv_to_dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_DATA_FOLDER</span><span class="p">,</span> <span class="s">&#39;table_4b.csv&#39;</span><span class="p">),</span> <span class="n">translate_4b_row</span><span class="p">)</span>
+
+<span class="n">TABLE_4C3</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">2301</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+    <span class="mi">2302</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+    <span class="mi">2303</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+    <span class="mi">2304</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+    <span class="mi">2307</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+    <span class="mi">2305</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+    <span class="mi">2308</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="mi">2309</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="mi">2310</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="mi">2306</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="c"># !!! Also need DHW only systems</span>
+<span class="p">}</span>
+
+<span class="c"># Table 4d</span>
+<span class="n">TABLE_4D</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">UNDERFLOOR_TIMBER</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">UNDERFLOOR_SCREED</span><span class="p">:</span> <span class="o">.</span><span class="mi">75</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">UNDERFLOOR_CONCRETE</span><span class="p">:</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS_UNDERFLOOR_TIMBER</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS_UNDERFLOOR_SCREED</span><span class="p">:</span> <span class="o">.</span><span class="mi">75</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS_UNDERFLOOR_CONCRETE</span><span class="p">:</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">FAN_COILS</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="c"># Table 4e</span>
+<span class="k">def</span> <span class="nf">translate_4e_row</span><span class="p">(</span><span class="n">controls</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="n">other_adjustments_str</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">other_adjustments_str</span> <span class="o">!=</span> <span class="s">&quot;n/a&quot;</span><span class="p">:</span>
+        <span class="c"># table_no = re.match(r&#39;Table 4c\((\d)\)&#39;, other_adjustments_str)</span>
+        <span class="c"># other_adj_table = globals()[&#39;apply_4c%s&#39; % (table_no.group(1),)]</span>
+        <span class="n">other_adj_table</span> <span class="o">=</span> <span class="n">other_adjustments_str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">other_adj_table</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">control</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="n">control_type</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">Tadjustment</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="n">thermostat</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="n">trv</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+            <span class="n">other_adj_table</span><span class="o">=</span><span class="n">other_adj_table</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+    <span class="n">controls</span><span class="p">[</span><span class="n">control</span><span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">control</span>
+
+
+<span class="n">TABLE_4E</span> <span class="o">=</span> <span class="n">csv_to_dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_DATA_FOLDER</span><span class="p">,</span> <span class="s">&#39;table_4e.csv&#39;</span><span class="p">),</span> <span class="n">translate_4e_row</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_4a_system</span><span class="p">(</span><span class="n">electricity_tariff</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="n">TABLE_4A</span><span class="p">[</span><span class="n">code</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="c"># Electric storage heaters appear twice with the same code -</span>
+        <span class="c"># once for off peak, once for 24 hour tariffs.</span>
+        <span class="k">if</span> <span class="n">electricity_tariff</span> <span class="o">==</span> <span class="n">ELECTRICITY_24HR</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="n">electricity_tariff</span> <span class="o">==</span> <span class="n">ELECTRICITY_10HR</span> <span class="ow">or</span>
+                    <span class="n">electricity_tariff</span> <span class="o">==</span> <span class="n">ELECTRICITY_7HR</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_effy"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.get_effy">[docs]</a><span class="k">def</span> <span class="nf">get_effy</span><span class="p">(</span><span class="n">system_data</span><span class="p">,</span> <span class="n">fuel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Try to get the efficiency</span>
+
+<span class="sd">    :param system_data: HeatingSystem</span>
+<span class="sd">    :param fuel: fuel of this heating system. TODO: why can&#39;t we just get the fuel from the system?</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy&#39;</span><span class="p">]</span>
+
+    <span class="k">elif</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy_gas&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fuel</span><span class="o">.</span><span class="n">is_mains_gas</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy_gas&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c"># if fuel in [BULK_LPG, BOTTLED_LPG, LPG_COND18]:</span>
+            <span class="c"># Should be LPG fuel if we get here, but do this assertion</span>
+            <span class="c"># check anyway which will catch everything apart from LNG</span>
+            <span class="k">assert</span> <span class="n">fuel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">FuelTypes</span><span class="o">.</span><span class="n">GAS</span>
+            <span class="k">return</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy_lpg&#39;</span><span class="p">]</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Input error if we get here?&quot;</span><span class="p">)</span>
+
+</div>
+<span class="n">T4C4_SPACE_EFFY_MULTIPLIERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="c"># !!!Need to check for presence of load compensator! (also for the rads+underfloor cases)</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">UNDERFLOOR_TIMBER</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">UNDERFLOOR_SCREED</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">UNDERFLOOR_CONCRETE</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS_UNDERFLOOR_TIMBER</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS_UNDERFLOOR_SCREED</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS_UNDERFLOOR_CONCRETE</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">FAN_COILS</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="c"># Table 4f</span>
+<span class="k">def</span> <span class="nf">has_oil_pump</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">has_oil_pump</span> <span class="ow">or</span>
+            <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_sys_2&#39;</span><span class="p">)</span> <span class="ow">and</span>
+             <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_2_fraction</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>
+             <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_2</span><span class="o">.</span><span class="n">has_oil_pump</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">heating_fans_and_pumps_electricity</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="n">Qfansandpumps</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">has_ch_pump</span> <span class="ow">or</span>
+            <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_sys_2&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                 <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_2</span><span class="o">.</span><span class="n">has_ch_pump</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">has_room_thermostat</span><span class="p">:</span>
+            <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mi">130</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mi">130</span> <span class="o">*</span> <span class="mf">1.3</span>
+
+    <span class="k">if</span> <span class="n">has_oil_pump</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">has_room_thermostat</span><span class="p">:</span>
+            <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mi">100</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># raise RuntimeError(&quot;!!! DO WE EVER GET HERE?&quot;)</span>
+            <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mi">100</span> <span class="o">*</span> <span class="mf">1.3</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">has_flue_fan</span><span class="p">:</span>
+        <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mi">45</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_sys_2&#39;</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_2</span><span class="o">.</span><span class="n">has_flue_fan</span> <span class="ow">and</span>
+                <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_2_fraction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mi">45</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="ow">or</span> <span class="p">(</span>
+                    <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_sys_2&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_2</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="ow">and</span>
+                    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_2_fraction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">ventilation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MVHR</span><span class="p">,</span>
+                                             <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MV</span><span class="p">]:</span>
+            <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Warm air fan elec not included for MVHR/MV</span>
+            <span class="k">pass</span>
+
+    <span class="c"># Keep hot only applies for water sys?  What if you have a combi</span>
+    <span class="c"># boiler but it&#39;s not providing hw? No need for keep hot?  Or</span>
+    <span class="c"># maybe it&#39;s just not a combi boiler in that case?</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;keep_hot_elec_consumption&quot;</span><span class="p">):</span>
+        <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">keep_hot_elec_consumption</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;has_electric_shw_pump&#39;</span><span class="p">):</span>
+        <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mi">75</span>
+
+    <span class="k">return</span> <span class="n">Qfansandpumps</span>
+
+
+<span class="k">def</span> <span class="nf">mech_vent_fans_electricity</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="n">Qfansandpumps</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">ventilation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MEV_CENTRALISED</span><span class="p">,</span>
+                                     <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MEV_DECENTRALISED</span><span class="p">,</span>
+                                     <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MV</span><span class="p">,</span>
+                                     <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">PIV_FROM_OUTSIDE</span><span class="p">]:</span>
+        <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mf">1.22</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">adjusted_fan_sfp</span>
+    <span class="k">elif</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">ventilation_type</span> <span class="o">==</span> <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MVHR</span><span class="p">:</span>
+        <span class="n">nmech</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">Qfansandpumps</span> <span class="o">+=</span> <span class="mf">2.44</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span> <span class="o">*</span> <span class="n">nmech</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">adjusted_fan_sfp</span>
+    <span class="k">return</span> <span class="n">Qfansandpumps</span>
+
+
+<span class="k">def</span> <span class="nf">fans_and_pumps_electricity</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">Q_fans_and_pumps</span> <span class="o">=</span> <span class="n">heating_fans_and_pumps_electricity</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">Q_mech_vent_fans</span> <span class="o">=</span> <span class="n">mech_vent_fans_electricity</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+
+
+<span class="c"># Table 4h</span>
+<div class="viewcode-block" id="mech_vent_default_in_use_factor"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.mech_vent_default_in_use_factor">[docs]</a><span class="k">def</span> <span class="nf">mech_vent_default_in_use_factor</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Default values for mechanical ventilation in use factor</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">2.5</span>
+
+</div>
+<div class="viewcode-block" id="mech_vent_default_hr_effy_factor"><a class="viewcode-back" href="../../sap_tables.html#sap.sap_tables.mech_vent_default_hr_effy_factor">[docs]</a><span class="k">def</span> <span class="nf">mech_vent_default_hr_effy_factor</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Default efficiency for mechanical ventilation with heat recovery</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">0.7</span>
+
+
+<span class="c"># Table 5a</span>
+<span class="c"># FIXME: NEED TO FINISH THIS!</span></div>
+<span class="k">def</span> <span class="nf">has_oil_pump_inside</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_heating_oil_pump_inside_dwelling&#39;</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_heating_2_oil_pump_inside_dwelling&#39;</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">fans_and_pumps_gain</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="n">fans_pumps_gain</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">heating_system_gain</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c"># !!! Nope, this is for balanced without heat recovery</span>
+    <span class="c"># if dwelling.ventilation_type==VentilationTypes.MVHR:</span>
+    <span class="c">#    fansandpumps_gain+=dwelling.adjusted_fan_sfp*0.06*dwelling.volume</span>
+
+    <span class="n">ch_pump_gain</span> <span class="o">=</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;central_heating_pump_in_heated_space&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">has_ch_pump</span> <span class="ow">or</span>
+            <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_sys_2&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_2</span><span class="o">.</span><span class="n">has_ch_pump</span><span class="p">)):</span>
+        <span class="n">fans_pumps_gain</span> <span class="o">+=</span> <span class="n">ch_pump_gain</span>
+        <span class="n">heating_system_gain</span> <span class="o">+=</span> <span class="n">ch_pump_gain</span>
+
+    <span class="k">if</span> <span class="n">has_oil_pump_inside</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+        <span class="n">fans_pumps_gain</span> <span class="o">+=</span> <span class="mi">10</span>
+        <span class="n">heating_system_gain</span> <span class="o">+=</span> <span class="mi">10</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;has_fans_for_positive_input_vent_from_outside&#39;</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;has_fans_for_balanced_mech_vent_without_hr&#39;</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">ventilation_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MVHR</span><span class="p">,</span>
+                                         <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MV</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="ow">or</span> <span class="p">(</span>
+                        <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_sys_2&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_2</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="ow">and</span>
+                        <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_2_fraction</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">fans_pumps_gain</span> <span class="o">+=</span> <span class="mf">0.06</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">ventilation_type</span> <span class="o">==</span> <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">MV</span><span class="p">:</span>
+        <span class="n">fans_pumps_gain</span> <span class="o">+=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">adjusted_fan_sfp</span> <span class="o">*</span> <span class="o">.</span><span class="mo">06</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span>
+    <span class="k">elif</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">ventilation_type</span> <span class="o">==</span> <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">PIV_FROM_OUTSIDE</span><span class="p">:</span>
+        <span class="n">fans_pumps_gain</span> <span class="o">+=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">adjusted_fan_sfp</span> <span class="o">*</span> <span class="o">.</span><span class="mi">12</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">pump_gain</span> <span class="o">=</span> <span class="n">fans_pumps_gain</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">heating_system_pump_gain</span> <span class="o">=</span> <span class="n">heating_system_gain</span>
+
+
+<span class="c"># Table 6d</span>
+<span class="n">TABLE_6D</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">OvershadingTypes</span><span class="o">.</span><span class="n">HEAVY</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">solar_access_factor_winter</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+            <span class="n">solar_access_factor_summer</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">light_access_factor</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">OvershadingTypes</span><span class="o">.</span><span class="n">MORE_THAN_AVERAGE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">solar_access_factor_winter</span><span class="o">=</span><span class="mf">0.54</span><span class="p">,</span>
+            <span class="n">solar_access_factor_summer</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+            <span class="n">light_access_factor</span><span class="o">=</span><span class="mf">0.67</span><span class="p">),</span>
+    <span class="n">OvershadingTypes</span><span class="o">.</span><span class="n">AVERAGE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">solar_access_factor_winter</span><span class="o">=</span><span class="mf">0.77</span><span class="p">,</span>
+            <span class="n">solar_access_factor_summer</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+            <span class="n">light_access_factor</span><span class="o">=</span><span class="mf">0.83</span><span class="p">),</span>
+    <span class="n">OvershadingTypes</span><span class="o">.</span><span class="n">VERY_LITTLE</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">solar_access_factor_winter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">solar_access_factor_summer</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">light_access_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+<span class="p">}</span>
+
+
+<span class="c"># Table 10</span>
+
+
+<span class="k">def</span> <span class="nf">summer_to_annual</span><span class="p">(</span><span class="n">summer_vals</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">summer_vals</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">translate_10_row</span><span class="p">(</span><span class="n">regions</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="n">climate_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">latitude</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="n">solar_radiation</span><span class="o">=</span><span class="n">summer_to_annual</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]),</span>
+            <span class="n">external_temperature</span><span class="o">=</span><span class="n">summer_to_annual</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">]))</span>
+
+    <span class="n">regions</span><span class="p">[</span><span class="n">climate_data</span><span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">climate_data</span>
+
+
+<span class="n">TABLE_10</span> <span class="o">=</span> <span class="n">csv_to_dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_DATA_FOLDER</span><span class="p">,</span> <span class="s">&#39;table_10.csv&#39;</span><span class="p">),</span> <span class="n">translate_10_row</span><span class="p">)</span>
+
+
+<span class="c"># Table 10c</span>
+<span class="k">def</span> <span class="nf">translate_10c_row</span><span class="p">(</span><span class="n">systems</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">energy_label</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">split_sys_eer</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">packaged_sys_eer</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">systems</span><span class="p">[</span><span class="n">system</span><span class="p">[</span><span class="s">&#39;energy_label&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">system</span>
+
+
+<span class="n">TABLE_10C</span> <span class="o">=</span> <span class="n">csv_to_dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_DATA_FOLDER</span><span class="p">,</span> <span class="s">&#39;table_10c.csv&#39;</span><span class="p">),</span> <span class="n">translate_10c_row</span><span class="p">)</span>
+
+<span class="n">TABLE_D2_7</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">FuelTypes</span><span class="o">.</span><span class="n">GAS</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># !!! Assumes modulating burner !!!</span>
+        <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.7</span><span class="p">),</span>
+        <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.2</span><span class="p">),</span>
+        <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.3</span><span class="p">),</span>
+        <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">22</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.64</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">FuelTypes</span><span class="o">.</span><span class="n">OIL</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.6</span><span class="p">),</span>
+        <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.5</span><span class="p">),</span>
+        <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="o">-</span><span class="mf">7.2</span><span class="p">),</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">TABLE_D7</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">FuelTypes</span><span class="o">.</span><span class="n">GAS</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># Modulating, condensing, type</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.5</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">1.45</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.95</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">6.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.8</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.8</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">6.1</span><span class="p">,</span> <span class="mf">4.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.1</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.1</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">6.59</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.59</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">6.59</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.59</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.7</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.7</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.7</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.64</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.64</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.64</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.64</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.28</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.28</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.28</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.28</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">FuelTypes</span><span class="o">.</span><span class="n">OIL</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c"># Condensing, type</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">):</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.1</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">):</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.1</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.8</span><span class="p">,</span> <span class="mf">1.45</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.8</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.8</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.8</span><span class="p">),</span>
+        <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">):</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.95</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.8</span><span class="p">),</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c"># Table H1</span>
+<span class="n">TABLE_H1</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">SHWCollectorTypes</span><span class="o">.</span><span class="n">EVACUATED_TUBE</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">72</span><span class="p">],</span>
+    <span class="n">SHWCollectorTypes</span><span class="o">.</span><span class="n">FLAT_PLATE_GLAZED</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.75</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">],</span>
+    <span class="n">SHWCollectorTypes</span><span class="o">.</span><span class="n">UNGLAZED</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="c"># Table H2</span>
+<span class="n">TABLE_H2</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c"># !!! Needs finishing</span>
+    <span class="s">&quot;Horizontal&quot;</span><span class="p">:</span> <span class="mi">961</span><span class="p">,</span>
+    <span class="mi">30</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="mi">730</span><span class="p">,</span>
+        <span class="mi">45</span><span class="p">:</span> <span class="mi">785</span><span class="p">,</span>
+        <span class="mi">90</span><span class="p">:</span> <span class="mi">913</span><span class="p">,</span>
+        <span class="mi">135</span><span class="p">:</span> <span class="mi">1027</span><span class="p">,</span>
+        <span class="mi">180</span><span class="p">:</span> <span class="mi">1073</span><span class="p">,</span>
+        <span class="mi">225</span><span class="p">:</span> <span class="mi">1027</span><span class="p">,</span>
+        <span class="mi">270</span><span class="p">:</span> <span class="mi">913</span><span class="p">,</span>
+        <span class="mi">315</span><span class="p">:</span> <span class="mi">785</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="mi">45</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="mi">640</span><span class="p">,</span>
+        <span class="mi">45</span><span class="p">:</span> <span class="mi">686</span><span class="p">,</span>
+        <span class="mi">90</span><span class="p">:</span> <span class="mi">854</span><span class="p">,</span>
+        <span class="mi">135</span><span class="p">:</span> <span class="mi">997</span><span class="p">,</span>
+        <span class="mi">180</span><span class="p">:</span> <span class="mi">1054</span><span class="p">,</span>
+        <span class="mi">225</span><span class="p">:</span> <span class="mi">997</span><span class="p">,</span>
+        <span class="mi">270</span><span class="p">:</span> <span class="mi">854</span><span class="p">,</span>
+        <span class="mi">315</span><span class="p">:</span> <span class="mi">686</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="mi">60</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+        <span class="mi">45</span><span class="p">:</span> <span class="mi">597</span><span class="p">,</span>
+        <span class="mi">90</span><span class="p">:</span> <span class="mi">776</span><span class="p">,</span>
+        <span class="mi">135</span><span class="p">:</span> <span class="mi">927</span><span class="p">,</span>
+        <span class="mi">180</span><span class="p">:</span> <span class="mi">989</span><span class="p">,</span>
+        <span class="mi">225</span><span class="p">:</span> <span class="mi">927</span><span class="p">,</span>
+        <span class="mi">270</span><span class="p">:</span> <span class="mi">776</span><span class="p">,</span>
+        <span class="mi">315</span><span class="p">:</span> <span class="mi">597</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s">&quot;Vertical&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="mi">371</span><span class="p">,</span>
+        <span class="mi">45</span><span class="p">:</span> <span class="mi">440</span><span class="p">,</span>
+        <span class="mi">90</span><span class="p">:</span> <span class="mi">582</span><span class="p">,</span>
+        <span class="mi">135</span><span class="p">:</span> <span class="mi">705</span><span class="p">,</span>
+        <span class="mi">180</span><span class="p">:</span> <span class="mi">746</span><span class="p">,</span>
+        <span class="mi">225</span><span class="p">:</span> <span class="mi">705</span><span class="p">,</span>
+        <span class="mi">270</span><span class="p">:</span> <span class="mi">582</span><span class="p">,</span>
+        <span class="mi">315</span><span class="p">:</span> <span class="mi">440</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">TABLE_H3</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;Horizontal&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.24</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.86</span><span class="p">,</span> <span class="mf">1.37</span><span class="p">,</span> <span class="mf">1.74</span><span class="p">,</span> <span class="mf">1.84</span><span class="p">,</span> <span class="mf">1.78</span><span class="p">,</span> <span class="mf">1.50</span><span class="p">,</span> <span class="mf">1.06</span><span class="p">,</span> <span class="mf">0.63</span><span class="p">,</span> <span class="mf">0.31</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">]),</span>
+    <span class="mi">30</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.63</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="mf">1.30</span><span class="p">,</span> <span class="mf">1.58</span><span class="p">,</span> <span class="mf">1.68</span><span class="p">,</span> <span class="mf">1.62</span><span class="p">,</span> <span class="mf">1.39</span><span class="p">,</span> <span class="mf">1.08</span><span class="p">,</span> <span class="mf">0.74</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">0.29</span><span class="p">]),</span>
+    <span class="mi">45</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.39</span><span class="p">,</span> <span class="mf">0.69</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.27</span><span class="p">,</span> <span class="mf">1.52</span><span class="p">,</span> <span class="mf">1.61</span><span class="p">,</span> <span class="mf">1.55</span><span class="p">,</span> <span class="mf">1.34</span><span class="p">,</span> <span class="mf">1.08</span><span class="p">,</span> <span class="mf">0.79</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">]),</span>
+    <span class="mi">60</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.74</span><span class="p">,</span> <span class="mf">0.97</span><span class="p">,</span> <span class="mf">1.24</span><span class="p">,</span> <span class="mf">1.45</span><span class="p">,</span> <span class="mf">1.54</span><span class="p">,</span> <span class="mf">1.48</span><span class="p">,</span> <span class="mf">1.30</span><span class="p">,</span> <span class="mf">1.09</span><span class="p">,</span> <span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">,</span> <span class="mf">0.37</span><span class="p">]),</span>
+    <span class="s">&quot;Vertical&quot;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.58</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.15</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mf">1.33</span><span class="p">,</span> <span class="mf">1.28</span><span class="p">,</span> <span class="mf">1.15</span><span class="p">,</span> <span class="mf">1.10</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.69</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">]),</span>
+<span class="p">}</span>
+
+<span class="c"># Table H4</span>
+<span class="n">TABLE_H4</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">PVOvershading</span><span class="o">.</span><span class="n">HEAVY</span><span class="p">:</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">PVOvershading</span><span class="o">.</span><span class="n">SIGNIFICANT</span><span class="p">:</span> <span class="o">.</span><span class="mi">65</span><span class="p">,</span>
+    <span class="n">PVOvershading</span><span class="o">.</span><span class="n">MODEST</span><span class="p">:</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">PVOvershading</span><span class="o">.</span><span class="n">NONE_OR_VERY_LITTLE</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">TABLE_H5</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.94</span><span class="p">,</span> <span class="mf">0.70</span><span class="p">,</span> <span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.76</span><span class="p">,</span> <span class="mf">0.94</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+
+<span class="n">TABLE_M1</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">TerrainTypes</span><span class="o">.</span><span class="n">DENSE_URBAN</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">10</span><span class="p">:</span> <span class="o">.</span><span class="mi">56</span><span class="p">,</span>
+        <span class="mi">5</span><span class="p">:</span> <span class="o">.</span><span class="mi">51</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="o">.</span><span class="mi">28</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">TerrainTypes</span><span class="o">.</span><span class="n">SUBURBAN</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">6</span><span class="p">:</span> <span class="o">.</span><span class="mi">67</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="o">.</span><span class="mi">61</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="o">.</span><span class="mi">53</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="o">.</span><span class="mi">39</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">TerrainTypes</span><span class="o">.</span><span class="n">RURAL</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">12</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="mi">7</span><span class="p">:</span> <span class="o">.</span><span class="mi">94</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="o">.</span><span class="mi">86</span><span class="p">,</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="o">.</span><span class="mi">82</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="c"># Table N4</span>
+<span class="n">TABLE_N4</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">143</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>  <span class="c"># PSR;N24.16;N24,9;N16,9;</span>
+    <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">29</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.55</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">41</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.65</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">51</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">36</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">24</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">27</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">1.15</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">1.25</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">1.3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c"># Table N8</span>
+<span class="n">TABLE_N8</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c"># psr;24 hr heating secondary fraction; 16 hr; 11hr; variable</span>
+    <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">,</span> <span class="mf">0.64</span><span class="p">,</span> <span class="mf">0.41</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.28</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">,</span> <span class="mf">0.57</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">,</span> <span class="mf">0.34</span><span class="p">,</span> <span class="mf">0.49</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">,</span> <span class="mf">0.13</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">,</span> <span class="mf">0.29</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.09</span><span class="p">,</span> <span class="mf">0.24</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.55</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.06</span><span class="p">,</span> <span class="mf">0.19</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.09</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">table_n4_heating_days</span><span class="p">(</span><span class="n">psr</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">interpolate_psr_table</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">TABLE_N4</span><span class="p">)</span>
+    <span class="n">N24_16</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">N24_9</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">N16_9</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">N24_16</span><span class="p">,</span> <span class="n">N24_9</span><span class="p">,</span> <span class="n">N16_9</span>
+
+
+<span class="k">def</span> <span class="nf">table_n8_secondary_fraction</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">heating_duration</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">interpolate_psr_table</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">TABLE_N8</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;24&quot;</span><span class="p">:</span>
+        <span class="n">table_col</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;16&quot;</span><span class="p">:</span>
+        <span class="n">table_col</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;11&quot;</span><span class="p">:</span>
+        <span class="n">table_col</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;V&quot;</span>
+        <span class="n">table_col</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="n">interpolated</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">table_col</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">interpolated</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.</span>
+
+
+<span class="c"># !!! Needs completing</span>
+<span class="k">def</span> <span class="nf">get_seasonal_effy_offset</span><span class="p">(</span><span class="n">is_modulating_burner</span><span class="p">,</span>
+                             <span class="n">fuel</span><span class="p">,</span>
+                             <span class="n">boiler_type</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">is_modulating_burner</span>  <span class="c"># !!!</span>
+    <span class="k">return</span> <span class="n">TABLE_D2_7</span><span class="p">[</span><span class="n">fuel</span><span class="o">.</span><span class="n">type</span><span class="p">][</span><span class="n">boiler_type</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">interpolate_psr_table</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span>
+                          <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                          <span class="n">data</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">psr</span> <span class="o">&gt;=</span> <span class="n">key</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">psr</span> <span class="o">&lt;</span> <span class="n">key</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c"># TODO: Interpolation will fail if psr is off bottom of range. Explicitly throw error?</span>
+    <span class="n">psr_data_below</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">table</span> <span class="k">if</span> <span class="n">key</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">psr</span><span class="p">),</span>
+                         <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">psr_data_above</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">table</span> <span class="k">if</span> <span class="n">key</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">psr</span><span class="p">),</span>
+                         <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">frac</span> <span class="o">=</span> <span class="p">(</span><span class="n">psr</span> <span class="o">-</span> <span class="n">key</span><span class="p">(</span><span class="n">psr_data_below</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">key</span><span class="p">(</span><span class="n">psr_data_above</span><span class="p">)</span> <span class="o">-</span> <span class="n">key</span><span class="p">(</span><span class="n">psr_data_below</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">frac</span><span class="p">)</span> <span class="o">*</span> <span class="n">data</span><span class="p">(</span><span class="n">psr_data_below</span><span class="p">)</span> <span class="o">+</span> <span class="n">frac</span> <span class="o">*</span> <span class="n">data</span><span class="p">(</span><span class="n">psr_data_above</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">interpolate_efficiency</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">psr_dataset</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">psr</span> <span class="o">&gt;</span> <span class="n">psr_dataset</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;psr&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">SAPCalculationError</span><span class="p">(</span><span class="s">&quot;PSR too large for this system&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">psr</span> <span class="o">&lt;</span> <span class="n">psr_dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;psr&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="n">SAPCalculationError</span><span class="p">(</span><span class="s">&quot;PSR too small for this system&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">interpolate_psr_table</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">psr_dataset</span><span class="p">,</span>
+                                     <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;psr&#39;</span><span class="p">],</span>
+                                     <span class="n">data</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;space_effy&#39;</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">is_cpsu</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">120</span> <span class="o">&lt;=</span> <span class="n">type_code</span> <span class="o">&lt;=</span> <span class="mi">123</span><span class="p">)</span> <span class="ow">or</span> <span class="n">type_code</span> <span class="o">==</span> <span class="mi">192</span>
+
+
+<span class="k">def</span> <span class="nf">is_storage_heater</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">401</span> <span class="o">&lt;=</span> <span class="n">type_code</span> <span class="o">&lt;=</span> <span class="mi">407</span>  <span class="c"># (408 is an integrated system)</span>
+
+
+<span class="k">def</span> <span class="nf">is_off_peak_only_system</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">type_code</span> <span class="o">==</span> <span class="mi">421</span> <span class="ow">or</span> <span class="n">type_code</span> <span class="o">==</span> <span class="mi">515</span>
+
+
+<span class="k">def</span> <span class="nf">is_integrated_system</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">type_code</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">408</span><span class="p">,</span> <span class="mi">422</span><span class="p">,</span> <span class="mi">423</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">is_electric_boiler</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">191</span> <span class="o">&lt;=</span> <span class="n">type_code</span> <span class="o">&lt;=</span> <span class="mi">196</span>
+
+
+<span class="k">def</span> <span class="nf">is_boiler</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">type_code</span> <span class="o">&lt;</span> <span class="mi">200</span>
+
+
+<span class="k">def</span> <span class="nf">is_heat_pump</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">((</span><span class="mi">201</span> <span class="o">&lt;=</span> <span class="n">type_code</span> <span class="o">&lt;=</span> <span class="mi">207</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="p">(</span><span class="mi">521</span> <span class="o">&lt;=</span> <span class="n">type_code</span> <span class="o">&lt;=</span> <span class="mi">527</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">is_room_heater</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">601</span> <span class="o">&lt;=</span> <span class="n">type_code</span> <span class="o">&lt;=</span> <span class="mi">694</span>
+
+
+<span class="k">def</span> <span class="nf">is_warm_air_system</span><span class="p">(</span><span class="n">type_code</span><span class="p">):</span>
+    <span class="c"># Note overlap with heat pumps</span>
+    <span class="k">return</span> <span class="mi">501</span> <span class="o">&lt;=</span> <span class="n">type_code</span> <span class="o">&lt;=</span> <span class="mi">527</span>
+
+
+<span class="k">def</span> <span class="nf">system_type_from_sap_code</span><span class="p">(</span><span class="n">system_code</span><span class="p">,</span> <span class="n">system_data</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s">&#39;boiler_type&#39;</span> <span class="ow">in</span> <span class="n">system_data</span> <span class="ow">and</span>
+                <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;boiler_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">BoilerTypes</span><span class="o">.</span><span class="n">COMBI</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span>
+    <span class="k">elif</span> <span class="n">is_cpsu</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span>
+
+    <span class="k">elif</span> <span class="n">is_off_peak_only_system</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">off_peak_only</span>
+
+    <span class="k">elif</span> <span class="n">is_integrated_system</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">integrated_system</span>
+
+    <span class="k">elif</span> <span class="n">is_storage_heater</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_heater</span>
+
+    <span class="k">elif</span> <span class="n">is_electric_boiler</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">electric_boiler</span>
+
+    <span class="k">elif</span> <span class="n">is_boiler</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span>
+
+    <span class="k">elif</span> <span class="n">is_heat_pump</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">heat_pump</span>
+
+    <span class="k">elif</span> <span class="n">is_room_heater</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">room_heater</span>
+
+    <span class="k">elif</span> <span class="n">is_warm_air_system</span><span class="p">(</span><span class="n">system_code</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">warm_air</span>
+
+    <span class="k">return</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">misc</span>
+
+
+<span class="n">FLOOR_INFILTRATION</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">FloorTypes</span><span class="o">.</span><span class="n">SUSPENDED_TIMBER_UNSEALED</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">FloorTypes</span><span class="o">.</span><span class="n">SUSPENDED_TIMBER_SEALED</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">FloorTypes</span><span class="o">.</span><span class="n">NOT_SUSPENDED_TIMBER</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">FloorTypes</span><span class="o">.</span><span class="n">OTHER</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

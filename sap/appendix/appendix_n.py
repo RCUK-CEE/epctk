@@ -5,17 +5,20 @@ Appendix N: Heat Pumps and Micro CHP
 Additional tables and functions implementing Appendix N of SAP
 which describes heat pumps and micro CHP units
 
+
+
 """
+# types is used for MethodType, which is use to dynamically add methods to heating systems
 import types
 
 import numpy
 
-from ..sap_constants import SUMMER_MONTHS
+from ..tables import (interpolate_efficiency, interpolate_psr_table,
+                                   table_n8_secondary_fraction, table_n4_heating_days)
+from ..constants import SUMMER_MONTHS, USE_TABLE_4D_FOR_RESPONSIVENESS
 from ..heating_system_types import HeatingSystem
-from ..utils import weighted_effy
-from ..sap_tables import interpolate_efficiency, interpolate_psr_table, table_n8_secondary_fraction, \
-    table_n4_heating_days, USE_TABLE_4D_FOR_RESPONSIVENESS
 from ..sap_types import HeatingTypes, FuelTypes
+from ..utils import weighted_effy
 
 
 def add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data):
@@ -90,6 +93,7 @@ def add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data):
                 water_effy[i] = 100
         return water_effy
 
+    # Dynamically add a method to the system
     sys.water_heat_effy = types.MethodType(heat_pump_water_effy, sys)
     sys.space_heat_effy = types.MethodType(heat_pump_space_effy, sys)
 

@@ -5,12 +5,12 @@ Appendix G: Flue gas heat recovery systems and Waste water heat recovery systems
 """
 import numpy
 
-from ..sap_constants import DAYS_PER_MONTH
-from ..pcdf import get_wwhr_system, get_fghr_system
-from ..sap_tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
-                            combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
-from ..sap_types import HeatingTypes
+from ..tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
+                                   combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
 from .appendix_m import configure_pv_system
+from ..constants import DAYS_PER_MONTH
+from ..pcdf import get_wwhr_system, get_fghr_system
+from ..sap_types import HeatingTypes
 
 
 def configure_wwhr(dwelling):

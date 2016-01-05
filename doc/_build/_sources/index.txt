@@ -9,11 +9,23 @@ Welcome to SAPcalc's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   appendix_a
-   appendix_b
-   appendix_c
+    part_2
+    sap_tables
+
+    appendix_a
+    appendix_b
+    appendix_c
+    appendix_d
+    appendix_e
+    appendix_f
+    appendix_g
+    appendix_h
+    appendix_j
+    appendix_m
+    appendix_n
+    appendix_t
 
 
 

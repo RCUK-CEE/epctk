@@ -2,12 +2,13 @@ import math
 
 import numpy
 
-from .utils import sum_it, monthly_to_annual
-from .sap_constants import DAYS_PER_MONTH, HEATING_LATITUDE, SUMMER_MONTHS
-from .sap_tables import (MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
-                         ELECTRICITY_SOLD, ELECTRICITY_OFFSET, TABLE_H5)
-from .sap_types import HeatingTypes, VentilationTypes
+from sap.fuels import ELECTRICITY_OFFSET, ELECTRICITY_SOLD
+from .tables import (MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
+                                TABLE_H5)
 from .appendix import appendix_g, appendix_m
+from .constants import DAYS_PER_MONTH, HEATING_LATITUDE, SUMMER_MONTHS
+from .sap_types import HeatingTypes, VentilationTypes
+from .utils import sum_it, monthly_to_annual
 
 
 def geometry(dwelling):
@@ -122,9 +123,9 @@ def ventilation(dwelling):
 
     if dwelling.ventilation_type == VentilationTypes.NATURAL:
         dwelling.infiltration_ach = numpy.where(
-            effective_inf_rate < 1.,
-            0.5 + (effective_inf_rate ** 2) * 0.5,
-            effective_inf_rate)
+                effective_inf_rate < 1.,
+                0.5 + (effective_inf_rate ** 2) * 0.5,
+                effective_inf_rate)
 
     elif dwelling.ventilation_type == VentilationTypes.MV:
         system_ach = 0.5
@@ -135,9 +136,9 @@ def ventilation(dwelling):
                                        VentilationTypes.PIV_FROM_OUTSIDE]:
         system_ach = 0.5
         dwelling.infiltration_ach = numpy.where(
-            effective_inf_rate < 0.5 * system_ach,
-            system_ach,
-            effective_inf_rate + 0.5 * system_ach)
+                effective_inf_rate < 0.5 * system_ach,
+                system_ach,
+                effective_inf_rate + 0.5 * system_ach)
     elif dwelling.ventilation_type == VentilationTypes.MVHR:
         system_ach = 0.5
         dwelling.infiltration_ach = (
@@ -151,7 +152,7 @@ def ventilation(dwelling):
                 dwelling.infiltration_ach = numpy.array(appendix_q_system['ach_rates'])
 
     dwelling.infiltration_ach_annual = monthly_to_annual(
-        dwelling.infiltration_ach)
+            dwelling.infiltration_ach)
 
 
 def heat_loss(dwelling):
@@ -169,7 +170,7 @@ def heat_loss(dwelling):
 
     UA = sum(e.Uvalue * e.area for e in dwelling.heat_loss_elements)
     A_bridging = sum(
-        e.area for e in dwelling.heat_loss_elements if e.is_external)
+            e.area for e in dwelling.heat_loss_elements if e.is_external)
     if dwelling.get("Uthermalbridges") is not None:
         h_bridging = dwelling.Uthermalbridges * A_bridging
     else:
@@ -440,7 +441,7 @@ def fghrs_solar_input(dwelling, fghrs, hw_energy_content, daily_hot_water_use):
 
     volume_ratio = effective_solar_volume / daily_hot_water_use
     storage_volume_factor = numpy.minimum(
-        1., 1 + 0.2 * numpy.log(volume_ratio))
+            1., 1 + 0.2 * numpy.log(volume_ratio))
     Qsolar_annual = available_energy * utilisation * storage_volume_factor
     Qsolar = -Qsolar_annual * \
              dwelling.fghrs['monthly_solar_hw_factors'] * DAYS_PER_MONTH / 365
@@ -474,20 +475,20 @@ def lighting_consumption(dwelling):
 
     if not dwelling.get('low_energy_bulb_ratio'):
         dwelling.low_energy_bulb_ratio = int(
-            100 * float(dwelling.lighting_outlets_low_energy) / dwelling.lighting_outlets_total + .5) / 100.
+                100 * float(dwelling.lighting_outlets_low_energy) / dwelling.lighting_outlets_total + .5) / 100.
 
     C1 = 1 - 0.5 * dwelling.low_energy_bulb_ratio
     GLwin = GL_sum(o for o in dwelling.openings if not o.opening_type.roof_window and not o.opening_type.bfrc_data) * \
             dwelling.light_access_factor / dwelling.GFA
     GLroof = GL_sum(
-        o for o in dwelling.openings if o.opening_type.roof_window and not o.opening_type.bfrc_data) / dwelling.GFA
+            o for o in dwelling.openings if o.opening_type.roof_window and not o.opening_type.bfrc_data) / dwelling.GFA
 
     # Use frame factor of 0.7 for bfrc rated windows
     GLwin_bfrc = GL_sum(o for o in dwelling.openings if not o.opening_type.roof_window and o.opening_type.bfrc_data) * \
                  .7 * .9 * dwelling.light_access_factor / dwelling.GFA
     GLroof_bfrc = GL_sum(
-        o for o in dwelling.openings if
-        o.opening_type.roof_window and o.opening_type.bfrc_data) * .7 * .9 / dwelling.GFA
+            o for o in dwelling.openings if
+            o.opening_type.roof_window and o.opening_type.bfrc_data) * .7 * .9 / dwelling.GFA
 
     GL = GLwin + GLroof + GLwin_bfrc + GLroof_bfrc
     C2 = 52.2 * GL ** 2 - 9.94 * GL + 1.433 if GL <= 0.095 else 0.96
@@ -558,7 +559,7 @@ def internal_heat_gain(dwelling):
 class SolarConstants:
     def __init__(self, latitude):
         declination = numpy.array(
-            [-20.7, -12.8, -1.8, 9.8, 18.8, 23.1, 21.2, 13.7, 2.9, -8.7, -18.4, -23])
+                [-20.7, -12.8, -1.8, 9.8, 18.8, 23.1, 21.2, 13.7, 2.9, -8.7, -18.4, -23])
 
         delta_lat = latitude - declination
         delta_lat_sq = delta_lat ** 2
@@ -599,12 +600,13 @@ def solar_access_factor_summer(dwelling, opening):
 
 def solar(dwelling):
     dwelling.solar_gain_winter = sum(
-        0.9 * solar_access_factor_winter(dwelling, o) * o.opening_type.gvalue * o.opening_type.frame_factor * o.area *
-        incident_solar(dwelling.Igh_heating,
-                       solar_constants_heating,
-                       o.orientation_degrees * math.pi / 180,
-                       o.opening_type.roof_window)
-        for o in dwelling.openings)
+            0.9 * solar_access_factor_winter(dwelling,
+                                             o) * o.opening_type.gvalue * o.opening_type.frame_factor * o.area *
+            incident_solar(dwelling.Igh_heating,
+                           solar_constants_heating,
+                           o.orientation_degrees * math.pi / 180,
+                           o.opening_type.roof_window)
+            for o in dwelling.openings)
 
     # for o in dwelling.openings:
     #     flux=incident_solar(dwelling.Igh_heating,
@@ -619,12 +621,13 @@ def solar(dwelling):
 
     # !!! Really only want to do this if we have cooling
     dwelling.solar_gain_summer = sum(
-        0.9 * solar_access_factor_summer(dwelling, o) * o.opening_type.gvalue * o.opening_type.frame_factor * o.area *
-        incident_solar(dwelling.Igh_summer,
-                       SolarConstants(dwelling.latitude),
-                       o.orientation_degrees * math.pi / 180,
-                       o.opening_type.roof_window)
-        for o in dwelling.openings)
+            0.9 * solar_access_factor_summer(dwelling,
+                                             o) * o.opening_type.gvalue * o.opening_type.frame_factor * o.area *
+            incident_solar(dwelling.Igh_summer,
+                           SolarConstants(dwelling.latitude),
+                           o.orientation_degrees * math.pi / 180,
+                           o.opening_type.roof_window)
+            for o in dwelling.openings)
 
     dwelling.summer_heat_gains = dwelling.total_internal_gains_summer + \
                                  dwelling.solar_gain_summer
@@ -638,7 +641,7 @@ def heating_requirement(dwelling):
         dwelling.thermal_mass_parameter = ka / dwelling.GFA
 
     dwelling.heat_calc_results = calc_heat_required(
-        dwelling, dwelling.Texternal_heating, dwelling.winter_heat_gains)
+            dwelling, dwelling.Texternal_heating, dwelling.winter_heat_gains)
     Q_required = dwelling.heat_calc_results['heat_required']
     for i in SUMMER_MONTHS:
         Q_required[i] = 0
@@ -670,8 +673,8 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
                                           dwelling.h)
 
     Tmean_living_area = Tmean(
-        Texternal, dwelling.living_area_Theating, Tno_heat_living,
-        tau, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m, living_space=True)
+            Texternal, dwelling.living_area_Theating, Tno_heat_living,
+            tau, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m, living_space=True)
 
     if dwelling.main_heating_fraction < 1 and dwelling.get('heating_systems_heat_separate_areas'):
         if dwelling.main_heating_fraction > dwelling.living_area_fraction:
@@ -680,22 +683,23 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
                            (1 - dwelling.living_area_fraction)
 
             Tmean_other_1 = temperature_rest_of_dwelling(
-                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
-                N16_9_m)
+                    dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
+                    N16_9_m)
             Tmean_other_2 = temperature_rest_of_dwelling(
-                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
-                N16_9_m)
+                    dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
+                    N16_9_m)
 
             Tmean_other = Tmean_other_1 * \
                           weight_1 + Tmean_other_2 * (1 - weight_1)
         else:
             # only sys2 does rest of house
             Tmean_other = temperature_rest_of_dwelling(
-                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
-                N16_9_m)
+                    dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
+                    N16_9_m)
     else:
         Tmean_other = temperature_rest_of_dwelling(
-            dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m)
+                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
+                N16_9_m)
 
     if not dwelling.get('living_area_fraction'):
         dwelling.living_area_fraction = dwelling.living_area / dwelling.GFA
@@ -706,19 +710,19 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
     L = dwelling.h * (meanT - Texternal)
     utilisation = heat_utilisation_factor(a, heat_gains, L)
     return dict(
-        tau=tau,
-        alpha=a,
-        Texternal=Texternal,
-        Tmean_living_area=Tmean_living_area,
-        Tmean_other=Tmean_other,
-        util_living=util_living,
-        Tmean=meanT,
-        loss=L,
-        utilisation=utilisation,
-        useful_gain=utilisation * heat_gains,
-        heat_required=(range_cooker_factor(dwelling) *
-                       0.024 * (
-                           L - utilisation * heat_gains) * DAYS_PER_MONTH),
+            tau=tau,
+            alpha=a,
+            Texternal=Texternal,
+            Tmean_living_area=Tmean_living_area,
+            Tmean_other=Tmean_other,
+            util_living=util_living,
+            Tmean=meanT,
+            loss=L,
+            utilisation=utilisation,
+            useful_gain=utilisation * heat_gains,
+            heat_required=(range_cooker_factor(dwelling) *
+                           0.024 * (
+                               L - utilisation * heat_gains) * DAYS_PER_MONTH),
     )
 
 
@@ -729,7 +733,7 @@ def temperature_rest_of_dwelling(dwelling, Texternal, tau, a, L, heat_gains, con
                                          Theat_other,
                                          dwelling.heating_responsiveness,
                                          heat_utilisation_factor(
-                                             a, heat_gains, L),
+                                                 a, heat_gains, L),
                                          heat_gains,
                                          dwelling.h)
     return Tmean(Texternal, Theat_other, Tno_heat_other, tau, control_type, N24_16_m, N24_9_m, N16_9_m,
@@ -837,7 +841,7 @@ def cooling_requirement(dwelling):
 
     # No cooling in months where heating would be more than half of cooling
     heat_calc_results = calc_heat_required(
-        dwelling, Texternal_summer, G + dwelling.heating_system_pump_gain)
+            dwelling, Texternal_summer, G + dwelling.heating_system_pump_gain)
     Qheat_summer = heat_calc_results['heat_required']
     Qrequired = numpy.where(3 * Qheat_summer < Qrequired,
                             Qrequired,
@@ -898,7 +902,8 @@ def systems(dwelling):
     dwelling.water_effy = dwelling.water_sys.water_heat_effy(dwelling.output_from_water_heater)
 
     if hasattr(dwelling.water_sys, "keep_hot_elec_consumption"):
-        dwelling.Q_waterheat = 100 * (dwelling.output_from_water_heater - dwelling.combi_loss_monthly) / dwelling.water_effy
+        dwelling.Q_waterheat = 100 * (
+        dwelling.output_from_water_heater - dwelling.combi_loss_monthly) / dwelling.water_effy
     else:
         dwelling.Q_waterheat = 100 * dwelling.output_from_water_heater / dwelling.water_effy
 
@@ -1211,7 +1216,7 @@ def fee(dwelling):
     r = dwelling.report
     r.start_section("", "FEE Calculation")
     r.add_single_result(
-        "Fabric energy efficiency (kWh/m2)", "109", dwelling.fee_rating)
+            "Fabric energy efficiency (kWh/m2)", "109", dwelling.fee_rating)
 
 
 def der(dwelling):
@@ -1220,7 +1225,7 @@ def der(dwelling):
     r = dwelling.report
     r.start_section("", "DER Calculation")
     r.add_single_result(
-        "Dwelling emissions (kg/yr)", "272", dwelling.emissions)
+            "Dwelling emissions (kg/yr)", "272", dwelling.emissions)
     r.add_single_result("DER rating (kg/m2/year)", "273", dwelling.der_rating)
 
 
@@ -1243,9 +1248,9 @@ def ter(dwelling, heating_fuel):
     r = dwelling.report
     r.start_section("", "TER Calculation")
     r.add_single_result(
-        "Emissions per m2 for space and water heating", "272a", C_h / dwelling.GFA)
+            "Emissions per m2 for space and water heating", "272a", C_h / dwelling.GFA)
     r.add_single_result(
-        "Emissions per m2 for lighting", "272b", C_l / dwelling.GFA)
+            "Emissions per m2 for lighting", "272b", C_l / dwelling.GFA)
     r.add_single_result("Heating fuel factor", None, FF)
     r.add_single_result("Heating fuel emission factor adjustment", None, EFA_h)
     r.add_single_result("Electricity emission factor adjustment", None, EFA_l)

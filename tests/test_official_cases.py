@@ -4,6 +4,7 @@ import pickle
 import sys
 import unittest
 
+import sap.appendix.appendix_t
 from sap import runner
 from sap.dwelling import Dwelling, log_dwelling
 from sap.io import input_conversion_rules, yaml_io
@@ -11,6 +12,8 @@ from sap.utils import SAPCalculationError, ALL_PARAMS
 from tests import output_checker
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
+
+_FOLDER = os.path.dirname(__file__)
 
 SAP_REGIONS = {
     '2.rtf': 11,
@@ -91,24 +94,24 @@ def parse_input_file(test_case_id):
                       reference_case_parser.whole_file)
 
 
-def load_reference_case(case_name, parser, force_reparse):
+def load_reference_case(case_path, parser, force_reparse):
     """
     Load the given file with the given parser. First attempts to
     load the cached parsed file (pickled), if that does not exist
     or if force_reparse is true, will reparse the original file
 
-    :param case_name:
+    :param case_path:
     :param parser:
     :param force_reparse:
     :return:
     """
-    pickled_file = os.path.join('.', 'pickled_reference_cases', os.path.basename(case_name) + ".pkl")
+    pickled_file = os.path.join(_FOLDER, 'pickled_reference_cases', os.path.basename(case_path) + ".pkl")
 
     if os.path.exists(pickled_file) and not force_reparse:
         case = pickle.load(open(pickled_file, "rb"))
     else:
-        print("Reparsing ", case_name)
-        case = parse_file(case_name, parser)
+        print("Reparsing ", case_path)
+        case = parse_file(case_path, parser)
         pickle.dump(case, open(pickled_file, "w"))
 
     return case
@@ -130,10 +133,12 @@ def run_dwelling(fname, dwelling):
         dwelling['sap_region'] = 11
 
     runner.run_sap(dwelling)
-    runner.run_improvements(dwelling)
     runner.run_fee(dwelling)
     runner.run_der(dwelling)
     runner.run_ter(dwelling)
+
+    # FIXME: ongoing problems in applying Appendix T improvements
+    # sap.appendix.appendix_t.run_improvements(dwelling)
 
 
 def run_sap_only(fname, dwelling):
@@ -154,12 +159,11 @@ def run_sap_only(fname, dwelling):
     runner.run_sap(dwelling)
 
 
-
 def run_case(fname, reparse):
     logging.warning("RUNNING %s" % (fname,))
 
     try:
-        yaml_file = os.path.join("yaml_test_cases", os.path.basename(fname) + ".yml")
+        yaml_file = os.path.join(_FOLDER, "yaml_test_cases", os.path.basename(fname) + ".yml")
         if os.path.exists(yaml_file) and not reparse:
             dwelling = yaml_io.from_yaml(yaml_file)
         else:
@@ -205,7 +209,7 @@ def run_sample_cases(force_reparse):
         # gain from central heating pumps in the summer cooling demand
         # calc?
 
-        run_case(os.path.join(".reference_dwellings", "%d.rtf" % id), force_reparse)
+        run_case(os.path.join("reference_dwellings", "%d.rtf" % id), force_reparse)
 
 
 def run_official_cases(cases, maxruns=None, reparse=False):
@@ -214,7 +218,7 @@ def run_official_cases(cases, maxruns=None, reparse=False):
         if filename in SKIP:
             continue
 
-        fname = os.path.join('.', 'official_reference_cases', filename)
+        fname = os.path.join(_FOLDER, 'official_reference_cases', filename)
         # print "RUNNING: ",fname
         run_case(fname, reparse)
         count += 1

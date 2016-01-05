@@ -1,7 +1,7 @@
 """
-Appendix D
+Appendix E
 ~~~~~~~~~~
 
-Appendix D is for manufacturers and not used for calculating SAP ratings
+Appendix E is for manufacturers and not used for calculating SAP ratings
 
 """

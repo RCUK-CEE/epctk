@@ -13,7 +13,7 @@ periods per day. It is not valid for other tariffs.
 """
 import numpy
 
-from ..sap_constants import DAYS_PER_MONTH, SUMMER_MONTHS
+from ..constants import DAYS_PER_MONTH, SUMMER_MONTHS
 
 
 def cpsu_on_peak(system, dwelling):

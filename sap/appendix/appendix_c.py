@@ -27,17 +27,6 @@ class CommunityHeating(HeatingSystem):
     """
 
     def __init__(self, heat_sources, sap_distribution_type):
-        """
-        Create CommunityHeating
-
-        Args:
-            heat_sources (List[dict]): list of heat source dicts
-            sap_distribution_type (CommunityDistributionTypes):
-
-        Returns:
-
-
-        """
         # TODO use the super class initializer
         # super().__init__(HeatingTypes.community, winter_effy, summer_effy,
         #          False, False, False,
@@ -115,12 +104,13 @@ class CommunityHeating(HeatingSystem):
             if hs['fuel'].is_mains_gas:
                 fuel_factor = hs['fuel'].fuel_factor
                 emission_factor_adjustment = hs['fuel'].emission_factor_adjustment
-                return
+                self.fuel = CommunityFuel(fuel_factor, emission_factor_adjustment)
+                break
+        else:
+            fuel_factor = biggest_contributor['fuel'].fuel_factor
+            emission_factor_adjustment = biggest_contributor['fuel'].emission_factor_adjustment
 
-        fuel_factor = biggest_contributor['fuel'].fuel_factor
-        emission_factor_adjustment = biggest_contributor['fuel'].emission_factor_adjustment
-
-        self.fuel = CommunityFuel(fuel_factor, emission_factor_adjustment)
+            self.fuel = CommunityFuel(fuel_factor, emission_factor_adjustment)
 
     def space_heat_effy(self, _Q_space):
         """

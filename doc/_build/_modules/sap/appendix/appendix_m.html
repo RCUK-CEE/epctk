@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>sap.appendix.appendix_m &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for sap.appendix.appendix_m</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Appendix M: Energy from Photovoltaic (PV) technology, small and micro wind turbines and small- scale hydro-electric generators</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">..sap_tables</span> <span class="kn">import</span> <span class="n">TABLE_H2</span><span class="p">,</span> <span class="n">TABLE_H4</span><span class="p">,</span> <span class="n">TABLE_M1</span>
+
+
+<span class="k">def</span> <span class="nf">configure_pv_system</span><span class="p">(</span><span class="n">pv_system</span><span class="p">):</span>
+    <span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;overshading_factor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">TABLE_H4</span><span class="p">[</span><span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;overshading_category&#39;</span><span class="p">]]</span>
+
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;pitch&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s">&quot;Horizontal&quot;</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;Igh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">TABLE_H2</span><span class="p">[</span><span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;pitch&#39;</span><span class="p">]][</span><span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;orientation&#39;</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;Igh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">TABLE_H2</span><span class="p">[</span><span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;pitch&#39;</span><span class="p">]]</span>
+
+
+<span class="k">def</span> <span class="nf">configure_pv</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">pv_system</span> <span class="ow">in</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;photovoltaic_systems&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="n">configure_pv_system</span><span class="p">(</span><span class="n">pv_system</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="configure_wind_turbines"><a class="viewcode-back" href="../../../appendix_m.html#sap.appendix.appendix_m.configure_wind_turbines">[docs]</a><span class="k">def</span> <span class="nf">configure_wind_turbines</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the wind turbine speed correction factor `wind_turbine_speed_correction_factor`</span>
+<span class="sd">    if the dwelling has 1 or more wind turbines, using interpolated values from Table M1</span>
+
+<span class="sd">    :param dwelling:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;N_wind_turbines&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_turbine_speed_correction_factor</span> <span class="o">=</span> <span class="n">m1_correction_factor</span><span class="p">(</span>
+                <span class="n">dwelling</span><span class="o">.</span><span class="n">terrain_type</span><span class="p">,</span>
+                <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_turbine_hub_height</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="m1_correction_factor"><a class="viewcode-back" href="../../../appendix_m.html#sap.appendix.appendix_m.m1_correction_factor">[docs]</a><span class="k">def</span> <span class="nf">m1_correction_factor</span><span class="p">(</span><span class="n">terrain_type</span><span class="p">,</span> <span class="n">wind_speed</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolate the correction factor for the given terrain type</span>
+<span class="sd">    and standardised wind speed using Table M1</span>
+
+<span class="sd">    :param terrain_type:</span>
+<span class="sd">    :param wind_speed:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">interpolation_vals</span> <span class="o">=</span> <span class="n">TABLE_M1</span><span class="p">[</span><span class="n">terrain_type</span><span class="p">]</span>
+
+    <span class="n">closest_above</span> <span class="o">=</span> <span class="mi">999</span>
+    <span class="n">closest_below</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">interpolation_vals</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">wind_speed</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">closest_above</span><span class="p">:</span>
+            <span class="n">closest_above</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="k">if</span> <span class="n">wind_speed</span> <span class="o">&gt;=</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="n">closest_below</span><span class="p">:</span>
+            <span class="n">closest_below</span> <span class="o">=</span> <span class="n">k</span>
+
+    <span class="k">if</span> <span class="n">closest_above</span> <span class="o">==</span> <span class="mi">999</span><span class="p">:</span>
+        <span class="c"># Outside of range, return largest</span>
+        <span class="k">return</span> <span class="n">interpolation_vals</span><span class="p">[</span><span class="n">closest_below</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">closest_above</span> <span class="o">==</span> <span class="n">closest_below</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">interpolation_vals</span><span class="p">[</span><span class="n">closest_below</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">interpolation_vals</span><span class="p">[</span><span class="n">closest_below</span><span class="p">]</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">interpolation_vals</span><span class="p">[</span><span class="n">closest_above</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">v1</span> <span class="o">+</span> <span class="p">(</span><span class="n">v2</span> <span class="o">-</span> <span class="n">v1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">wind_speed</span> <span class="o">-</span> <span class="n">closest_below</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">closest_above</span> <span class="o">-</span> <span class="n">closest_below</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">pv</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;photovoltaic_systems&#39;</span><span class="p">):</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">pv_electricity_onsite_fraction</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">pv_electricity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">pv_system</span> <span class="ow">in</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">photovoltaic_systems</span><span class="p">:</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">pv_electricity</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">0.8</span> <span class="o">*</span> <span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;kWp&#39;</span><span class="p">]</span> <span class="o">*</span>
+                                        <span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;Igh&#39;</span><span class="p">]</span> <span class="o">*</span>
+                                        <span class="n">pv_system</span><span class="p">[</span><span class="s">&#39;overshading_factor&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">pv_electricity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">pv_electricity_onsite_fraction</span> <span class="o">=</span> <span class="mf">0.</span>
+
+
+<div class="viewcode-block" id="wind_turbines"><a class="viewcode-back" href="../../../appendix_m.html#sap.appendix.appendix_m.wind_turbines">[docs]</a><span class="k">def</span> <span class="nf">wind_turbines</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the wind power generated and the graction of wind energy generated onsite</span>
+
+<span class="sd">    :param dwelling:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;N_wind_turbines&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">wind_speed</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_turbine_speed_correction_factor</span>
+        <span class="n">PA</span> <span class="o">=</span> <span class="o">.</span><span class="mi">6125</span> <span class="o">*</span> <span class="n">wind_speed</span> <span class="o">**</span> <span class="mi">3</span>
+        <span class="n">CP_G_IE</span> <span class="o">=</span> <span class="o">.</span><span class="mi">24</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="o">.</span><span class="mi">25</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_turbine_rotor_diameter</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">p_wind</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="n">PA</span> <span class="o">*</span> <span class="n">CP_G_IE</span>
+
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_electricity</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">N_wind_turbines</span> <span class="o">*</span> <span class="n">p_wind</span> <span class="o">*</span> <span class="mf">1.9</span> <span class="o">*</span> <span class="mi">8766</span> <span class="o">*</span> <span class="mf">0.001</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_electricity_onsite_fraction</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_electricity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_electricity_onsite_fraction</span> <span class="o">=</span> <span class="mi">0</span>
+
+</div>
+<span class="k">def</span> <span class="nf">hydro</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hydro_electricity&#39;</span><span class="p">):</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">hydro_electricity_onsite_fraction</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">hydro_electricity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">hydro_electricity_onsite_fraction</span> <span class="o">=</span> <span class="mf">0.</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

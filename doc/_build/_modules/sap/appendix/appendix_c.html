@@ -68,17 +68,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">heat_sources</span><span class="p">,</span> <span class="n">sap_distribution_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create CommunityHeating</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            heat_sources (List[dict]): list of heat source dicts</span>
-<span class="sd">            sap_distribution_type (CommunityDistributionTypes):</span>
-
-<span class="sd">        Returns:</span>
-
-
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># TODO use the super class initializer</span>
+        <span class="c"># super().__init__(HeatingTypes.community, winter_effy, summer_effy,</span>
+        <span class="c">#          False, False, False,</span>
+        <span class="c">#          2, 0.1, CommunityFuel(fuel_factor, emission_factor_adjustment))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_community_heating</span> <span class="o">=</span> <span class="bp">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table2b_row</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c"># !!! Assume indirect cylinder inside dwelling</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">system_type</span> <span class="o">=</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">community</span>
@@ -152,12 +145,13 @@
             <span class="k">if</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_mains_gas</span><span class="p">:</span>
                 <span class="n">fuel_factor</span> <span class="o">=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fuel_factor</span>
                 <span class="n">emission_factor_adjustment</span> <span class="o">=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">emission_factor_adjustment</span>
-                <span class="k">return</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fuel</span> <span class="o">=</span> <span class="n">CommunityFuel</span><span class="p">(</span><span class="n">fuel_factor</span><span class="p">,</span> <span class="n">emission_factor_adjustment</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fuel_factor</span> <span class="o">=</span> <span class="n">biggest_contributor</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fuel_factor</span>
+            <span class="n">emission_factor_adjustment</span> <span class="o">=</span> <span class="n">biggest_contributor</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">emission_factor_adjustment</span>
 
-        <span class="n">fuel_factor</span> <span class="o">=</span> <span class="n">biggest_contributor</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fuel_factor</span>
-        <span class="n">emission_factor_adjustment</span> <span class="o">=</span> <span class="n">biggest_contributor</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">emission_factor_adjustment</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">fuel</span> <span class="o">=</span> <span class="n">CommunityFuel</span><span class="p">(</span><span class="n">fuel_factor</span><span class="p">,</span> <span class="n">emission_factor_adjustment</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fuel</span> <span class="o">=</span> <span class="n">CommunityFuel</span><span class="p">(</span><span class="n">fuel_factor</span><span class="p">,</span> <span class="n">emission_factor_adjustment</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommunityHeating.space_heat_effy"><a class="viewcode-back" href="../../../appendix_c.html#sap.appendix.appendix_c.CommunityHeating.space_heat_effy">[docs]</a>    <span class="k">def</span> <span class="nf">space_heat_effy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_Q_space</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

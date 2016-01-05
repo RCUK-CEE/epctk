@@ -10,3 +10,5 @@ HEATING_LATITUDE = 53.4
 LIVING_AREA_T_HEATING = 21
 COOLING_BASE_TEMPERATURE = 24
 SUMMER_MONTHS = list(range(5, 9))
+USE_TABLE_4D_FOR_RESPONSIVENESS = -99
+COMMUNITY_FUEL_ID = -42 # Arbitrary constant for community fuel type, mostly for use of hash function

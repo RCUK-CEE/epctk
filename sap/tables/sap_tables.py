@@ -3,32 +3,59 @@ import os.path
 
 import numpy
 
-from .utils import SAPCalculationError, csv_to_dict, float_or_zero
-from .fuels import ElectricityTariff, ELECTRICITY_7HR, ELECTRICITY_10HR, ELECTRICITY_24HR
-from .sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes,
-                        HeatingTypes, PVOvershading, HeatEmitters,
-                        VentilationTypes, BoilerTypes, FloorTypes)
-from .appendix.appendix_f import cpsu_store, elec_cpsu_store
+from ..appendix.appendix_f import cpsu_store, elec_cpsu_store
+from ..sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes,
+                           HeatingTypes, PVOvershading, VentilationTypes, BoilerTypes, FloorTypes)
+from ..utils import SAPCalculationError, csv_to_dict
 
-_DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
-
-USE_TABLE_4D_FOR_RESPONSIVENESS = -99
-
-ELECTRICITY_OFFSET = ElectricityTariff(37, 37, 1, 1)
-ELECTRICITY_SOLD = ElectricityTariff(36, 36, 1, 1)
+_DATA_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'data')
 
 
-# ----------------------------
-# SAP STANDARD NUMBERED TABLES
-# ----------------------------
-# Table 1b part 1
-def occupancy(GFA):
-    return 1 + 1.76 * (1 - math.exp(-0.000349 * (GFA - 13.9) ** 2)) + 0.0013 * (
-        GFA - 13.9) if GFA > 13.9 else 1
+def table_1b_occupancy(TFA):
+    """
+    Table 1b Part 1: Occupancy
+
+    if TFA > 13.9: N = 1 + 1.76 × [1-exp (-0.000349 × (TFA-13.9)2 )] + 0.0013 × (TFA-13.9)
+
+    if TFA ≤ 13.9: N=1
+
+    Args:
+        TFA: Total Floor Area
+
+    Returns:
+        int: Assumed number of occupants
+    """
+    if TFA > 13.9:
+        return 1 + 1.76 * (1 - math.exp(-0.000349 * (TFA - 13.9) ** 2)) + 0.0013 * (TFA - 13.9)
+    else:
+        return 1
 
 
-# Table 1b part 2
-def daily_hw_use(low_water_use, Nocc):
+def table_1b_daily_hot_water(low_water_use, Nocc):
+    """
+    Table 1b part 2: Domestic hot water usage
+
+
+    (a) Annual average hot water usage in litres per day Vd,average = (25 × N) + 36
+    (b) Reduce the annual average hot water usage by 5% if the dwelling is designed
+        to achieve a water use target of not more that 125 litres per person per day
+        (all water use, hot and cold)
+    (c) For each month, multiply Vd,average by the factor from Table 1c to obtain
+        the daily volume in the month Vd,m
+    (d) The energy content of water used is
+            4.190 × Vd,m × nm × ∆Tm / 3600 kWh/month
+        where ∆Tm is the temperature rise for month m from Table 1d.
+    (e) Distribution loss is 0.15 times energy content calculated in (d).
+
+    This function calculates parts a) and b)
+
+    Args:
+        Nocc: Number of Occupants (from Table 1b part 1)
+        low_water_use (bool): Whether the dwelling is designed to save water (see point b)
+
+    Returns:
+        Average daily hot water use
+    """
     if low_water_use:
         return (25. * Nocc + 36.) * .95
     else:
@@ -43,15 +70,20 @@ MONTHLY_HOT_WATER_TEMPERATURE_RISE = numpy.array(
         [41.2, 41.4, 40.1, 37.6, 36.4, 33.9, 30.4, 33.4, 33.5, 36.3, 39.4, 39.9])
 
 
-# Table 2
-def hw_storage_loss_factor(hw_cylinder_insulation_type, hw_cylinder_insulation):
+def table_2_hot_water_store_loss_factor(hw_cylinder_insulation_type, hw_cylinder_insulation):
     """
+    Table 2
+
     Calculate Hot water storage loss factor according to equation in Note 1.
     of Table 2 (rather than using the tabulated values)
 
-    :param hw_cylinder_insulation_type: a CylinderInsulationTypes
-    :param hw_cylinder_insulation: thickness of cylinder insulation
-    :return: hot water storage loss factor
+    Args:
+        hw_cylinder_insulation_type (CylinderInsulationTypes):
+        hw_cylinder_insulation: thickness of cylinder insulation in mm
+
+    Returns:
+        hot water storage loss factor in kWh/litre/day
+
     """
     if hw_cylinder_insulation_type == CylinderInsulationTypes.FOAM:
         return 0.005 + 0.55 / (hw_cylinder_insulation + 4)
@@ -59,13 +91,18 @@ def hw_storage_loss_factor(hw_cylinder_insulation_type, hw_cylinder_insulation):
         return 0.005 + 1.76 / (hw_cylinder_insulation + 12.8)
 
 
-# Table 2a
-def hw_volume_factor(cylinder_volume):
+def table_2a_hot_water_vol_factor(cylinder_volume):
     """
-    Calculate the volume factor according to equation in Note 2. of Table 2a
+    Table 2a
 
-    :param cylinder_volume: volume of hot water cylinder
-    :return: hot water volume factor
+    Calculate the volume factor according to equation in Note 2. of Table 2a
+    When using Table 2, the loss is to be multiplied by the volume factor.
+
+    Args:
+        cylinder_volume: volume of hot water cylinder
+
+    Returns:
+        hot water volume factor
     """
     return (120. / cylinder_volume) ** (1.0 / 3.0)
 
@@ -89,52 +126,47 @@ def cylinder_indirect(dwelling):
 
 
 def storage_combi_primary(d):
-    return (.82
+    return (0.82
             if d.hw_cylinder_volume >= 115
             else .82 + 0.0022 * (115 - d.hw_cylinder_volume))
 
 
-def storage_combi_secondary_store(d):
-    return (.6
+def storage_combi_secondary(d):
+    return (0.6
             if d.hw_cylinder_volume >= 115
-            else .6 + 0.0016 * (115 - d.hw_cylinder_volume))
+            else 0.6 + 0.0016 * (115 - d.hw_cylinder_volume))
 
 
-TABLE_2b_manuf = {
-    1: constant(0.6),
-    2: cylinder_indirect,
-    3: 0,
-    4: storage_combi_secondary_store,
-    5: cylinder_indirect,  # same equations as indirect cylinder
-    6: cpsu_store,
-    7: cpsu_store,
-    8: elec_cpsu_store,
-    9: constant(1),
-}
-
-TABLE_2b_table2 = {
-    1: constant(0.6),
-    2: cylinder_indirect,
-    3: storage_combi_primary,
-    4: storage_combi_secondary_store,
-    5: cylinder_indirect,  # same equations as indirect cylinder,
-    6: cpsu_store,
-    7: cpsu_store,
-    8: elec_cpsu_store,
-    9: constant(1),
+# Table 2b format:
+# Row number: (With Manufacturers data, Table 2 fallback)
+_TABLE_2b = {
+    1: (constant(0.6)          , constant(0.6)),
+    2: (cylinder_indirect      , cylinder_indirect),
+    3: (0                      , storage_combi_primary),
+    4: (storage_combi_secondary, storage_combi_secondary),
+    5: (cylinder_indirect      , cylinder_indirect),  # same equations as indirect cylinder
+    6: (cpsu_store             , cpsu_store),
+    7: (cpsu_store             , cpsu_store),
+    8: (elec_cpsu_store        , elec_cpsu_store),
+    9: (constant(1)            , constant(1)),
 }
 
 
-def hw_temperature_factor(dwelling, measured_loss):
+def table_2b_hot_water_temp_factor(dwelling, measured_loss):
     """
-    Calculate the hot water temperature factor
+    Calculate the hot water temperature factor according to Table 2b
 
-    :param dwelling: dwelling object
-    :param measured_loss: boolean, whether the losses are measured by manufacturer or must be assumed
-    :return:
+    Args:
+        dwelling (Dwelling):
+        measured_loss: boolean, whether the losses are measured by manufacturer or must be assumed
+
+    Returns:
     """
-    table2b = TABLE_2b_manuf if measured_loss else TABLE_2b_table2
-    return table2b[dwelling.water_sys.table2b_row](dwelling)
+
+    if measured_loss:
+        return _TABLE_2b[dwelling.water_sys.table2b_row][0](dwelling)
+    else:
+        return _TABLE_2b[dwelling.water_sys.table2b_row][1](dwelling)
 
 
 # Table 3 Primary Circuit losses
@@ -186,8 +218,8 @@ def combi_loss_table_3a(dwelling, system):
     storage_volume = dwelling.get('hw_cylinder_volume', 0)
 
     if storage_volume == 0:
-        if system.get("table3a_row"):
-            return system.table3a_row
+        if system.get("table3a_fn"):
+            return system.table3a_fn
         else:
             # !!! Need other keep hot types
             return combi_loss_instant_without_keep_hot
@@ -197,7 +229,7 @@ def combi_loss_table_3a(dwelling, system):
         return combi_loss_storage_combi_more_than_55l
 
 
-# !!! Need to complete this table
+# FIXME Need to complete this table
 def combi_loss_table_3b(pcdf_data):
     # !!! Need to set storage loss here
     # dwelling.measured_cylinder_loss=0#pcdf_data['storage_loss_factor_f1']
@@ -212,136 +244,17 @@ def combi_loss_table_3c():
     raise NotImplementedError("Combi Loss Table 3c not implemented")
 
 
-# Table 4a
-# FIXME Electric storage systems - offpeak and 24 hour tariff systems have same type codes!
-def translate_4a_row(systems, row):
-    if row[6] != 'n/a':
-        sys = dict(
-                code=int(row[0]),
-                # type=row[1],
-                effy=float_or_zero(row[2]),
-                effy_hetas=float_or_zero(row[3]),
-                effy_gas=float_or_zero(row[4]),
-                effy_lpg=float_or_zero(row[5]),
-                responsiveness=(float(row[6])
-                                if row[6] != 'emitter'
-                                else USE_TABLE_4D_FOR_RESPONSIVENESS),
-                table2b_row=int(row[7]) if row[7] != '' else -1,
-                fraction_of_heat_from_secondary=float(row[8]),
-                flue_fan=row[9],
-                warm_air_fan=row[10],
-                water_effy=row[11])
-    else:
-        # Hot Water system
-        sys = dict(
-                code=int(row[0]),
-                type=row[1],
-                effy=float(row[2]),
-                table2b_row=int(row[7]) if row[7] != '' else -1)
-
-    if sys['code'] in systems:
-        systems[sys['code']].append(sys)
-    else:
-        systems[sys['code']] = [sys, ]
-
-
-TABLE_4A = csv_to_dict(os.path.join(_DATA_FOLDER, 'table_4a.csv'), translate_4a_row)
-
-
-# Table 4b
-def translate_4b_row(systems, row):
-    sys = dict(
-            code=int(row[0]),
-            type=row[1],
-            effy_winter=float(row[1]),
-            effy_summer=float(row[2]),
-            table2b_row=int(row[3]),
-            fraction_of_heat_from_secondary=.1,
-            responsiveness=USE_TABLE_4D_FOR_RESPONSIVENESS,
-            flue_fan=row[4],
-            boiler_type=int(row[5]),
-            condensing=row[6] == "TRUE",
-            warm_air_fan="FALSE")
-    systems[sys['code']] = sys
-
-
-TABLE_4B = csv_to_dict(os.path.join(_DATA_FOLDER, 'table_4b.csv'), translate_4b_row)
-
-TABLE_4C3 = {
-    2301: (1.1, 1.05),
-    2302: (1.1, 1.05),
-    2303: (1.05, 1.05),
-    2304: (1.05, 1.05),
-    2307: (1.05, 1.05),
-    2305: (1.05, 1.05),
-    2308: (1.05, 1),
-    2309: (1.05, 1),
-    2310: (1.0, 1.0),
-    2306: (1.0, 1.0),
-    # !!! Also need DHW only systems
-}
-
-# Table 4d
-TABLE_4D = {
-    HeatEmitters.RADIATORS: 1,
-    HeatEmitters.UNDERFLOOR_TIMBER: 1,
-    HeatEmitters.UNDERFLOOR_SCREED: .75,
-    HeatEmitters.UNDERFLOOR_CONCRETE: .25,
-    HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER: 1,
-    HeatEmitters.RADIATORS_UNDERFLOOR_SCREED: .75,
-    HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE: .25,
-    HeatEmitters.FAN_COILS: 1,
-}
-
-
-# Table 4e
-def translate_4e_row(controls, row):
-    other_adjustments_str = row[5]
-    if other_adjustments_str != "n/a":
-        # table_no = re.match(r'Table 4c\((\d)\)', other_adjustments_str)
-        # other_adj_table = globals()['apply_4c%s' % (table_no.group(1),)]
-        other_adj_table = other_adjustments_str.lower()
-    else:
-        other_adj_table = None
-
-    control = dict(
-            code=int(row[0]),
-            control_type=int(row[1]),
-            Tadjustment=float(row[2]),
-            thermostat=row[3],
-            trv=row[4],
-            other_adj_table=other_adj_table,
-            description=row[6])
-
-    controls[control['code']] = control
-
-
-TABLE_4E = csv_to_dict(os.path.join(_DATA_FOLDER, 'table_4e.csv'), translate_4e_row)
-
-
-def get_4a_system(electricity_tariff, code):
-    matches = TABLE_4A[code]
-    if len(matches) > 1:
-        assert len(matches) == 2
-        # Electric storage heaters appear twice with the same code -
-        # once for off peak, once for 24 hour tariffs.
-        if electricity_tariff == ELECTRICITY_24HR:
-            return matches[1]
-        else:
-            assert (electricity_tariff == ELECTRICITY_10HR or
-                    electricity_tariff == ELECTRICITY_7HR)
-            return matches[0]
-    else:
-        return matches[0]
-
-
-def get_effy(system_data, fuel):
+def system_efficiency(system_data, fuel):
     """
-    Try to get the efficiency
+    Try to get the efficiency of the given heating sustem
 
-    :param system_data: HeatingSystem
-    :param fuel: fuel of this heating system. TODO: why can't we just get the fuel from the system?
-    :return:
+    Args:
+        system_data: HeatingSystem
+        fuel: fuel of this heating system.
+        .. todo:
+         why can't we just get the fuel from the system?
+
+    Returns:
     """
     if system_data['effy'] > 0:
         return system_data['effy']
@@ -358,112 +271,6 @@ def get_effy(system_data, fuel):
     raise ValueError("Input error if we get here?")
 
 
-T4C4_SPACE_EFFY_MULTIPLIERS = {
-    HeatEmitters.RADIATORS: 0.7,
-    # !!!Need to check for presence of load compensator! (also for the rads+underfloor cases)
-    HeatEmitters.UNDERFLOOR_TIMBER: 1.0,
-    HeatEmitters.UNDERFLOOR_SCREED: 1.0,
-    HeatEmitters.UNDERFLOOR_CONCRETE: 1.0,
-    HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER: 0.7,
-    HeatEmitters.RADIATORS_UNDERFLOOR_SCREED: 0.7,
-    HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE: 0.7,
-    HeatEmitters.FAN_COILS: 0.85,
-}
-
-
-# Table 4f
-def has_oil_pump(dwelling):
-    return (dwelling.main_sys_1.has_oil_pump or
-            (dwelling.get('main_sys_2') and
-             dwelling.main_heating_2_fraction > 0 and
-             dwelling.main_sys_2.has_oil_pump))
-
-
-def heating_fans_and_pumps_electricity(dwelling):
-    Qfansandpumps = 0
-    if (dwelling.main_sys_1.has_ch_pump or
-            (dwelling.get('main_sys_2') and
-                 dwelling.main_sys_2.has_ch_pump)):
-        if dwelling.has_room_thermostat:
-            Qfansandpumps += 130
-        else:
-            Qfansandpumps += 130 * 1.3
-
-    if has_oil_pump(dwelling):
-        if dwelling.has_room_thermostat:
-            Qfansandpumps += 100
-        else:
-            # raise RuntimeError("!!! DO WE EVER GET HERE?")
-            Qfansandpumps += 100 * 1.3
-
-    if dwelling.main_sys_1.has_flue_fan:
-        Qfansandpumps += 45
-
-    if (dwelling.get('main_sys_2') and
-            dwelling.main_sys_2.has_flue_fan and
-                dwelling.main_heating_2_fraction > 0):
-        Qfansandpumps += 45
-
-    if dwelling.main_sys_1.has_warm_air_fan or (
-                    dwelling.get('main_sys_2') and
-                    dwelling.main_sys_2.has_warm_air_fan and
-                    dwelling.main_heating_2_fraction > 0):
-        if not dwelling.ventilation_type in [VentilationTypes.MVHR,
-                                             VentilationTypes.MV]:
-            Qfansandpumps += 0.6 * dwelling.volume
-        else:
-            # Warm air fan elec not included for MVHR/MV
-            pass
-
-    # Keep hot only applies for water sys?  What if you have a combi
-    # boiler but it's not providing hw? No need for keep hot?  Or
-    # maybe it's just not a combi boiler in that case?
-    if dwelling.water_sys.get("keep_hot_elec_consumption"):
-        Qfansandpumps += dwelling.water_sys.keep_hot_elec_consumption
-
-    if dwelling.get('has_electric_shw_pump'):
-        Qfansandpumps += 75
-
-    return Qfansandpumps
-
-
-def mech_vent_fans_electricity(dwelling):
-    Qfansandpumps = 0
-    if dwelling.ventilation_type in [VentilationTypes.MEV_CENTRALISED,
-                                     VentilationTypes.MEV_DECENTRALISED,
-                                     VentilationTypes.MV,
-                                     VentilationTypes.PIV_FROM_OUTSIDE]:
-        Qfansandpumps += 1.22 * dwelling.volume * dwelling.adjusted_fan_sfp
-    elif dwelling.ventilation_type == VentilationTypes.MVHR:
-        nmech = 0.5
-        Qfansandpumps += 2.44 * dwelling.volume * nmech * dwelling.adjusted_fan_sfp
-    return Qfansandpumps
-
-
-def fans_and_pumps_electricity(dwelling):
-    dwelling.Q_fans_and_pumps = heating_fans_and_pumps_electricity(dwelling)
-    dwelling.Q_mech_vent_fans = mech_vent_fans_electricity(dwelling)
-
-
-# Table 4h
-def mech_vent_default_in_use_factor():
-    """
-    Default values for mechanical ventilation in use factor
-
-    :return:
-    """
-    return 2.5
-
-
-def mech_vent_default_hr_effy_factor():
-    """
-    Default efficiency for mechanical ventilation with heat recovery
-
-    :return:
-    """
-    return 0.7
-
-
 # Table 5a
 # FIXME: NEED TO FINISH THIS!
 def has_oil_pump_inside(dwelling):
@@ -471,7 +278,15 @@ def has_oil_pump_inside(dwelling):
             dwelling.get('main_heating_2_oil_pump_inside_dwelling'))
 
 
-def fans_and_pumps_gain(dwelling):
+def table_5a_fans_and_pumps_gain(dwelling):
+    """
+    Table 5a gains from pumps and fans
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
     fans_pumps_gain = 0
     heating_system_gain = 0
 
@@ -785,20 +600,6 @@ def get_seasonal_effy_offset(is_modulating_burner,
     return TABLE_D2_7[fuel.type][boiler_type]
 
 
-"""
-class AppendixD:
-    class BurnerTypes:
-        ON_OFF
-        MODULATING
-
-    class BoilerTypes:
-        REGULAR
-        INSTANTANEOUS_COMBI
-        STORAGE_COMBI
-        CPSU
-"""
-
-
 def interpolate_psr_table(psr, table,
                           key=lambda x: x[0],
                           data=numpy.array):
@@ -807,7 +608,7 @@ def interpolate_psr_table(psr, table,
     if psr < key(table[0]):
         return data(table[0])
 
-    # !!! Interpolation will fail if psr is off bottom of range
+    # TODO: Interpolation will fail if psr is off bottom of range. Explicitly throw error?
     psr_data_below = max((p for p in table if key(p) < psr),
                          key=key)
     psr_data_above = min((p for p in table if key(p) > psr),

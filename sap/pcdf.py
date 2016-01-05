@@ -1,8 +1,9 @@
 """
 Module to load raw data from PCDF file
 
+Relates to Appendix Q
 """
-
+import logging
 import os
 
 from .sap_types import VentilationTypes, DuctTypes
@@ -67,6 +68,7 @@ MV_TYPE_MAPPING = {
     '1': [VentilationTypes.MEV_CENTRALISED, ],
     '2': [VentilationTypes.MEV_DECENTRALISED,
           VentilationTypes.PIV_FROM_OUTSIDE],
+    '5': [], # TODO: New addition to PCDF file, no idea what it is...
     '3': [VentilationTypes.MV,
           VentilationTypes.MVHR, ],
     '10': [],
@@ -81,7 +83,7 @@ def row_id(table_id, toks):
 
 
 def load_pcdf():
-    print(("LOADING PCDF: ", PCDF_DATA_FILE))
+    logging.info("LOADING PCDF: " + PCDF_DATA_FILE)
     with open(PCDF_DATA_FILE, 'rU') as datafile:
         pcdf_data = dict()
         current = dict()
@@ -119,6 +121,7 @@ def get_boiler(boiler_id):
         fields = get_product('104', boiler_id)
     except KeyError:
         return None
+
     result = dict(
         sedbuk_idx=str(fields[0]),
         manufacturer=str(fields[3]),
@@ -144,6 +147,7 @@ def get_boiler(boiler_id):
         store_solar_volume=float_or_none(fields[40]),
         store_insulation_mms=float_or_none(fields[41]),
         separate_dhw_tests=fields[45])
+
     if len(fields) >= 49:
         extra = dict(
             rejected_energy_r1=fields[48],
@@ -194,7 +198,7 @@ def get_twin_burner_cooker_boiler(product_id):
         return None
     return dict(
         sedbuk_idx=str(fields[0]),
-        manufacturer=str(fields[3], encoding='latin-1'),
+        manufacturer=str(fields[3]),
         brand=str(fields[4]),
         model=str(fields[5]),
         fuel=FUELS[fields[10]],
@@ -216,7 +220,7 @@ def get_heat_pump(id):
         return None
     sys = dict(
         sedbuk_idx=str(fields[0]),
-        manufacturer=str(fields[4], encoding='latin-1'),
+        manufacturer=str(fields[4]),
         brand=str(fields[5]),
         model=str(fields[6]),
         fuel=str(fields[11]),
@@ -278,7 +282,7 @@ def get_microchp(id):
         return None
     sys = dict(
         sedbuk_idx=str(fields[0]),
-        manufacturer=str(fields[4], encoding='latin-1'),
+        manufacturer=str(fields[4]),
         brand=str(fields[5]),
         model=str(fields[6]),
         fuel=str(fields[10]),

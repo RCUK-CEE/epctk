@@ -1,6 +1,6 @@
 import numpy
 
-from .sap_constants import SUMMER_MONTHS
+from .constants import SUMMER_MONTHS
 from .fuels import ELECTRICITY_7HR, ELECTRICITY_10HR
 from .utils import weighted_effy
 from .sap_types import FuelTypes, HeatingTypes

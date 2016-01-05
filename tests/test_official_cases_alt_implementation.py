@@ -5,6 +5,8 @@ import pickle
 import sys
 
 import output_checker
+
+import sap.appendix.appendix_t
 from sap import pcdf
 from sap import runner
 from sap.dwelling import log_dwelling_params, log_dwelling, ParamTrackerDwelling
@@ -111,7 +113,7 @@ def add_sap_region(dwelling, fname):
 
 def run_dwelling(dwelling):
     runner.run_sap(dwelling)
-    runner.run_improvements(dwelling)
+    sap.appendix.appendix_t.run_improvements(dwelling)
     runner.run_fee(dwelling)
     runner.run_der(dwelling)
     runner.run_ter(dwelling)

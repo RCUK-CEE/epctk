@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Appendix F &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="index.html" />
+    <link rel="next" title="Appendix G" href="appendix_g.html" />
+    <link rel="prev" title="Appendix E" href="appendix_e.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-sap.appendix.appendix_f">
+<span id="appendix-f"></span><h1>Appendix F<a class="headerlink" href="#module-sap.appendix.appendix_f" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="appendix-f-electric-cpsus">
+<h2>Appendix F: Electric CPSUs<a class="headerlink" href="#appendix-f-electric-cpsus" title="Permalink to this headline">¶</a></h2>
+<p>An electric CPSU is a central heating system providing space and domestic water heating.
+Primary water heated mainly during low-rate periods to up to 95°C in winter is stored
+in a thermal store. If the CPSU volume is less than 270 litres, the resulting high-rate
+fraction can lead to a poor SAP rating.</p>
+<p>The procedure in this appendix applies for a 10-hour off-peak tariff providing 3 low-rate
+periods per day. It is not valid for other tariffs.</p>
+<dl class="function">
+<dt id="sap.appendix.appendix_f.cpsu_on_peak">
+<code class="descclassname">sap.appendix.appendix_f.</code><code class="descname">cpsu_on_peak</code><span class="sig-paren">(</span><em>system</em>, <em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_f.html#cpsu_on_peak"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_f.cpsu_on_peak" title="Permalink to this definition">¶</a></dt>
+<dd><p>39m=dwelling.h
+45m=hw_energy_content
+93m=Tmean
+95m=useful gains
+98m=Q_required</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dwelling</strong> &#8211; </li>
+<li><strong>system</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Appendix F</a><ul>
+<li><a class="reference internal" href="#appendix-f-electric-cpsus">Appendix F: Electric CPSUs</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="appendix_e.html" title="previous chapter">Appendix E</a></li>
+      <li>Next: <a href="appendix_g.html" title="next chapter">Appendix G</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/appendix_f.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/appendix_f.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

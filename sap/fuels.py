@@ -2,6 +2,7 @@ import copy
 import os.path
 import logging
 
+from sap.constants import COMMUNITY_FUEL_ID
 from .pcdf import pcdf_fuel_prices
 from .sap_types import FuelTypes
 from .utils import float_or_none, csv_to_dict
@@ -49,14 +50,6 @@ class Fuel(object):
     @property
     def standing_charge(self):
         return self.fuel_data.standing_charge
-
-    # @property
-    # def is_mains_gas(self):
-    #     return self.fuel_id == 1 or self.fuel_id == 51
-
-    # @property
-    # def is_electric(self):
-    #     return False
 
     @property
     def type(self):
@@ -109,6 +102,13 @@ class Fuel(object):
     def fuel_data_table_12(self):
         return get_fuel_data_table_12(self.fuel_id)
 
+    # @property
+    # def is_mains_gas(self):
+    #     return self.fuel_id == 1 or self.fuel_id == 51
+
+    # @property
+    # def is_electric(self):
+    #     return False
 
 class CommunityFuel(Fuel):
     def __init__(self, fuel_factor, emission_factor_adjustment):
@@ -118,13 +118,19 @@ class CommunityFuel(Fuel):
 
         self.is_mains_gas = False
 
-    # @property
-    # def is_mains_gas(self):
-    #     return False
+        self._standing_charge = 106
+
+    def __hash__(self):
+        return COMMUNITY_FUEL_ID
+        # return hash((self._fuel_factor, self._emission_factor_adjustment))
 
     @property
     def standing_charge(self):
-        return 106
+        return self._standing_charge
+
+    @standing_charge.setter
+    def standing_charge(self, value):
+        self._standing_charge = value
 
     @property
     def fuel_factor(self):
@@ -137,6 +143,10 @@ class CommunityFuel(Fuel):
     @property
     def fuel_data(self):
         raise NotImplementedError("No fuel data for Community Heating Fuel Type")
+
+    # @property
+    # def is_mains_gas(self):
+    #     return False
 
 class ElectricityTariff(Fuel):
     """
@@ -182,6 +192,7 @@ class ElectricityTariff(Fuel):
         price_off_peak = self.off_peak_data.price
         return price_on_peak * onpeak_fraction + price_off_peak * (1 - onpeak_fraction)
 
+    @property
     def type(self):
         return FuelTypes.ELECTRIC
 
@@ -305,8 +316,7 @@ def get_fuel_data_pcdf(fuel_id):
         return fuel_prices
 
     else:
-        # print()
-        logging.warning("fuels.py: THERE IS NO PCDF DATA FOR THIS FUEL ID %d" % fuel_id)
+        # logging.warning("fuels.py: THERE IS NO PCDF DATA FOR THIS FUEL ID %d" % fuel_id)
         # raise RuntimeError("THERE IS NO PCDF DATA FOR THIS FUEL ID")
         return get_fuel_data_table_12(fuel_id)
 
@@ -325,6 +335,9 @@ ELECTRICITY_7HR = ElectricityTariff(32, 31, 0.9, 0.71)
 ELECTRICITY_10HR = ElectricityTariff(34, 33, 0.8, 0.58)
 ELECTRICITY_24HR = ElectricityTariff(35, 35, 1, 1)
 
+ELECTRICITY_OFFSET = ElectricityTariff(37, 37, 1, 1)
+ELECTRICITY_SOLD = ElectricityTariff(36, 36, 1, 1)
+
 _TABLE_12_ELEC = {
     30: ELECTRICITY_STANDARD,
     32: ELECTRICITY_7HR,
@@ -340,3 +353,5 @@ def fuel_from_code(code):
         return copy.deepcopy(_TABLE_12_ELEC[code])
     else:
         return Fuel(code)
+
+

@@ -1280,7 +1280,7 @@ INPUT_RULES = {
 }
 
 
-def process_floor_area_table(d, r):
+def process_floor_area_table(dwelling, r):
     gfa = 0
     volume = 0
     floors = 0
@@ -1294,9 +1294,10 @@ def process_floor_area_table(d, r):
 
         if row[0] != "Non-separated conservatory":
             floors += 1
-    d.GFA = gfa
-    d.volume = volume
-    d.Nstoreys = floors
+
+    dwelling.GFA = gfa
+    dwelling.volume = volume
+    dwelling.Nstoreys = floors
 
 
 class Elements:

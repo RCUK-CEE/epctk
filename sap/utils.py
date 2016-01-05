@@ -2,7 +2,7 @@ import csv
 
 import numpy
 
-from .sap_constants import DAYS_PER_MONTH
+from .constants import DAYS_PER_MONTH
 
 CALC_STAGE = 0
 ALL_PARAMS = [set(), set(), set(), set(), set(), set(), set()]

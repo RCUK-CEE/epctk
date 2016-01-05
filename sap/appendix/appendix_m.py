@@ -1,12 +1,11 @@
 """
-Appendix M: Energy from Photovoltaic (PV) technology, small and micro wind turbines
-and small- scale hydro-electric generators
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Appendix M: Energy from Photovoltaic (PV) technology, small and micro wind turbines and small- scale hydro-electric generators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 import math
 
-from ..sap_tables import TABLE_H2, TABLE_H4, TABLE_M1
+from ..tables import TABLE_H2, TABLE_H4, TABLE_M1
 
 
 def configure_pv_system(pv_system):

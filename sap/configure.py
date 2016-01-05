@@ -1,19 +1,18 @@
-from sap.sap_table_4e import apply_4c1, apply_table_4e
 from . import fuels
 from .fuels import ELECTRICITY_STANDARD
 from .heating_systems import pcdf_heating_system
 
 # FIXME: we calculate on peak already inside
+from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
 from .heating_system_types import DedicatedWaterSystem
 from .sap_types import HeatingTypes, WallTypes
 from .heating_systems import immersion_on_peak_fraction, sedbuk_2005_heating_system, sedbuk_2009_heating_system
-from .sap_tables import (TABLE_3, TABLE_4A, TABLE_4D, TABLE_4E, TABLE_6D, TABLE_10, TABLE_10C, get_4a_system,
-                         hw_volume_factor, hw_storage_loss_factor, hw_temperature_factor,
-                         fans_and_pumps_gain, fans_and_pumps_electricity, occupancy, daily_hw_use,
-                         USE_TABLE_4D_FOR_RESPONSIVENESS, FLOOR_INFILTRATION)
+from .tables import (TABLE_3, TABLE_6D, TABLE_10, TABLE_10C, table_1b_occupancy, table_1b_daily_hot_water,
+                     table_2a_hot_water_vol_factor, table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,
+                     table_5a_fans_and_pumps_gain, FLOOR_INFILTRATION, TABLE_4A, TABLE_4D, TABLE_4E, get_4a_system, table_4f_fans_pumps_keep_hot, apply_table_4e)
 
 from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
-from .configure_ventilation import configure_ventilation
+from .ventilation import configure_ventilation
 
 
 def configure_fuel_costs(dwelling):
@@ -110,19 +109,29 @@ def configure_control_system(dwelling, system_num):
     # TODO Special case table 4c4 for warm air heat pumps - needs to apply to sys2 too
     # TODO Should only apply if water is from this system!!
     heat_type_code = dwelling.get('main_heating' + sub + '_type_code')
-    if heat_type_code and 521 <= heat_type_code <= 527:
+    if heat_type_code and heat_type_code != 'community' and 521 <= heat_type_code <= 527:
         system.water_mult = 0.7
 
 
 def configure_main_system(dwelling):
+    """
+    Configure the main heating system.
+
+
+
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
     if dwelling.get('main_heating_pcdf_id') is not None:
         dwelling.main_sys_1 = pcdf_heating_system(dwelling,
                                                   dwelling.main_heating_pcdf_id,
                                                   dwelling.main_sys_fuel,
                                                   dwelling.get('use_immersion_heater_summer', False))
-        # !!! Might need to enforce a secondary system?
+    # !!! Might need to enforce a secondary system?
     elif dwelling.get('sys1_sedbuk_2005_effy') is not None:
-
         dwelling.main_sys_1 = sedbuk_2005_heating_system(
                 dwelling,
                 dwelling.main_sys_fuel,
@@ -150,6 +159,7 @@ def configure_main_system(dwelling):
         dwelling.main_sys_1 = appendix_c.CommunityHeating(
                 dwelling.community_heat_sources,
                 dwelling.get('sap_community_distribution_type'))
+
         dwelling.main_sys_fuel = dwelling.main_sys_1.fuel
 
     else:
@@ -159,8 +169,10 @@ def configure_main_system(dwelling):
                 dwelling.main_sys_fuel,
                 dwelling.use_immersion_heater_summer if dwelling.get('use_immersion_heater_summer') else False,
                 dwelling.sys1_hetas_approved if dwelling.get('sys1_hetas_approved') else False)
-        # !!! Should really check here for no main system specified, and
-        # !!! use a default if that's the case
+
+    # TODO Should check here for no main system specified, and use a default if that's the case
+    if dwelling.main_sys_1 is None:
+        raise RuntimeError('Main system 1 cannot be None')
 
 
 def configure_main_system_2(dwelling):
@@ -187,53 +199,61 @@ def configure_main_system_2(dwelling):
 
 
 def configure_water_system(dwelling):
-    if dwelling.get('water_heating_type_code'):  # !!! Why this test?
-        code = dwelling.water_heating_type_code
+    # if dwelling.get('water_heating_type_code'):  # !!! Why this test?
+    code = dwelling.water_heating_type_code
 
-        if code in TABLE_4A:
-            water_system = get_4a_system(dwelling.electricity_tariff, code)
-            dwelling.water_sys = DedicatedWaterSystem(water_system['effy'],
-                                                      dwelling.use_immersion_heater_summer if dwelling.get(
-                                                              'use_immersion_heater_summer') else False)
-            dwelling.water_sys.table2b_row = water_system['table2b_row']
-            dwelling.water_sys.fuel = dwelling.water_sys_fuel
-        elif code == 999:  # no h/w system present - assume electric immersion
-            pass
-        elif code == 901:  # from main
-            dwelling.water_sys = dwelling.main_sys_1
-        elif code == 902:  # from secondary
-            dwelling.water_sys = dwelling.secondary_sys
-        elif code == 914:  # from second main
-            dwelling.water_sys = dwelling.main_sys_2
-        elif code == 950:  # community dhw only
-            # !!! Community hot water based on sap defaults not handled
-            dwelling.water_sys = appendix_c.CommunityHeating(
-                    dwelling.community_heat_sources_dhw,
-                    dwelling.get('sap_community_distribution_type_dhw'))
+    if code in TABLE_4A:
+        water_system = get_4a_system(dwelling.electricity_tariff, code)
+        dwelling.water_sys = DedicatedWaterSystem(water_system['effy'],
+                                                  dwelling.use_immersion_heater_summer if dwelling.get(
+                                                          'use_immersion_heater_summer') else False)
+        dwelling.water_sys.table2b_row = water_system['table2b_row']
+        dwelling.water_sys.fuel = dwelling.water_sys_fuel
 
-            if dwelling.get('community_dhw_flat_rate_charging'):
-                dwelling.water_sys.dhw_charging_factor = 1.05
+    elif code == 999:  # no h/w system present - assume electric immersion
+        pass
 
-            else:
-                dwelling.water_sys.dhw_charging_factor = 1.0
+    elif code == 901:  # from main
+        if dwelling.main_sys_1 is None:
+            raise RuntimeError("Main system 1 must not be None")
+        dwelling.water_sys = dwelling.main_sys_1
 
-            if dwelling.main_sys_1.system_type == HeatingTypes.community:
-                # Standing charge already covered by main system
-                dwelling.water_sys.fuel.standing_charge = 0
+    elif code == 902:  # from secondary
+        dwelling.water_sys = dwelling.secondary_sys
 
-            else:
-                # Only half of standing charge applies for DHW only
-                dwelling.water_sys.fuel.standing_charge /= 2
+    elif code == 914:  # from second main
+        dwelling.water_sys = dwelling.main_sys_2
+
+    elif code == 950:  # community dhw only
+        # TODO Community hot water based on sap defaults not handled
+        dwelling.water_sys = appendix_c.CommunityHeating(
+                dwelling.community_heat_sources_dhw,
+                dwelling.get('sap_community_distribution_type_dhw'))
+
+        if dwelling.get('community_dhw_flat_rate_charging'):
+            dwelling.water_sys.dhw_charging_factor = 1.05
+
         else:
-            assert False
+            dwelling.water_sys.dhw_charging_factor = 1.0
+
+        if dwelling.main_sys_1.system_type == HeatingTypes.community:
+            # Standing charge already covered by main system
+            dwelling.water_sys.fuel.standing_charge = 0
+
+        else:
+            # Only half of standing charge applies for DHW only
+            dwelling.water_sys.fuel.standing_charge /= 2
+    else:
+        assert False
 
 
 def configure_water_storage(dwelling):
     """
     Configure the water storage for the dwelling
 
-    :param dwelling:
-    :return:
+    Args:
+        dwelling:
+
     """
     if dwelling.water_sys.is_community_heating:
         dwelling.has_cylinderstat = True
@@ -250,7 +270,7 @@ def configure_water_storage(dwelling):
 
     elif dwelling.has_hw_cylinder:
         if dwelling.get("measured_cylinder_loss") is not None:
-            dwelling.temperature_factor = hw_temperature_factor(dwelling, True)
+            dwelling.temperature_factor = table_2b_hot_water_temp_factor(dwelling, True)
 
         else:
             # TODO Is this electric CPSU test in the right place?
@@ -260,10 +280,12 @@ def configure_water_storage(dwelling):
 
             elif not dwelling.get('storage_loss_factor'):
                 # This is already set for community heating dhw
-                dwelling.storage_loss_factor = hw_storage_loss_factor(dwelling.hw_cylinder_insulation_type,
-                                                                      dwelling.hw_cylinder_insulation)
-            dwelling.volume_factor = hw_volume_factor(dwelling.hw_cylinder_volume)
-            dwelling.temperature_factor = hw_temperature_factor(dwelling, False)
+                dwelling.storage_loss_factor = table_2_hot_water_store_loss_factor(dwelling.hw_cylinder_insulation_type,
+                                                                                   dwelling.hw_cylinder_insulation)
+
+            dwelling.volume_factor = table_2a_hot_water_vol_factor(dwelling.hw_cylinder_volume)
+            dwelling.temperature_factor = table_2b_hot_water_temp_factor(dwelling, False)
+
         dwelling.primary_circuit_loss_annual = hw_primary_circuit_loss(dwelling)
     else:
         dwelling.storage_loss_factor = 0
@@ -314,15 +336,27 @@ def configure_controls(dwelling):
 
 
 def configure_systems(dwelling):
+    """
+    Configure space and water heating systems
+
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
     dwelling['community_heating_dhw'] = False
     dwelling['Nfluelessgasfires'] = 0
+
     if dwelling.get('main_heating_type_code') and dwelling.main_heating_type_code == 613:
         dwelling.Nfluelessgasfires += 1
+
     if dwelling.get('secondary_heating_type_code') and dwelling.secondary_heating_type_code == 613:
         dwelling.Nfluelessgasfires += 1
 
     configure_main_system(dwelling)
     configure_main_system_2(dwelling)
+
     # !!! fraction of heat from main 2 not specified, assume 0%
     if not dwelling.get('main_heating_fraction'):
         dwelling.main_heating_fraction = 1
@@ -345,20 +379,34 @@ def configure_systems(dwelling):
 
 
 def configure_fans_and_pumps(dwelling):
-    fans_and_pumps_gain(dwelling)
-    fans_and_pumps_electricity(dwelling)
+    table_5a_fans_and_pumps_gain(dwelling)
+    table_4f_fans_pumps_keep_hot(dwelling)
 
     configure_responsiveness(dwelling)
     configure_fuel_costs(dwelling)
 
 
 def configure_cooling_system(dwelling):
+    """
+    Part 10 SPACE COOLING REQUIREMENT
+
+    The space cooling requirement should always be calculated (section 8c of the worksheet).
+    It is included in the DER and ratings if the dwelling has a fixed air conditioning system.
+    This is based on standardised cooling patterns of 6 hours/day operation and cooling of part
+    of or all the dwelling to 24°C. Details are given in Tables 10, 10a and 10b and the associated equations.
+
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
     if dwelling.get('cooled_area') and dwelling.cooled_area > 0:
         dwelling.fraction_cooled = dwelling.cooled_area / dwelling.GFA
 
         if dwelling.get("cooling_tested_eer"):
             cooling_eer = dwelling.cooling_tested_eer
-        elif dwelling.cooling_packaged_system == True:
+        elif dwelling.cooling_packaged_system:
             cooling_eer = TABLE_10C[dwelling.cooling_energy_label]['packaged_sys_eer']
         else:
             cooling_eer = TABLE_10C[dwelling.cooling_energy_label]['split_sys_eer']
@@ -381,8 +429,11 @@ def get_table3_row(dwelling):
     This implements the logic of section 4.2 Storage loss, and is used through the
     hw_primary_circuit_loss function
 
-    :param dwelling:
-    :return:
+    Args:
+        dwelling (Dwelling):
+    
+    Returns:
+        Table 3 row corresponding to this dwelling properties
     """
     if dwelling.water_heating_type_code == 901:
         # !!! Also need to do this for second main system?
@@ -427,7 +478,7 @@ def get_table3_row(dwelling):
 
     else:
         # Must be combi?
-        raise Exception("WTF?")  # !!!
+        raise Exception("Must be combi?")
         # return 6
 
 
@@ -492,8 +543,8 @@ def lookup_sap_tables(dwelling):
     if dwelling.get('secondary_sys_fuel') == ELECTRICITY_STANDARD:
         dwelling['secondary_sys_fuel'] = dwelling.electricity_tariff
 
-    dwelling['Nocc'] = occupancy(dwelling.GFA)
-    dwelling['daily_hot_water_use'] = daily_hw_use(dwelling.low_water_use, dwelling.Nocc)
+    dwelling.Nocc = table_1b_occupancy(dwelling.GFA)
+    dwelling['daily_hot_water_use'] = table_1b_daily_hot_water(dwelling.Nocc, dwelling.low_water_use)
 
     set_regional_properties(dwelling)
 
@@ -506,9 +557,11 @@ def lookup_sap_tables(dwelling):
     configure_ventilation(dwelling)
     configure_systems(dwelling)
     configure_cooling_system(dwelling)
+
     appendix_m.configure_wind_turbines(dwelling)
     appendix_m.configure_pv(dwelling)
     appendix_h.configure_solar_hw(dwelling)
+
     configure_fans_and_pumps(dwelling)
 
     # Bit of a special case here!

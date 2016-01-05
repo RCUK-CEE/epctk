@@ -1,0 +1,22 @@
+You’ll need to install an extra Python library: PyYAML (from the same site as before).
+ 
+There is now a folder called “yaml”, which has the inputs for all of the BRE test cases in the YAML format (and I included all of the pkl files – these will have changed slightly from the versions you have because of the changes I have made, so use these instead).
+ 
+There are now two ways of running calculations:
+ 
+If you run v0.py as before (I should rename that!), then it will run all of the BRE test cases and check that the outputs match.  As before it will generate a .pkl file from the .rtf file (if the .pkl file doesn’t exist), and it will generate a .yml file now as well if one doesn’t exist (and put it in the yaml directory).  It then uses the .yml file to get the test case inputs, and checks them against the outputs in the .pkl file (which came from the .rtf file).  So that means if you change the inputs in the .yml file and re-run the test case, you will see lots of the failures in the results because the outputs no longer  match.
+ 
+To run your own cases, there is a new runner called run_yaml.py.  You use it like:
+python run_yaml.py my_yaml_file.yml  > my_results.txt
+ 
+That will run the SAP, DER, TER and FEE calculations and put a calculation report into my_results.txt.  The calculation report roughly follows the sap worksheet (once for each calculation), but there are bits missing.  I intend to eventually add all of the standard SAP worksheet to the report, but usually I just add bits as I need them.  If you find bits that you need are missing let me know and I’ll add them.
+ 
+Do you need the EPC improvements recommendations results?  The calculator can calculate those too, it just doesn’t output them at the moment when you use run_yaml (it does calculate them and check the results when use run v0.py).
+ 
+The .yml files now have Texternal_heating, Igh_heating & wind_speed inputs in them.  You can just change those as you like to use different values.  If you don’t set those variables (i.e. delete them from the file), then the sap runner will populate them for you using the default SAP data, which is at the top of sap_tables.py (so you could remove the inputs from your test files and change the values at the top of sap_tables.py if you prefer, which will affect all calculations – might be easier than modifying lots of separate input files).
+ 
+Note that Texternal_heating and Igh_heating are only used for the heating season calcs.  The cooling season calcs use region specific information – which is selected based on the sap_region input.  To change the cooling season temperatures you can add a row at the bottom of table_10.csv (or modify existing rows) and set the sap_region input to select your row.
+ 
+See attached document for an overview of the SAP YAML input format.  I’ve attempted to document all of the input codes (for things like ventilation_type), let me know if I’ve missed anything or if anything is unclear.  I know it’s not particularly well documented at the moment, hopefully that will improve!
+ 
+All the best,
