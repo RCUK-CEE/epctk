@@ -2,7 +2,6 @@ import math
 
 import numpy
 
-import sap.appendix
 from .utils import sum_it, monthly_to_annual
 from .sap_constants import DAYS_PER_MONTH, HEATING_LATITUDE, SUMMER_MONTHS
 from .sap_tables import (MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
@@ -203,8 +202,6 @@ def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
     annual_radiation = dwelling.collector_Igh
 
     overshading_factor = dwelling.collector_overshading_factor
-
-    # print(dwelling.solar_collector_aperture)
     available_energy = dwelling.solar_collector_aperture * dwelling.collector_zero_loss_effy
     available_energy *= annual_radiation * overshading_factor
 
@@ -609,13 +606,13 @@ def solar(dwelling):
                        o.opening_type.roof_window)
         for o in dwelling.openings)
 
-    """for o in dwelling.openings:
-        flux=incident_solar(dwelling.Igh_heating,
-                       solar_constants_heating,
-                       o.orientation_degrees*math.pi/180,
-                       o.opening_type.roof_window) 
-
-        print o.area,o.orientation_degrees,flux,o.type.gvalue,o.type.frame_factor,solar_access_factor_winter(dwelling,o)"""
+    # for o in dwelling.openings:
+    #     flux=incident_solar(dwelling.Igh_heating,
+    #                    solar_constants_heating,
+    #                    o.orientation_degrees*math.pi/180,
+    #                    o.opening_type.roof_window)
+    #
+    #     print(o.area,o.orientation_degrees,flux,o.type.gvalue,o.type.frame_factor,solar_access_factor_winter(dwelling,o))
 
     dwelling.winter_heat_gains = dwelling.total_internal_gains + \
                                  dwelling.solar_gain_winter
