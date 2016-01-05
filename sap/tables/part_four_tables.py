@@ -1,8 +1,9 @@
 """
+SAP Tables Part 4: 4, 4a-4h
+===========================
+
 Table 4e and 4c
 ~~~~~~~~~~~~~~~
-
-
 Table 4e defines the efficiency adjustments to apply as a function
 of the combination of heating system and heating system controls installed.
 

@@ -1,9 +1,14 @@
 """
 Hide the implementation details of the tables inside this package
 
-Import the relevant functions as needed by other parts of saptk
+Import the relevant functions as needed by other parts of saptk.
+When you add, modify, or remove functions from the tables modules,
+you must make the corresponding change in this file.
 
-Aim to reduce the API surface of tables over time by encapsulating functionality inside it.
+Aim to reduce the API surface of tables over time by encapsulating
+functionality inside it, and reducing the number of imports into this
+file.
+
 """
 import os.path
 
