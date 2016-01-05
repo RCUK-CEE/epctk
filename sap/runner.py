@@ -59,7 +59,7 @@ def run_fee(input_dwelling):
         dwelling.overshading = OvershadingTypes.AVERAGE
 
     dwelling.main_heating_pcdf_id = None
-    dwelling['main_heating_type_code'] = 191
+    dwelling.main_heating_type_code = 191
     dwelling.main_sys_fuel = fuel_from_code(1)
     dwelling.heating_emitter_type = HeatEmitters.RADIATORS
     dwelling.control_type_code = 2106
@@ -122,8 +122,10 @@ def run_der(input_dwelling):
             (dwelling.get('main_sys_2_fuel') and
                  dwelling.main_sys_2_fuel.is_mains_gas)):
         input_dwelling.ter_fuel = fuel_from_code(1)
+
     elif sum(dwelling.Q_main_1) >= sum(dwelling.Q_main_2):
         input_dwelling.ter_fuel = dwelling.main_sys_fuel
+
     else:
         input_dwelling.ter_fuel = dwelling.main_sys_2_fuel
 
@@ -151,8 +153,8 @@ def run_ter(input_dwelling):
     opaque_door_area = element_type_area(HeatLossElementTypes.OPAQUE_DOOR,
                                          dwelling.heat_loss_elements)
 
-    window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == False)
-    roof_window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == True)
+    window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window is False)
+    roof_window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window is True)
     gross_wall_area = net_wall_area + window_area + opaque_door_area
 
     new_opening_area = min(dwelling.GFA * .25, gross_wall_area)
@@ -164,32 +166,37 @@ def run_ter(input_dwelling):
                                       dwelling.heat_loss_elements)
     roof_area = net_roof_area + roof_window_area
 
-    heat_loss_elements = [HeatLossElement(
+    heat_loss_elements = [
+        HeatLossElement(
             area=gross_wall_area - new_window_area - 1.85,
             Uvalue=.35,
             is_external=True,
-            element_type=HeatLossElementTypes.EXTERNAL_WALL,
-    ), HeatLossElement(
+            element_type=HeatLossElementTypes.EXTERNAL_WALL
+        ),
+        HeatLossElement(
             area=1.85,
             Uvalue=2,
             is_external=True,
-            element_type=HeatLossElementTypes.OPAQUE_DOOR,
-    ), HeatLossElement(
+            element_type=HeatLossElementTypes.OPAQUE_DOOR
+        ),
+        HeatLossElement(
             area=floor_area,
             Uvalue=.25,
             is_external=True,
-            element_type=HeatLossElementTypes.EXTERNAL_FLOOR,
-    ), HeatLossElement(
+            element_type=HeatLossElementTypes.EXTERNAL_FLOOR
+        ),
+        HeatLossElement(
             area=roof_area,
             Uvalue=.16,
             is_external=True,
-            element_type=HeatLossElementTypes.EXTERNAL_ROOF,
-    ), HeatLossElement(
+            element_type=HeatLossElementTypes.EXTERNAL_ROOF
+        ),
+        HeatLossElement(
             area=new_window_area,
             Uvalue=1. / (1. / 2 + .04),
             is_external=True,
-            element_type=HeatLossElementTypes.GLAZING,
-    )]
+            element_type=HeatLossElementTypes.GLAZING)
+    ]
 
     dwelling.heat_loss_elements = heat_loss_elements
 
@@ -303,25 +310,27 @@ def apply_low_energy_lighting(base, dwelling):
     return True
 
 
-def needs_separate_solar_cylinder(base, dwelling):
+def needs_separate_solar_cylinder(base):
     """
 
-    :param base: the base configuration of the dwelling
-    :param dwelling:
-    :return:
+    Args:
+        base: The base dwelling configuration
+    Returns:
+
     """
-    if base.water_sys.system_type in [
-        HeatingTypes.cpsu,
-        HeatingTypes.combi,
-        HeatingTypes.storage_combi,
-        HeatingTypes.heat_pump,
-        HeatingTypes.pcdf_heat_pump,
-    ]:
+    if base.water_sys.system_type in [HeatingTypes.cpsu,
+                                      HeatingTypes.combi,
+                                      HeatingTypes.storage_combi,
+                                      HeatingTypes.heat_pump,
+                                      HeatingTypes.pcdf_heat_pump]:
         return True
+
     if base.get('instantaneous_pou_water_heating'):
         return True
-    if base.water_sys.system_type == HeatingTypes.community and dwelling.get('hw_cylinder_volume') is None:
+
+    if base.water_sys.system_type == HeatingTypes.community and base.get('hw_cylinder_volume') is None:
         return True
+
     if (base.water_sys.system_type == HeatingTypes.microchp
         and base.water_sys.has_integral_store):
         return True
@@ -329,41 +338,66 @@ def needs_separate_solar_cylinder(base, dwelling):
     return False
 
 
-def apply_solar_hot_water(base, d):
-    if d.is_flat:
-        return False
-    if d.get('solar_collector_aperture', 0) > 0:
-        return False
-    d.solar_collector_aperture = 3
-    d.collector_zero_loss_effy = .7
-    d.collector_heat_loss_coeff = 1.8
-    d.collector_orientation = 180.
-    d.collector_pitch = 30.
-    d.collector_overshading = PVOvershading.MODEST
-    d.has_electric_shw_pump = True
-    d.solar_dedicated_storage_volume = 75.
+def apply_solar_hot_water(base, dwelling):
+    """
+    Apply the solar hot water improvement
+    Args:
+        base: The base dwelling configuration
+        dwelling: The improved dwelling configuration
 
-    if needs_separate_solar_cylinder(base, d):
-        d.solar_storage_combined_cylinder = False
+    Returns:
+
+    """
+    if dwelling.is_flat:
+        return False
+
+    if dwelling.get('solar_collector_aperture', 0) > 0:
+        return False
+
+    dwelling.solar_collector_aperture = 3
+    dwelling.collector_zero_loss_effy = .7
+    dwelling.collector_heat_loss_coeff = 1.8
+    dwelling.collector_orientation = 180.
+    dwelling.collector_pitch = 30.
+    dwelling.collector_overshading = PVOvershading.MODEST
+    dwelling.has_electric_shw_pump = True
+    dwelling.solar_dedicated_storage_volume = 75.
+
+    if needs_separate_solar_cylinder(base):
+        dwelling.solar_storage_combined_cylinder = False
     else:
-        assert d.hw_cylinder_volume > 0
-        d.solar_storage_combined_cylinder = True
+        assert dwelling.hw_cylinder_volume > 0
+        dwelling.solar_storage_combined_cylinder = True
 
-        if d.hw_cylinder_volume < 190 and d.get('measured_cylinder_loss'):
-            old_vol_fac = hw_volume_factor(d.hw_cylinder_volume)
+        if dwelling.hw_cylinder_volume < 190 and dwelling.get('measured_cylinder_loss'):
+            old_vol_fac = hw_volume_factor(dwelling.hw_cylinder_volume)
             new_vol_fac = hw_volume_factor(190)
-            d.measured_cylinder_loss *= new_vol_fac * 190 / (old_vol_fac * d.hw_cylinder_volume)
-            d.hw_cylinder_volume = 190
+            dwelling.measured_cylinder_loss *= new_vol_fac * 190 / (old_vol_fac * dwelling.hw_cylinder_volume)
+            dwelling.hw_cylinder_volume = 190
         else:
-            d.hw_cylinder_volume = max(d.hw_cylinder_volume, 190.)
+            dwelling.hw_cylinder_volume = max(dwelling.hw_cylinder_volume, 190.)
 
     return True
 
 
 def apply_pv(base, dwelling):
+    """
+    Apply PV improvements. Only valid if the dwelling is not a flat
+    and there are no photovoltaic systems already installed
+
+    Args:
+        base: The base dwelling configuration
+        dwelling: The improved dwelling configuration
+
+    Returns:
+        Update the dwelling configuration and return bool indicating
+        whether the PV improvement applies
+    """
+    # TODO: check whether the is_flat etc checks should be on the base dwelling or the improved one
     if dwelling.is_flat:
         return False
-    if dwelling.get('photovoltaic_systems', 0) > 0:
+
+    if len(dwelling.get('photovoltaic_systems', [])) > 0:
         return False
 
     pv_system = dict(
@@ -377,6 +411,16 @@ def apply_pv(base, dwelling):
 
 
 def apply_wind(base, dwelling):
+    """
+
+    Args:
+        base: The base dwelling configuration
+        dwelling: The improved dwelling configuration
+
+    Returns:
+        Update the dwelling configuration and return bool indicating
+        whether the wind improvement applies
+    """
     if dwelling.is_flat:
         return False
 
@@ -415,7 +459,7 @@ class ImprovementResults:
 
 def apply_previous_improvements(base, target, previous):
     for improvement in previous:
-        name, min_val, improve = [x for x in IMPROVEMENTS if x[0] == improvement.tag][0]
+        name, min_val, improve = [improve for improve in IMPROVEMENTS if improve[0] == improvement.tag][0]
         improve(base, target)
         improve(base, target)
 
@@ -429,12 +473,11 @@ def run_improvements(dwelling):
     :param dwelling:
     :return:
     """
-    print('432 run_improvements', dwelling.has_room_thermostat)
 
     base_dwelling_pcdf_prices = DwellingResults(dwelling)
 
-    print('436 run_dwelling', dwelling.has_room_thermostat)
-    print('436 run_dwelling', base_dwelling_pcdf_prices.has_room_thermostat)
+    print('435 run_improvements', dwelling.has_room_thermostat)
+    print('436 run_improvements', base_dwelling_pcdf_prices.has_room_thermostat)
 
     base_dwelling_pcdf_prices.reduced_gains = False
     base_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
