@@ -14,14 +14,27 @@ class Dwelling(dict):
     def __init__(self, **kwargs):
         # TODO: allow attributes to be sorted
         super().__init__(**kwargs)
-        self.use_pcdf_fuel_prices = True
-        self.results = dict()
-        # self.er_results = dict()
-        self.report = CalculationReport(self)
+        self['use_pcdf_fuel_prices'] = True
+        self['results'] = dict()
+        self['report'] = CalculationReport(self)
+
+    def __setattr__(self, key, value):
+        """
+        Override setting attributes so that their values go into the dictionary,
+        thereby standardising on 'dictionary style' access
+
+        Args:
+            key:
+            value:
+
+        Returns:
+
+        """
+        self[key] = value
 
     def __getattr__(self, item):
         """
-        Return own attribute, but if that is missing, return it from the results instead...
+        Make dict keys accessible as attributes
 
         FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
         """
@@ -33,26 +46,6 @@ class Dwelling(dict):
             except KeyError:
                 raise AttributeError(item)
 
-    def get(self, k, d=None):
-        """
-        The flip side of overloading getattr - if you use the dict-style "get" for a name
-        that was set dynamically as an attribute (dw.foo = 'bar'), this function will try to find it
-        by checking the dict object __dict__ as well as the normal dict elements.
-
-        Args:
-            k:
-            d: default value
-        Returns:
-            either the value of the key k or the attribute with name k
-        """
-        try:
-            return self[k]
-        except KeyError:
-            try:
-                return self.__dict__[k]
-            except KeyError:
-                return d
-
     def __str__(self):
         s = ''
         for k, v in self.items():
@@ -62,6 +55,37 @@ class Dwelling(dict):
     def __repr__(self):
         return self.__str__()
 
+
+
+    # def __setattr__(self, key, value):
+    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
+    #     # FIXME: This is really fragile...
+    #     # FIXME: also this is broken since I tried to half-fix it. Now things set with Setattr don't get copied when wrapping Dwelling.
+    #     # Special-case the attributes that are set in the init phase
+    #     if key in ['results', 'report']:
+    #         self.__dict__[key] = value
+    #     else:
+    #         self[key] = value
+
+    # def get(self, k, d=None):
+    #     """
+    #     The flip side of overloading getattr - if you use the dict-style "get" for a name
+    #     that was set dynamically as an attribute (dw.foo = 'bar'), this function will try to find it
+    #     by checking the dict object __dict__ as well as the normal dict elements.
+    #
+    #     Args:
+    #         k:
+    #         d: default value
+    #     Returns:
+    #         either the value of the key k or the attribute with name k
+    #     """
+    #     try:
+    #         return self[k]
+    #     except KeyError:
+    #         try:
+    #             return self.__dict__[k]
+    #         except KeyError:
+    #             return d
     # @property
     # def er_results(self):
     #     return self.results
@@ -83,38 +107,52 @@ class DwellingResults(Dwelling):
     The idea being that the original dwelling is 'frozen' and some point in the calculation
     """
     def __init__(self, dwelling):
-
-        self.results = dict()  # just use a Dict, don't really need CalculationResults for now
-        self.report = CalculationReport(self)
-        self.update(dwelling)
+        super().__init__(**dwelling)
+        # self.update(dwelling)
+        # self.results = dict()  # just use a Dict, don't really need CalculationResults for now
+        # self.report = CalculationReport(self)
         # self.report = self.results.report
         # self.use_pcdf_fuel_prices = True
 
     def __setattr__(self, key, value):
-        # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
-        # FIXME: This is really fragile...
-        if key not in ['results', 'report']:
-            self.results[key] = value
-        else:
-            self.__dict__[key] = value
+        """
+        Override the set attribute so that everything set AFTER wrapping
+        a dwelling in a dwellingResults is set on the `results` dict instead
+        of the 'main' dict. This way you can retrieve only the 'changed' values
+        by accessing `results`
+
+        Args:
+            key:
+            value:
+
+        """
+        self['results'][key] = value
 
     def __getattr__(self, item):
         """
-        Return own attribute, but if that is missing, return it from the results instead...
+        Return value from `results`, if missing return it from the Dwelling's original
+        properties
 
-        FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
+        Args:
+            item: name of item to retreive
         """
         try:
-            return self.results[item]
+            return self['results'][item]
         except KeyError:
-            try:
-                return self[item]
-            except KeyError:
-                try:
-                    return self.__dict__[item]
-                except KeyError:
-                    # print(self)
-                    raise AttributeError(item)
+            super().__getattr__(item)
+
+    # def __setattr__(self, key, value):
+    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
+    #     # FIXME: This is really fragile...
+    #     # FIXME: also this is broken since I tried to half-fix it. Now things set with Setattr don't get copied when wrapping Dwelling.
+    #     # TODO: Fix this properly if it fucking kills me!
+    #     # Special-case the attributes that are set in the init phase
+    #     if key in ['results', 'report']:
+    #         super().__setattr__(key, value)
+    #     else:
+    #         self.results[key] = value
+
+
 
 
 
