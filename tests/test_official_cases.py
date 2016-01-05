@@ -4,11 +4,11 @@ import pickle
 import sys
 import unittest
 
-import output_checker
 from sap import runner
 from sap.dwelling import Dwelling, log_dwelling
 from sap.io import input_conversion_rules, yaml_io
 from sap.utils import SAPCalculationError, ALL_PARAMS
+from tests import output_checker
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
 
@@ -130,7 +130,6 @@ def run_dwelling(fname, dwelling):
         dwelling['sap_region'] = 11
 
     runner.run_sap(dwelling)
-    # print(dwelling['storage_loss_factor'])
     runner.run_improvements(dwelling)
     runner.run_fee(dwelling)
     runner.run_der(dwelling)

@@ -119,7 +119,7 @@ def configure_main_system(dwelling):
         dwelling.main_sys_1 = pcdf_heating_system(dwelling,
                                                   dwelling.main_heating_pcdf_id,
                                                   dwelling.main_sys_fuel,
-                                                  dwelling.get( 'use_immersion_heater_summer', False))
+                                                  dwelling.get('use_immersion_heater_summer', False))
         # !!! Might need to enforce a secondary system?
     elif dwelling.get('sys1_sedbuk_2005_effy') is not None:
 
@@ -146,7 +146,7 @@ def configure_main_system(dwelling):
                 dwelling.get('use_immersion_heater_summer', False))
 
     elif dwelling.get('main_heating_type_code') == "community":
-        #TODO: Can Community can be second main system too?
+        # TODO: Can Community can be second main system too?
         dwelling.main_sys_1 = appendix_c.CommunityHeating(
                 dwelling.community_heat_sources,
                 dwelling.get('sap_community_distribution_type'))
@@ -308,7 +308,6 @@ def configure_controls(dwelling):
 
         configure_control_system(dwelling, 1)
 
-    print(dwelling.has_room_thermostat)
     if (dwelling.get('main_sys_2') and not dwelling.get('heating_control_type_sys2') and
                 dwelling.get("control_2_type_code") != 2100):
         configure_control_system(dwelling, 2)
@@ -480,7 +479,7 @@ def lookup_sap_tables(dwelling):
     :return:
     """
 
-    # FIXME: You'd think you'd always want PCDF prices, but this is not set by default and is usually False
+    # FIXME: use of global variable is a problem!
     if dwelling.get('use_pcdf_fuel_prices'):
         fuels.PREFER_PCDF_FUEL_PRICES = True
     else:

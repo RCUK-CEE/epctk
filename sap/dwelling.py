@@ -49,9 +49,9 @@ class Dwelling(dict):
 
     def __getattr__(self, item):
         """
-        Make dict keys accessible as attributes
+        Make dict keys accessible as attributes. If an item is not in the
+        dict, return it from the object `__dict__`
 
-        FIXME: overloading getattr is fragile and somewhat opaque, prefer getitem
         """
         try:
             return self[item]

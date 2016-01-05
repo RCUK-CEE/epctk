@@ -38,6 +38,10 @@ class CommunityHeating(HeatingSystem):
 
 
         """
+        # TODO use the super class initializer
+        # super().__init__(HeatingTypes.community, winter_effy, summer_effy,
+        #          False, False, False,
+        #          2, 0.1, CommunityFuel(fuel_factor, emission_factor_adjustment))
         self.is_community_heating = True
         self.table2b_row = 2  # !!! Assume indirect cylinder inside dwelling
         self.system_type = HeatingTypes.community
