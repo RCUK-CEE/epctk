@@ -4,6 +4,20 @@ from .fuels import Fuel, ElectricityTariff
 
 
 class Dwelling(dict):
+    """
+    Dwelling Class
+
+    Dict subclass for storing dwelling data. Is a dict which makes
+    key/value pair accessible as attributes for readability and compatibility
+    with code base.
+
+    .. todo:
+      This is somewhat error prone/sensitive to changes, and makes it harder
+      for tools like IDE's to check the types/usage of dwelling properties.
+      Would be preferable to list all the required and optional dwelling properties
+      somewhere, making the configuration much more explicit.
+
+    """
     # apply_sap_hardcoded_values here to avoid setting attrs outside of __init__
     wind_speed = WIND_SPEED
     Texternal_heating = T_EXTERNAL_HEATING
@@ -12,8 +26,9 @@ class Dwelling(dict):
     Tcooling = COOLING_BASE_TEMPERATURE
 
     def __init__(self, **kwargs):
-        # TODO: allow attributes to be sorted
         super().__init__(**kwargs)
+        # TODO: allow attributes to be sorted. Could be done by subclassing ordereddict
+        # IMPORTANT: best to only set values explicitly as dict values here
         self['use_pcdf_fuel_prices'] = True
         self['results'] = dict()
         self['report'] = CalculationReport(self)
@@ -56,63 +71,20 @@ class Dwelling(dict):
         return self.__str__()
 
 
-
-    # def __setattr__(self, key, value):
-    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
-    #     # FIXME: This is really fragile...
-    #     # FIXME: also this is broken since I tried to half-fix it. Now things set with Setattr don't get copied when wrapping Dwelling.
-    #     # Special-case the attributes that are set in the init phase
-    #     if key in ['results', 'report']:
-    #         self.__dict__[key] = value
-    #     else:
-    #         self[key] = value
-
-    # def get(self, k, d=None):
-    #     """
-    #     The flip side of overloading getattr - if you use the dict-style "get" for a name
-    #     that was set dynamically as an attribute (dw.foo = 'bar'), this function will try to find it
-    #     by checking the dict object __dict__ as well as the normal dict elements.
-    #
-    #     Args:
-    #         k:
-    #         d: default value
-    #     Returns:
-    #         either the value of the key k or the attribute with name k
-    #     """
-    #     try:
-    #         return self[k]
-    #     except KeyError:
-    #         try:
-    #             return self.__dict__[k]
-    #         except KeyError:
-    #             return d
-    # @property
-    # def er_results(self):
-    #     return self.results
-    #
-    # @er_results.setter
-    # def er_results(self, value):
-    #     self.results = value
-
-
-# TODO: could probably rather subclass Dwelling
-# FIXME: seems that worksheet in any case depends on the dwelling object having report object. May better to just merge this into Dwelling
 class DwellingResults(Dwelling):
     """
-    This looks like a dwelling but redirects 'setter' operations
-    to a 'results' internal object. This is used to perform different variations of
+    Dwelling Results allows you to "freeze" a dwelling configuration.
+    Any changes made, such as setting new attributes, will be stored in the
+    "results" dict making it easy to retreive only the changes values later
+    in the process.
+
+    This is used to perform different variations of
     SAP calculation on a dwelling and then assign only the results of those to the original
     dwelling with an appropriate prefix, e.g. der_results, fee_results etc...
 
-    The idea being that the original dwelling is 'frozen' and some point in the calculation
     """
     def __init__(self, dwelling):
         super().__init__(**dwelling)
-        # self.update(dwelling)
-        # self.results = dict()  # just use a Dict, don't really need CalculationResults for now
-        # self.report = CalculationReport(self)
-        # self.report = self.results.report
-        # self.use_pcdf_fuel_prices = True
 
     def __setattr__(self, key, value):
         """
@@ -140,17 +112,6 @@ class DwellingResults(Dwelling):
             return self['results'][item]
         except KeyError:
             super().__getattr__(item)
-
-    # def __setattr__(self, key, value):
-    #     # FIXME: hack to allow using setattr without messing with the attrs set in __init__. Would be better to access results explicitly
-    #     # FIXME: This is really fragile...
-    #     # FIXME: also this is broken since I tried to half-fix it. Now things set with Setattr don't get copied when wrapping Dwelling.
-    #     # TODO: Fix this properly if it fucking kills me!
-    #     # Special-case the attributes that are set in the init phase
-    #     if key in ['results', 'report']:
-    #         super().__setattr__(key, value)
-    #     else:
-    #         self.results[key] = value
 
 
 
