@@ -6,7 +6,7 @@ Configure the ventilation according to section 2 of SAP
 
 """
 
-from sap.tables.part_four_tables import mech_vent_default_in_use_factor, mech_vent_default_hr_effy_factor
+from .tables import mech_vent_default_in_use_factor, mech_vent_default_hr_effy_factor
 from .pcdf import mech_vent_in_use_factor, mech_vent_in_use_factor_hr, get_mev_system
 from .sap_types import VentilationTypes, DuctTypes
 

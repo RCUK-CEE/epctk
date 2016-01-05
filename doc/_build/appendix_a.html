@@ -26,7 +26,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="SAPcalc 0.1 documentation" href="index.html" />
     <link rel="next" title="Appendix B" href="appendix_b.html" />
-    <link rel="prev" title="SAP Tables" href="sap_tables.html" />
+    <link rel="prev" title="SAP Tables" href="tables.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -39,8 +39,183 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="appendix-a">
-<h1>Appendix A<a class="headerlink" href="#appendix-a" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-sap.appendix.appendix_a">
+<span id="appendix-a"></span><h1>Appendix A<a class="headerlink" href="#module-sap.appendix.appendix_a" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="appendix-a-main-and-secondary-heating-systems">
+<h2>Appendix A: Main and secondary heating systems<a class="headerlink" href="#appendix-a-main-and-secondary-heating-systems" title="Permalink to this headline">¶</a></h2>
+<p>The main heating system is that which heats the largest proportion of dwelling.
+It is a heating system which is not usually based on individual room heaters
+(although it can be), and often provides hot water as well as space heating.
+Main heating systems are either identified via the Product Characteristics Database
+or are categorised on the basis of the generic types in Tables 4a and 4b.</p>
+<p>A2.1 Identifying the main system</p>
+<blockquote>
+<div><ol class="arabic">
+<li><dl class="first docutils">
+<dt>If there is a central system that provides both space and water heating and</dt>
+<dd><p class="first last">it is capable of heating at least 30% of the dwelling, select that system
+as the main heating system. If there is no system that provides both space
+and water heating, then select the system that has the capability of heating
+the greatest part of the dwelling. For this purpose only habitable rooms should
+be considered (i.e. ignore heaters in non-habitable rooms).</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">If there is still doubt about which system should be selected as the main system,
+select the system that supplies useful heat to the dwelling at lowest cost
+(obtained by dividing fuel cost by conversion efficiency).</p>
+</li>
+</ol>
+</div></blockquote>
+<dl class="function">
+<dt id="sap.appendix.appendix_a.apply_appendix_a">
+<code class="descclassname">sap.appendix.appendix_a.</code><code class="descname">apply_appendix_a</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_a.html#apply_appendix_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_a.apply_appendix_a" title="Permalink to this definition">¶</a></dt>
+<dd><div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Move the main logic relating to appendix A from wherever it is now into this function!</p>
+</div>
+<p>A4 Description of the dwelling&#8217;s heating systems and software implementation</p>
+<ol class="loweralpha">
+<li><p class="first">If there is no heating system, assign electric heaters as the main
+system heating all rooms (no secondary system).</p>
+</li>
+<li><p class="first">If 25% or less of the habitable rooms are heated and their heating is by
+a room heater (not electric), assign electric heaters as the main system
+and the identified room heaters as the secondary system, applying the
+secondary fraction according to Table 11 for electric room heaters as the
+main system.</p>
+<p>If two main heating systems have been identified (e.g. a gas fire in one room,
+a coal fire in another room, plus 6 unheated habitable rooms) then:</p>
+<blockquote>
+<div><ul class="simple">
+<li>assign electric heaters as main system1</li>
+<li>assign the room heater entered as main system1 as the secondary system</li>
+<li>main system2 remains as it is</li>
+<li>set the fraction of heat from main system2 equal to heated habitable rooms
+divided by total habitable rooms</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Otherwise if there are any unheated habitable rooms and no secondary system
+has been identified, undertake the calculation with electric secondary heating</p>
+</li>
+</ol>
+<blockquote>
+<div>(portable electric heaters).</div></blockquote>
+<ol class="loweralpha simple" start="4">
+<li>If any fixed secondary heater has been identified, the calculation proceeds
+with the identified secondary heater, whether or not there are unheated habitable rooms.</li>
+<li>If there are no unheated habitable rooms and no fixed secondary heater
+in a habitable room, undertake the calculation with no secondary heating.</li>
+<li>An assumed heater, where main or secondary, is an electric portable heater.
+In case of main heating it does not have thermostatic control.</li>
+</ol>
+<p>Table 11 gives the fraction of the heating that is assumed to be supplied by the secondary system.
+The treatment of secondary systems is not affected by any control options for the secondary system.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_a.get_4a_main_system">
+<code class="descclassname">sap.appendix.appendix_a.</code><code class="descname">get_4a_main_system</code><span class="sig-paren">(</span><em>dwelling</em>, <em>system_code</em>, <em>fuel</em>, <em>use_immersion_in_summer</em>, <em>hetas_approved</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_a.html#get_4a_main_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_a.get_4a_main_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the main heating system according to Table 4a for the given dwelling</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dwelling</strong> &#8211; </li>
+<li><strong>system_code</strong> &#8211; </li>
+<li><strong>fuel</strong> &#8211; </li>
+<li><strong>use_immersion_in_summer</strong> &#8211; </li>
+<li><strong>hetas_approved</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">heating system configured according to Table 4A</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">HeatingSystem</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_a.get_4a_secondary_system">
+<code class="descclassname">sap.appendix.appendix_a.</code><code class="descname">get_4a_secondary_system</code><span class="sig-paren">(</span><em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_a.html#get_4a_secondary_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_a.get_4a_secondary_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the secondary heating system according to Table 4a for the
+given dwelling</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dwelling</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Secondary heating system configured from Table 4a</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">SecondarySystem</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_a.get_4b_main_system">
+<code class="descclassname">sap.appendix.appendix_a.</code><code class="descname">get_4b_main_system</code><span class="sig-paren">(</span><em>dwelling</em>, <em>system_code</em>, <em>fuel</em>, <em>use_immersion_in_summer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_a.html#get_4b_main_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_a.get_4b_main_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the secondary heating system according to Table 4b for the
+given dwelling</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dwelling</strong> (<em>Dwelling</em>) &#8211; </li>
+<li><strong>system_code</strong> &#8211; </li>
+<li><strong>fuel</strong> &#8211; </li>
+<li><strong>use_immersion_in_summer</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Secondary heating system configured from Table 4b</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">SecondarySystem</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_a.sap_table_heating_system">
+<code class="descclassname">sap.appendix.appendix_a.</code><code class="descname">sap_table_heating_system</code><span class="sig-paren">(</span><em>dwelling</em>, <em>system_code</em>, <em>fuel</em>, <em>use_immersion_in_summer</em>, <em>hetas_approved</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_a.html#sap_table_heating_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_a.sap_table_heating_system" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a HeatingSystem definition from SAP Table 4a if available, otherwise
+from Table 4b</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dwelling</strong> &#8211; </li>
+<li><strong>system_code</strong> &#8211; </li>
+<li><strong>fuel</strong> &#8211; </li>
+<li><strong>use_immersion_in_summer</strong> &#8211; </li>
+<li><strong>hetas_approved</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A heating system object with data loaded from the appropriate SAP table</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">HeatingSystem</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -48,11 +223,19 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Appendix A</a><ul>
+<li><a class="reference internal" href="#appendix-a-main-and-secondary-heating-systems">Appendix A: Main and secondary heating systems</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="sap_tables.html" title="previous chapter">SAP Tables</a></li>
+      <li>Previous: <a href="tables.html" title="previous chapter">SAP Tables</a></li>
       <li>Next: <a href="appendix_b.html" title="next chapter">Appendix B</a></li>
   </ul></li>
 </ul>

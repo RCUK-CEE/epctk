@@ -1,5 +1,4 @@
 SKIP = [
-    "EW-10s- semi - heat pump with PSR too large.rtf",
 
      # FIXME no code 495xxx in PCDF database
     "EW-3k-semi - with Test Database-index 495006.rtf",
@@ -25,6 +24,8 @@ SKIP = [
     "EW-10i-Heatpump - s-1_v-1(24-hour).rtf",
     "EW-10j- Heatpump - s-1_v-1(16-hour).rtf",
     "EW-10k-Heatpump - s-1_v-1(11-hour).rtf",
+    "EW-10r- Heatpump - warm air 493194.rtf",
+
 
     # FIXME: NO code 492xxx boilers in PCDF database
     "EW-9c- mCHP - oil - service 1 vessel 1 - test database 492023.rtf",  # fan and pump gain is odd?
@@ -34,6 +35,14 @@ SKIP = [
     "EW-9g- mCHP - Ex 3_ service 2 vessel 1.rtf",
     "EW-9h- mCHP - Ex 3_ service 2 vessel 3.rtf",
     "EW-9i- mCHP - Ex 3_ service 3 vessel 4.rtf",
+
+    # Fixme: Bug with this one, does not load water storage loss factor
+    "EW-10m- Heatpump Daikin index 100013 -10-hour.rtf",
+
+    # This one doesn't parse
+    "EW-10s- semi - heat pump with PSR too large.rtf",
+
+
 ]
 
 OFFICIAL_CASES_THAT_WORK = [

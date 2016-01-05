@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="SAPcalc 0.1 documentation" href="index.html" />
-    <link rel="next" title="SAP Tables" href="sap_tables.html" />
+    <link rel="next" title="SAP Tables" href="tables.html" />
     <link rel="prev" title="Welcome to SAPcalc’s documentation!" href="index.html" />
    
   
@@ -41,6 +41,73 @@
             
   <div class="section" id="sap-section-2-ventilation">
 <h1>SAP Section 2: Ventilation<a class="headerlink" href="#sap-section-2-ventilation" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-sap.ventilation"></span><div class="section" id="id1">
+<h2>SAP Section 2: Ventilation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Configure the ventilation according to section 2 of SAP</p>
+<dl class="function">
+<dt id="sap.ventilation.configure_ventilation">
+<code class="descclassname">sap.ventilation.</code><code class="descname">configure_ventilation</code><span class="sig-paren">(</span><em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/ventilation.html#configure_ventilation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.ventilation.configure_ventilation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mechanical ventilation:</p>
+<ol class="loweralpha">
+<li><p class="first">Positive input ventilation (PIV)
+Positive input ventilation is a fan driven ventilation system, which
+often provides ventilation to the dwelling from the loft space. The
+SAP calculation procedure for systems which use the loft to pre-heat
+the ventilation air is the same as for natural ventilation, including
+20 m3/h ventilation rate equivalent to two extract fans or passive vents.
+(The energy used by the fan is taken as counterbalancing the effect of
+using slightly warmer air from the loft space compared with outside).
+Some positive input ventilation systems supply the air directly from
+the outside and the procedure for these systems is the same as for mechanical extract ventilation.</p>
+</li>
+<li><p class="first">Mechanical extract ventilation (MEV)
+MEV is a fan driven ventilation system, which only extracts air from
+the dwelling. The SAP calculation is based on a throughput of 0.5 air
+changes per hour through the mechanical system, plus infiltration.
+MEV can be either:</p>
+<blockquote>
+<div><ul class="simple">
+<li>centralised: air is extracted from wet rooms via ducting and expelled by means of a central fan., or</li>
+<li>decentralised: air is extracted by continuously-running fans in each wet room.</li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dwelling</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.ventilation.set_mvhr_dwelling_properties">
+<code class="descclassname">sap.ventilation.</code><code class="descname">set_mvhr_dwelling_properties</code><span class="sig-paren">(</span><em>dwelling</em>, <em>mv_ducttype</em>, <em>mv_approved</em>, <em>ventilation_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/ventilation.html#set_mvhr_dwelling_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.ventilation.set_mvhr_dwelling_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the properties for the MVHR unit based on tables 4g and 4h</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dwelling</strong> &#8211; </li>
+<li><strong>mv_ducttype</strong> &#8211; </li>
+<li><strong>mv_approved</strong> &#8211; </li>
+<li><strong>ventilation_type</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -48,12 +115,20 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SAP Section 2: Ventilation</a><ul>
+<li><a class="reference internal" href="#id1">SAP Section 2: Ventilation</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to SAPcalc&#8217;s documentation!</a></li>
-      <li>Next: <a href="sap_tables.html" title="next chapter">SAP Tables</a></li>
+      <li>Next: <a href="tables.html" title="next chapter">SAP Tables</a></li>
   </ul></li>
 </ul>
 </div>

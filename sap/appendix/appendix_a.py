@@ -44,8 +44,8 @@ def apply_appendix_a():
        secondary fraction according to Table 11 for electric room heaters as the
        main system.
 
-        If two main heating systems have been identified (e.g. a gas fire in one room,
-         a coal fire in another room, plus 6 unheated habitable rooms) then:
+       If two main heating systems have been identified (e.g. a gas fire in one room,
+       a coal fire in another room, plus 6 unheated habitable rooms) then:
 
         - assign electric heaters as main system1
         - assign the room heater entered as main system1 as the secondary system
@@ -65,6 +65,7 @@ def apply_appendix_a():
 
     f) An assumed heater, where main or secondary, is an electric portable heater.
        In case of main heating it does not have thermostatic control.
+
 
     Table 11 gives the fraction of the heating that is assumed to be supplied by the secondary system.
     The treatment of secondary systems is not affected by any control options for the secondary system.

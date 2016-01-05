@@ -13,15 +13,26 @@ import types
 
 import numpy
 
-from ..tables import (interpolate_efficiency, interpolate_psr_table,
-                                   table_n8_secondary_fraction, table_n4_heating_days)
 from ..constants import SUMMER_MONTHS, USE_TABLE_4D_FOR_RESPONSIVENESS
 from ..heating_system_types import HeatingSystem
 from ..sap_types import HeatingTypes, FuelTypes
+from ..tables import table_n4_heating_days, table_n8_secondary_fraction, interpolate_psr_table, interpolate_efficiency
 from ..utils import weighted_effy
 
 
 def add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data):
+    """
+    Add the appendix n equations, which overwrite the default methods in some
+    cases
+
+    Args:
+        dwelling:
+        sys:
+        pcdf_data:
+
+    Returns:
+
+    """
     add_appendix_n_equations_shared(dwelling, sys, pcdf_data)
 
     def heat_pump_space_effy(self, Q_space):
@@ -61,10 +72,11 @@ def add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data):
             Qfans = dwelling.volume * dwelling.adjusted_fan_sfp * throughput * Rhp * (
                 8760 - running_hours) / 3600
             dwelling.Q_mech_vent_fans = Qfans
+
         else:
             effy = interpolate_efficiency(psr, pcdf_data['psr_datasets'][0])
 
-        space_heat_in_use_factor = .95
+        space_heat_in_use_factor = 0.95
         return effy * space_heat_in_use_factor
 
     def heat_pump_water_effy(self, Q_water):
@@ -91,6 +103,7 @@ def add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data):
         if self.summer_immersion:
             for i in SUMMER_MONTHS:
                 water_effy[i] = 100
+
         return water_effy
 
     # Dynamically add a method to the system
@@ -103,6 +116,29 @@ def sch3_calc(dwelling, sch2val, sch3val):
     return sch2val + (sch3val - sch2val) * (Vd - 100.2) / 99.6
 
 
+def table_n3(heating_duration, psr):
+    """
+
+    Args:
+        heating_duration:
+        psr:
+
+    Returns:
+
+    """
+    if heating_duration == "V":
+        N24_16, N24_9, N16_9 = table_n4_heating_days(psr)
+    elif heating_duration == "24":
+        N24_16, N24_9, N16_9 = (104, 261, 0)
+    elif heating_duration == "16":
+        N24_16, N24_9, N16_9 = (0, 0, 261)
+    else:
+        assert heating_duration == "11"
+        N24_16, N24_9, N16_9 = (0, 0, 0)
+
+    return N16_9, N24_16, N24_9
+
+
 def add_appendix_n_equations_shared(dwelling, sys, pcdf_data):
     def longer_heating_days(self):
         h_mean = sum(dwelling.h) / 12
@@ -112,15 +148,7 @@ def add_appendix_n_equations_shared(dwelling, sys, pcdf_data):
         dwelling.fraction_of_heat_from_main = 1 - table_n8_secondary_fraction(psr, pcdf_data['heating_duration'])
 
         # TABLE N3
-        if pcdf_data['heating_duration'] == "V":
-            N24_16, N24_9, N16_9 = table_n4_heating_days(psr)
-        elif pcdf_data['heating_duration'] == "24":
-            N24_16, N24_9, N16_9 = (104, 261, 0)
-        elif pcdf_data['heating_duration'] == "16":
-            N24_16, N24_9, N16_9 = (0, 0, 261)
-        else:
-            assert pcdf_data['heating_duration'] == "11"
-            N24_16, N24_9, N16_9 = (0, 0, 0)
+        N16_9, N24_16, N24_9 = table_n3(pcdf_data['heating_duration'], psr)
 
         # TABLE N5
         MONTH_ORDER = [0, 11, 1, 2, 10, 3, 9, 4, 5, 6, 7, 8]
@@ -281,3 +309,5 @@ def heat_pump_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
 
     add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data)
     return sys
+
+

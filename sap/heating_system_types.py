@@ -1,3 +1,10 @@
+"""
+Class definitions for heating system types
+
+Note that there is also Community heating type
+which is a subclass in appendix_c
+
+"""
 import numpy
 
 from .constants import SUMMER_MONTHS

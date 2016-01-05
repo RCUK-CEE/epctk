@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SAP Tables &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="index.html" />
+    <link rel="next" title="Appendix A" href="appendix_a.html" />
+    <link rel="prev" title="SAP Section 2: Ventilation" href="part_2.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sap-tables">
+<h1>SAP Tables<a class="headerlink" href="#sap-tables" title="Permalink to this headline">¶</a></h1>
+<p>Functions and constants implementing various SAP tables</p>
+<span class="target" id="module-sap.tables"></span><p>Hide the implementation details of the tables inside this package</p>
+<p>Import the relevant functions as needed by other parts of saptk.
+When you add, modify, or remove functions from the tables modules,
+you must make the corresponding change in this file.</p>
+<p>Aim to reduce the API surface of tables over time by encapsulating
+functionality inside it, and reducing the number of imports into this
+file.</p>
+<span class="target" id="module-sap.tables.sap_tables"></span><dl class="function">
+<dt id="sap.tables.sap_tables.system_efficiency">
+<code class="descclassname">sap.tables.sap_tables.</code><code class="descname">system_efficiency</code><span class="sig-paren">(</span><em>system_data</em>, <em>fuel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/tables/sap_tables.html#system_efficiency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.tables.sap_tables.system_efficiency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to get the efficiency of the given heating sustem</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>system_data</strong> &#8211; HeatingSystem</li>
+<li><strong>fuel</strong> &#8211; fuel of this heating system.</li>
+<li><strong>todo</strong> (<em>.</em>) &#8211; why can&#8217;t we just get the fuel from the system?</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.tables.sap_tables.table_1b_daily_hot_water">
+<code class="descclassname">sap.tables.sap_tables.</code><code class="descname">table_1b_daily_hot_water</code><span class="sig-paren">(</span><em>low_water_use</em>, <em>Nocc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/tables/sap_tables.html#table_1b_daily_hot_water"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.tables.sap_tables.table_1b_daily_hot_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table 1b part 2: Domestic hot water usage</p>
+<ol class="loweralpha">
+<li><p class="first">Annual average hot water usage in litres per day Vd,average = (25 × N) + 36</p>
+</li>
+<li><p class="first">Reduce the annual average hot water usage by 5% if the dwelling is designed
+to achieve a water use target of not more that 125 litres per person per day
+(all water use, hot and cold)</p>
+</li>
+<li><p class="first">For each month, multiply Vd,average by the factor from Table 1c to obtain
+the daily volume in the month Vd,m</p>
+</li>
+<li><dl class="first docutils">
+<dt>The energy content of water used is</dt>
+<dd><p class="first last">4.190 × Vd,m × nm × ∆Tm / 3600 kWh/month</p>
+</dd>
+</dl>
+<p>where ∆Tm is the temperature rise for month m from Table 1d.</p>
+</li>
+<li><p class="first">Distribution loss is 0.15 times energy content calculated in (d).</p>
+</li>
+</ol>
+<p>This function calculates parts a) and b)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Nocc</strong> &#8211; Number of Occupants (from Table 1b part 1)</li>
+<li><strong>low_water_use</strong> (<em>bool</em>) &#8211; Whether the dwelling is designed to save water (see point b)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Average daily hot water use</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.tables.sap_tables.table_1b_occupancy">
+<code class="descclassname">sap.tables.sap_tables.</code><code class="descname">table_1b_occupancy</code><span class="sig-paren">(</span><em>TFA</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/tables/sap_tables.html#table_1b_occupancy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.tables.sap_tables.table_1b_occupancy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table 1b Part 1: Occupancy</p>
+<p>if TFA &gt; 13.9: N = 1 + 1.76 × [1-exp (-0.000349 × (TFA-13.9)2 )] + 0.0013 × (TFA-13.9)</p>
+<p>if TFA ≤ 13.9: N=1</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>TFA</strong> &#8211; Total Floor Area</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Assumed number of occupants</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.tables.sap_tables.table_2_hot_water_store_loss_factor">
+<code class="descclassname">sap.tables.sap_tables.</code><code class="descname">table_2_hot_water_store_loss_factor</code><span class="sig-paren">(</span><em>hw_cylinder_insulation_type</em>, <em>hw_cylinder_insulation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/tables/sap_tables.html#table_2_hot_water_store_loss_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.tables.sap_tables.table_2_hot_water_store_loss_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table 2</p>
+<p>Calculate Hot water storage loss factor according to equation in Note 1.
+of Table 2 (rather than using the tabulated values)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hw_cylinder_insulation_type</strong> (<em>CylinderInsulationTypes</em>) &#8211; </li>
+<li><strong>hw_cylinder_insulation</strong> &#8211; thickness of cylinder insulation in mm</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">hot water storage loss factor in kWh/litre/day</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.tables.sap_tables.table_2a_hot_water_vol_factor">
+<code class="descclassname">sap.tables.sap_tables.</code><code class="descname">table_2a_hot_water_vol_factor</code><span class="sig-paren">(</span><em>cylinder_volume</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/tables/sap_tables.html#table_2a_hot_water_vol_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.tables.sap_tables.table_2a_hot_water_vol_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table 2a</p>
+<p>Calculate the volume factor according to equation in Note 2. of Table 2a
+When using Table 2, the loss is to be multiplied by the volume factor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cylinder_volume</strong> &#8211; volume of hot water cylinder</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">hot water volume factor</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.tables.sap_tables.table_2b_hot_water_temp_factor">
+<code class="descclassname">sap.tables.sap_tables.</code><code class="descname">table_2b_hot_water_temp_factor</code><span class="sig-paren">(</span><em>dwelling</em>, <em>measured_loss</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/tables/sap_tables.html#table_2b_hot_water_temp_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.tables.sap_tables.table_2b_hot_water_temp_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the hot water temperature factor according to Table 2b</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dwelling</strong> (<em>Dwelling</em>) &#8211; </li>
+<li><strong>measured_loss</strong> &#8211; boolean, whether the losses are measured by manufacturer or must be assumed</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.tables.sap_tables.table_5a_fans_and_pumps_gain">
+<code class="descclassname">sap.tables.sap_tables.</code><code class="descname">table_5a_fans_and_pumps_gain</code><span class="sig-paren">(</span><em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/tables/sap_tables.html#table_5a_fans_and_pumps_gain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.tables.sap_tables.table_5a_fans_and_pumps_gain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Table 5a gains from pumps and fans
+:param dwelling:</p>
+<p>Returns:</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="part_2.html" title="previous chapter">SAP Section 2: Ventilation</a></li>
+      <li>Next: <a href="appendix_a.html" title="next chapter">Appendix A</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tables.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/tables.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

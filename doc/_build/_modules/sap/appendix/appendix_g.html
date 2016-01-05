@@ -46,12 +46,12 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
+<span class="kn">from</span> <span class="nn">..tables</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MONTHLY_HOT_WATER_TEMPERATURE_RISE</span><span class="p">,</span> <span class="n">MONTHLY_HOT_WATER_FACTORS</span><span class="p">,</span> <span class="n">TABLE_H3</span><span class="p">,</span>
+                                   <span class="n">combi_loss_table_3a</span><span class="p">,</span> <span class="n">combi_loss_table_3b</span><span class="p">,</span> <span class="n">combi_loss_table_3c</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.appendix_m</span> <span class="kn">import</span> <span class="n">configure_pv_system</span>
 <span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">DAYS_PER_MONTH</span>
 <span class="kn">from</span> <span class="nn">..pcdf</span> <span class="kn">import</span> <span class="n">get_wwhr_system</span><span class="p">,</span> <span class="n">get_fghr_system</span>
-<span class="kn">from</span> <span class="nn">..sap_tables</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MONTHLY_HOT_WATER_TEMPERATURE_RISE</span><span class="p">,</span> <span class="n">MONTHLY_HOT_WATER_FACTORS</span><span class="p">,</span> <span class="n">TABLE_H3</span><span class="p">,</span>
-                            <span class="n">combi_loss_table_3a</span><span class="p">,</span> <span class="n">combi_loss_table_3b</span><span class="p">,</span> <span class="n">combi_loss_table_3c</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">..sap_types</span> <span class="kn">import</span> <span class="n">HeatingTypes</span>
-<span class="kn">from</span> <span class="nn">.appendix_m</span> <span class="kn">import</span> <span class="n">configure_pv_system</span>
 
 
 <div class="viewcode-block" id="configure_wwhr"><a class="viewcode-back" href="../../../appendix_g.html#sap.appendix.appendix_g.configure_wwhr">[docs]</a><span class="k">def</span> <span class="nf">configure_wwhr</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>

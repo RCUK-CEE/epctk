@@ -12,7 +12,7 @@ Contents:
     :maxdepth: 2
 
     part_2
-    sap_tables
+    tables
 
     appendix_a
     appendix_b

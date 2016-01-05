@@ -19,10 +19,6 @@ from .sap_types import HeatingTypes, ThermalStoreTypes, CylinderInsulationTypes,
 from .utils import SAPCalculationError
 
 
-# Table 12a
-# Table 13
-
-
 def pcdf_heating_system(dwelling, pcdf_id,
                         fuel, use_immersion_in_summer):
     """
@@ -69,7 +65,6 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
     """
     Generate a gas boiler heating system from dwelling data
 
-    TODO: Refactor this function into smaller easier to audit chunks
 
     Args:
         dwelling:
@@ -81,6 +76,8 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
         HeatingSystem gas boiler heating system
 
     """
+    # TODO: Refactor gas_boiler_from_pcdf into smaller easier to audit chunks
+
     if pcdf_data['main_type'] == "Combi":
         system_type = HeatingTypes.combi
     elif pcdf_data['main_type'] == "CPSU":
@@ -147,6 +144,7 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
                 dwelling.hw_cylinder_volume = pcdf_data["store_boiler_volume"]
                 dwelling.hw_cylinder_insulation = pcdf_data["store_insulation_mms"]
                 dwelling.hw_cylinder_insulation_type = CylinderInsulationTypes.FOAM
+
                 # Force calc to use the data from pcdf, don't use a user entered cylinder loss
                 dwelling.measured_cylinder_loss = None
 
@@ -167,6 +165,7 @@ def gas_boiler_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
             if pcdf_data['keep_hot_facility'] == "elec" or pcdf_data['keep_hot_facility'] == "gas/oil and elec":
                 # !!! or mixed?
                 sys.keep_hot_elec_consumption = 600
+
         else:
             sys.table3a_fn = combi_loss_instant_with_untimed_heat_hot
             if pcdf_data['keep_hot_facility'] == "elec" or pcdf_data['keep_hot_facility'] == "gas/oil and elec":

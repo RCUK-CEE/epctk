@@ -38,8 +38,105 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="appendix-t">
-<h1>Appendix T<a class="headerlink" href="#appendix-t" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-sap.appendix.appendix_t">
+<span id="appendix-t"></span><h1>Appendix T<a class="headerlink" href="#module-sap.appendix.appendix_t" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="appendix-t-improvement-measures">
+<h2>Appendix T : Improvement measures<a class="headerlink" href="#appendix-t-improvement-measures" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sap.appendix.appendix_t.apply_low_energy_lighting">
+<code class="descclassname">sap.appendix.appendix_t.</code><code class="descname">apply_low_energy_lighting</code><span class="sig-paren">(</span><em>base</em>, <em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_t.html#apply_low_energy_lighting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_t.apply_low_energy_lighting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply low energy lighting improvement
+:param base: base performance is ignored, but necessary to maintain consisten interface
+:param dwelling:
+:return:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_t.apply_pv">
+<code class="descclassname">sap.appendix.appendix_t.</code><code class="descname">apply_pv</code><span class="sig-paren">(</span><em>base</em>, <em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_t.html#apply_pv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_t.apply_pv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply PV improvements. Only valid if the dwelling is not a flat
+and there are no photovoltaic systems already installed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>base</strong> &#8211; The base dwelling configuration</li>
+<li><strong>dwelling</strong> &#8211; The improved dwelling configuration</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Update the dwelling configuration and return bool indicating
+whether the PV improvement applies</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_t.apply_solar_hot_water">
+<code class="descclassname">sap.appendix.appendix_t.</code><code class="descname">apply_solar_hot_water</code><span class="sig-paren">(</span><em>base</em>, <em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_t.html#apply_solar_hot_water"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_t.apply_solar_hot_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the solar hot water improvement
+:param base: The base dwelling configuration
+:param dwelling: The improved dwelling configuration</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_t.apply_wind">
+<code class="descclassname">sap.appendix.appendix_t.</code><code class="descname">apply_wind</code><span class="sig-paren">(</span><em>base</em>, <em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_t.html#apply_wind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_t.apply_wind" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>base</strong> &#8211; The base dwelling configuration</li>
+<li><strong>dwelling</strong> &#8211; The improved dwelling configuration</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Update the dwelling configuration and return bool indicating
+whether the wind improvement applies</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_t.needs_separate_solar_cylinder">
+<code class="descclassname">sap.appendix.appendix_t.</code><code class="descname">needs_separate_solar_cylinder</code><span class="sig-paren">(</span><em>base</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_t.html#needs_separate_solar_cylinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_t.needs_separate_solar_cylinder" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>base</strong> &#8211; The base dwelling configuration</td>
+</tr>
+</tbody>
+</table>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sap.appendix.appendix_t.run_improvements">
+<code class="descclassname">sap.appendix.appendix_t.</code><code class="descname">run_improvements</code><span class="sig-paren">(</span><em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sap/appendix/appendix_t.html#run_improvements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sap.appendix.appendix_t.run_improvements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Need to run the dwelling twice: once with pcdf fuel prices to
+get cost change, once with normal SAP fuel prices to get change
+in SAP rating</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dwelling</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -47,7 +144,15 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Appendix T</a><ul>
+<li><a class="reference internal" href="#appendix-t-improvement-measures">Appendix T : Improvement measures</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
