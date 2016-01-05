@@ -1,4 +1,3 @@
-import collections
 import sys
 import logging
 import numpy

@@ -454,7 +454,7 @@ def check_ter(d, res):
 
 def check_improvements(d, res):
     if res.improvements == "":
-        logging.warn("No TER section")
+        logging.warning("No TER section")
         return
 
     if res.improvements.effects == "(none)":

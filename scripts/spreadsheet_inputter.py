@@ -1,15 +1,16 @@
 import logging
 
 import win32com.client
-from output_checker import check_monthly_result
-from output_checker import check_result
-from output_checker import check_summer_monthly_result
+from tests.output_checker import check_monthly_result, check_result, check_summer_monthly_result
 
 import sap.sap_types
 from sap import runner
 from sap.dwelling import Dwelling
-from sap.io import input_conversion_rules, pcdf
-from sap.sap_types import GlazingTypes, VentilationTypes
+from sap.io import input_conversion_rules
+from sap.sap_types import (GlazingTypes, VentilationTypes, HeatEmitters, ImmersionTypes,
+                           CylinderInsulationTypes, DuctTypes, WallTypes, FloorTypes,
+                           PVOvershading, SHWCollectorTypes, LoadCompensators, HeatingTypes,
+                           TerrainTypes)
 from tests import reference_case_parser
 
 
@@ -360,8 +361,8 @@ def process_glazing_elements(xlbook, d):
 
 
 IMMERSION_TYPES = {
-    tables.ImmersionTypes.DUAL: "Dual",
-    tables.ImmersionTypes.SINGLE: "Single",
+    ImmersionTypes.DUAL: "Dual",
+    ImmersionTypes.SINGLE: "Single",
 }
 
 
@@ -385,12 +386,9 @@ def process_hw(xlbook, d: Dwelling):
     else:
         xlbook.set_input("water_sys_fuel", "")
 
-    xlbook.set_input("has_hw_time_control",
-                     true_and_not_missing(d, "has_hw_time_control"))
-    xlbook.set_input("has_cylinderstat",
-                     true_and_not_missing(d, "has_cylinderstat"))
-    xlbook.set_input("primary_pipework_insulated",
-                     true_and_not_missing(d, "primary_pipework_insulated"))
+    xlbook.set_input("has_hw_time_control", d.get("has_hw_time_control", False))
+    xlbook.set_input("has_cylinderstat", d.get("has_cylinderstat", False))
+    xlbook.set_input("primary_pipework_insulated", d.get("primary_pipework_insulated", False))
 
     if not hasattr(d, "hw_cylinder_volume") or d.hw_cylinder_volume == 0:
         xlbook.set_input("cylinder_in_heated_space", "")
@@ -401,8 +399,7 @@ def process_hw(xlbook, d: Dwelling):
         xlbook.set_input("hw_cylinder_insulation_type", "")
     else:
         if hasattr(d, 'cylinder_in_heated_space'):
-            xlbook.set_input("cylinder_in_heated_space",
-                             d.cylinder_in_heated_space)
+            xlbook.set_input("cylinder_in_heated_space", d.cylinder_in_heated_space)
         else:
             xlbook.set_input("cylinder_in_heated_space", True)
 
@@ -438,14 +435,14 @@ PITCH = {
     60: 60,
 }
 OVERSHADING = {
-    tables.PVOvershading.HEAVY: 'Heavy',
-    tables.PVOvershading.SIGNIFICANT: 'Significant',
-    tables.PVOvershading.MODEST: 'Modest',
-    tables.PVOvershading.NONE_OR_VERY_LITTLE: 'None or very little',
+    PVOvershading.HEAVY: 'Heavy',
+    PVOvershading.SIGNIFICANT: 'Significant',
+    PVOvershading.MODEST: 'Modest',
+    PVOvershading.NONE_OR_VERY_LITTLE: 'None or very little',
 }
 COLLECTOR_TYPES = {
-    tables.SHWCollectorTypes.EVACUATED_TUBE: "evacuated tube",
-    tables.SHWCollectorTypes.UNGLAZED: "unglazed",
+    SHWCollectorTypes.EVACUATED_TUBE: "evacuated tube",
+    SHWCollectorTypes.UNGLAZED: "unglazed",
 }
 
 
@@ -515,9 +512,9 @@ def clear_pv(xlbook, d):
 
 
 TERRAIN = {
-    tables.TerrainTypes.RURAL: 'Rural',
-    tables.TerrainTypes.SUBURBAN: 'Low rise urban',
-    tables.TerrainTypes.DENSE_URBAN: 'Dense urban',
+    TerrainTypes.RURAL: 'Rural',
+    TerrainTypes.SUBURBAN: 'Low rise urban',
+    TerrainTypes.DENSE_URBAN: 'Dense urban',
 }
 
 
@@ -538,10 +535,10 @@ def clear_wind(xlbook, d):
 
 
 SEDBUK_TYPE_TO_STRING = {
-    tables.HeatingSystem.TYPES.regular_boiler: "Regular",
-    tables.HeatingSystem.TYPES.storage_combi: "Storage combi",
-    tables.HeatingSystem.TYPES.cpsu: "CPSU",
-    tables.HeatingSystem.TYPES.combi: "Combi",
+    HeatingTypes.regular_boiler: "Regular",
+    HeatingTypes.storage_combi: "Storage combi",
+    HeatingTypes.cpsu: "CPSU",
+    HeatingTypes.combi: "Combi",
 }
 
 
@@ -587,8 +584,7 @@ def write_secondary_system(xlbook, d):
                          d.secondary_sys_manuf_effy)
         xlbook.set_input("secondary_heating_type_code", "")
 
-    xlbook.set_input("secondary_hetas_approved",
-                     true_and_not_missing(d, "secondary_hetas_approved"))
+    xlbook.set_input("secondary_hetas_approved", d.get("secondary_hetas_approved", False))
 
 
 def clear_secondary_system(xlbook):
@@ -598,14 +594,14 @@ def clear_secondary_system(xlbook):
 
 
 HEATING_EMITTER_TYPES = {
-    tables.HeatEmitters.RADIATORS: "Radiators",
-    tables.HeatEmitters.UNDERFLOOR_TIMBER: "Underfloor heating, pipes in insulated timber floor",
-    tables.HeatEmitters.UNDERFLOOR_SCREED: "Underfloor heating, in screed above insulation",
-    tables.HeatEmitters.UNDERFLOOR_CONCRETE: "Underfloor heating, pipes in concrete slab",
-    tables.HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER: "Underfloor heating and radiators, pipes in insulated timber floor",
-    tables.HeatEmitters.RADIATORS_UNDERFLOOR_SCREED: "Underfloor heating and radiators, in screed above insulation",
-    tables.HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE: "Underfloor heating and radiators, pipes in concrete slab",
-    tables.HeatEmitters.FAN_COILS: "Fan coil units",
+    HeatEmitters.RADIATORS: "Radiators",
+    HeatEmitters.UNDERFLOOR_TIMBER: "Underfloor heating, pipes in insulated timber floor",
+    HeatEmitters.UNDERFLOOR_SCREED: "Underfloor heating, in screed above insulation",
+    HeatEmitters.UNDERFLOOR_CONCRETE: "Underfloor heating, pipes in concrete slab",
+    HeatEmitters.RADIATORS_UNDERFLOOR_TIMBER: "Underfloor heating and radiators, pipes in insulated timber floor",
+    HeatEmitters.RADIATORS_UNDERFLOOR_SCREED: "Underfloor heating and radiators, in screed above insulation",
+    HeatEmitters.RADIATORS_UNDERFLOOR_CONCRETE: "Underfloor heating and radiators, pipes in concrete slab",
+    HeatEmitters.FAN_COILS: "Fan coil units",
 }
 
 
@@ -618,7 +614,7 @@ def process_cooling(xlbook, d):
 
 def write_cooling_system(xlbook, d):
     xlbook.set_input("cooled_area", d.cooled_area)
-    if hasattr(d, 'cooling_tested_eer'):
+    if d.get('cooling_tested_eer'):
         xlbook.set_input("cooling_tested_eer", d.cooling_tested_eer)
         xlbook.set_input("cooling_energy_label", "")
     else:
@@ -662,18 +658,16 @@ def process_systems(xlbook, d):
     else:
         xlbook.set_input("heating_emitter_type", "n/a")
     xlbook.set_input("control_type_code", d.control_type_code)
-    xlbook.set_input("cpsu_not_in_airing_cupboard",
-                     true_and_not_missing(d, 'cpsu_not_in_airing_cupboard'))
+    xlbook.set_input("cpsu_not_in_airing_cupboard", d.get('cpsu_not_in_airing_cupboard', False))
 
     if hasattr(d, 'sys1_load_compensator') and d.sys1_load_compensator in [
-        tables.LoadCompensators.ENHANCED_LOAD_COMPENSATOR,
-        tables.LoadCompensators.WEATHER_COMPENSATOR]:
+        LoadCompensators.ENHANCED_LOAD_COMPENSATOR,
+        LoadCompensators.WEATHER_COMPENSATOR]:
         xlbook.set_input("has_enhanced_load_compensator", True)
     else:
         xlbook.set_input("has_enhanced_load_compensator", False)
 
-    xlbook.set_input("sys1_delayed_start_thermostat",
-                     true_and_not_missing(d, 'sys1_delayed_start_thermostat'))
+    xlbook.set_input("sys1_delayed_start_thermostat", d.get('sys1_delayed_start_thermostat', False))
 
     if hasattr(d, "hwsys_has_boiler_interlock"):
         has_interlock = d.hwsys_has_boiler_interlock
@@ -713,12 +707,12 @@ def process_systems(xlbook, d):
 
 
 VENTILATION_TYPES = {
-    tables.VentilationTypes.NATURAL: "natural",
-    tables.VentilationTypes.MVHR: "mvhr",
-    tables.VentilationTypes.MEV_CENTRALISED: "mev (centralised)",
-    tables.VentilationTypes.MEV_DECENTRALISED: "mev (decentralised)",
-    tables.VentilationTypes.MV: "mv",
-    tables.VentilationTypes.PIV_FROM_OUTSIDE: "piv",
+    VentilationTypes.NATURAL: "natural",
+    VentilationTypes.MVHR: "mvhr",
+    VentilationTypes.MEV_CENTRALISED: "mev (centralised)",
+    VentilationTypes.MEV_DECENTRALISED: "mev (decentralised)",
+    VentilationTypes.MV: "mv",
+    VentilationTypes.PIV_FROM_OUTSIDE: "piv",
 
 }
 #    MEV_CENTRALISED=1
@@ -727,27 +721,27 @@ VENTILATION_TYPES = {
 #    PIV_FROM_OUTSIDE=5
 
 DUCT_TYPES = {
-    tables.DuctTypes.RIGID: "Rigid",
-    tables.DuctTypes.FLEXIBLE: "Flexible",
-    tables.DuctTypes.RIGID_INSULATED: "Rigid",
-    tables.DuctTypes.FLEXIBLE_INSULATED: "Flexible",
+    DuctTypes.RIGID: "Rigid",
+    DuctTypes.FLEXIBLE: "Flexible",
+    DuctTypes.RIGID_INSULATED: "Rigid",
+    DuctTypes.FLEXIBLE_INSULATED: "Flexible",
 }
 DUCTS_INSULATED = {
-    tables.DuctTypes.RIGID: False,
-    tables.DuctTypes.FLEXIBLE: False,
-    tables.DuctTypes.RIGID_INSULATED: True,
-    tables.DuctTypes.FLEXIBLE_INSULATED: True,
+    DuctTypes.RIGID: False,
+    DuctTypes.FLEXIBLE: False,
+    DuctTypes.RIGID_INSULATED: True,
+    DuctTypes.FLEXIBLE_INSULATED: True,
 }
 
 WALL_TYPES = {
-    tables.WallTypes.MASONRY: 'Masonry',
-    tables.WallTypes.OTHER: 'Steel/Timber frame',
+    WallTypes.MASONRY: 'Masonry',
+    WallTypes.OTHER: 'Steel/Timber frame',
 }
 FLOOR_TYPES = {
-    tables.FloorTypes.SUSPENDED_TIMBER_UNSEALED: 'Suspended wooden floor, unsealed',
-    tables.FloorTypes.SUSPENDED_TIMBER_SEALED: 'Suspended wooden floor, sealed',
-    tables.FloorTypes.NOT_SUSPENDED_TIMBER: 'Other',
-    tables.FloorTypes.OTHER: 'Other',
+    FloorTypes.SUSPENDED_TIMBER_UNSEALED: 'Suspended wooden floor, unsealed',
+    FloorTypes.SUSPENDED_TIMBER_SEALED: 'Suspended wooden floor, sealed',
+    FloorTypes.NOT_SUSPENDED_TIMBER: 'Other',
+    FloorTypes.OTHER: 'Other',
 }
 
 
@@ -774,7 +768,7 @@ def process_ventilation_system(xlbook, d):
     else:
         xlbook.set_input("duct_type", "")
 
-    xlbook.set_input("mv_approved", true_and_not_missing(d, "mv_approved"))
+    xlbook.set_input("mv_approved", d.get("mv_approved", False))
 
     clear_existing_infiltration_inputs(xlbook)
     if hasattr(d, 'pressurisation_test_result'):
@@ -931,7 +925,7 @@ def run_case(xlbook, fname):
     ]:
         return False
 
-    res = v0.load_or_parse_file(fname, reference_case_parser.whole_file, False)
+    res = load_or_parse_file(fname, reference_case_parser.whole_file, False)
     dwelling = Dwelling()
     input_conversion_rules.process_inputs(dwelling, res.inputs)
 
@@ -957,8 +951,8 @@ def run_case(xlbook, fname):
         VentilationTypes.MVHR,
         VentilationTypes.MEV_CENTRALISED,
         VentilationTypes.MV]:
-        #sap_tables.VentilationTypes.MEV_DECENTRALISED]:
-        #sap_tables.VentilationTypes.PIV_FROM_OUTSIDE]:
+        #sap_VentilationTypes.MEV_DECENTRALISED]:
+        #sap_VentilationTypes.PIV_FROM_OUTSIDE]:
         can_run_der = False
     if hasattr(dwelling, 'appendix_q_systems'):
         can_run_der = False
@@ -982,9 +976,6 @@ def workbook_is_open(xl, name):
 
 def main():
     logging.basicConfig(level=logging.ERROR)
-    from sap import pcdf
-
-    pcdf.DATA_FILE = "./official_reference_cases/pcdf2009_test_322.dat"
 
     xl = win32com.client.gencache.EnsureDispatch("Excel.Application")
     xl_opened_by_script = False

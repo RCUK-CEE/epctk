@@ -1,5 +1,3 @@
-__author__ = 'jonathanchambers'
-
 import argparse
 
 from sap import runner
