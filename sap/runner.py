@@ -1,47 +1,14 @@
-import copy
-
-import sap.appendix.appendix_m
-import sap.sap_types
-from sap.configure import lookup_sap_tables
-from sap.fuels import fuel_from_code
-from sap.sap_types import HeatEmitters, VentilationTypes
 from . import worksheet
-from .dwelling import DwellingResults
+from .configure import lookup_sap_tables
+from .fuels import fuel_from_code
 from .sap_tables import hw_volume_factor
-from .sap_types import CylinderInsulationTypes, GlazingTypes, OvershadingTypes, HeatingTypes, PVOvershading
+from .dwelling import DwellingResults
+from .sap_types import (CylinderInsulationTypes, GlazingTypes, OvershadingTypes, HeatingTypes, PVOvershading,
+                        HeatEmitters, VentilationTypes, HeatLossElementTypes, HeatLossElement, OpeningType, Opening)
 
 
-def perform_demand_calc(dwelling):
-    """
-    Calculate the SAP energy demand for a dwelling
-    :param dwelling:
-    :return:
-    """
-    worksheet.ventilation(dwelling)
-    worksheet.heat_loss(dwelling)
-    worksheet.hot_water_use(dwelling)
-    worksheet.internal_heat_gain(dwelling)
-    worksheet.solar(dwelling)
-    worksheet.heating_requirement(dwelling)
-    worksheet.cooling_requirement(dwelling)
-    worksheet.water_heater_output(dwelling)
-
-
-def perform_full_calc(dwelling):
-    """
-    Perform a full SAP worksheet calculation on a dwelling, adding the results
-    to the dwelling provided.
-    This performs a demand calculation, and a renewable energies calculation
-    :param dwelling:
-    :return:
-    """
-    perform_demand_calc(dwelling)
-    worksheet.systems(dwelling)
-    sap.appendix.appendix_m.pv(dwelling)
-    sap.appendix.appendix_m.wind_turbines(dwelling)
-    sap.appendix.appendix_m.hydro(dwelling)
-    worksheet.chp(dwelling)
-    worksheet.fuel_use(dwelling)
+def element_type_area(etype, els):
+    return sum(e.area for e in els if e.element_type == etype)
 
 
 def run_sap(input_dwelling):
@@ -56,7 +23,7 @@ def run_sap(input_dwelling):
 
     lookup_sap_tables(dwelling)
 
-    perform_full_calc(dwelling)
+    worksheet.perform_full_calc(dwelling)
 
     worksheet.sap(dwelling)
 
@@ -118,7 +85,7 @@ def run_fee(input_dwelling):
     dwelling.pump_gain = 0
     dwelling.heating_system_pump_gain = 0
 
-    perform_demand_calc(dwelling)
+    worksheet.perform_demand_calc(dwelling)
     worksheet.fee(dwelling)
     dwelling.report.build_report()
 
@@ -129,8 +96,11 @@ def run_fee(input_dwelling):
 def run_der(input_dwelling):
     """
 
-    :param input_dwelling:
-    :return:
+    Args:
+        input_dwelling:
+
+    Returns:
+
     """
     dwelling = DwellingResults(input_dwelling)
     dwelling.reduced_gains = True
@@ -139,8 +109,10 @@ def run_der(input_dwelling):
         dwelling.overshading = OvershadingTypes.AVERAGE
 
     lookup_sap_tables(dwelling)
-    perform_full_calc(dwelling)
+
+    worksheet.perform_full_calc(dwelling)
     worksheet.der(dwelling)
+
     dwelling.report.build_report()
 
     # Assign the results of the DER calculation to the original dwelling, with a prefix...
@@ -156,28 +128,27 @@ def run_der(input_dwelling):
         input_dwelling.ter_fuel = dwelling.main_sys_2_fuel
 
 
-def element_type_area(etype, els):
-    return sum(e.area for e in els if e.element_type == etype)
-
-
 def run_ter(input_dwelling):
     """
-    Run the target energy rating for the input dwelling.
-    Returns a COPY of the dwelling with the TER results
-    Assigns the .results to the input_dwelling.ter_results
+    Run the Target Energy Rating (TER) for the input dwelling.
 
-    :param input_dwelling:
-    :return: copy of input dwelling with TER results
+    Args:
+        input_dwelling:
+
+    Returns:
+          COPY of the dwelling with the TER results
+          Assigns the .results to the input_dwelling.ter_results
+
     """
     # Note this previously wrapped dwelling in Dwelling Wrapper
     dwelling = DwellingResults(input_dwelling)
 
     dwelling.reduced_gains = True
 
-    net_wall_area = element_type_area(sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
+    net_wall_area = element_type_area(HeatLossElementTypes.EXTERNAL_WALL,
                                       dwelling.heat_loss_elements)
 
-    opaque_door_area = element_type_area(sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
+    opaque_door_area = element_type_area(HeatLossElementTypes.OPAQUE_DOOR,
                                          dwelling.heat_loss_elements)
 
     window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window == False)
@@ -187,52 +158,52 @@ def run_ter(input_dwelling):
     new_opening_area = min(dwelling.GFA * .25, gross_wall_area)
     new_window_area = max(new_opening_area - 1.85, 0)
 
-    floor_area = element_type_area(sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
+    floor_area = element_type_area(HeatLossElementTypes.EXTERNAL_FLOOR,
                                    dwelling.heat_loss_elements)
-    net_roof_area = element_type_area(sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
+    net_roof_area = element_type_area(HeatLossElementTypes.EXTERNAL_ROOF,
                                       dwelling.heat_loss_elements)
     roof_area = net_roof_area + roof_window_area
 
-    heat_loss_elements = [sap.sap_types.HeatLossElement(
-        area=gross_wall_area - new_window_area - 1.85,
-        Uvalue=.35,
-        is_external=True,
-        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_WALL,
-    ), sap.sap_types.HeatLossElement(
-        area=1.85,
-        Uvalue=2,
-        is_external=True,
-        element_type=sap.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
-    ), sap.sap_types.HeatLossElement(
-        area=floor_area,
-        Uvalue=.25,
-        is_external=True,
-        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR,
-    ), sap.sap_types.HeatLossElement(
-        area=roof_area,
-        Uvalue=.16,
-        is_external=True,
-        element_type=sap.sap_types.HeatLossElementTypes.EXTERNAL_ROOF,
-    ), sap.sap_types.HeatLossElement(
-        area=new_window_area,
-        Uvalue=1. / (1. / 2 + .04),
-        is_external=True,
-        element_type=sap.sap_types.HeatLossElementTypes.GLAZING,
+    heat_loss_elements = [HeatLossElement(
+            area=gross_wall_area - new_window_area - 1.85,
+            Uvalue=.35,
+            is_external=True,
+            element_type=HeatLossElementTypes.EXTERNAL_WALL,
+    ), HeatLossElement(
+            area=1.85,
+            Uvalue=2,
+            is_external=True,
+            element_type=HeatLossElementTypes.OPAQUE_DOOR,
+    ), HeatLossElement(
+            area=floor_area,
+            Uvalue=.25,
+            is_external=True,
+            element_type=HeatLossElementTypes.EXTERNAL_FLOOR,
+    ), HeatLossElement(
+            area=roof_area,
+            Uvalue=.16,
+            is_external=True,
+            element_type=HeatLossElementTypes.EXTERNAL_ROOF,
+    ), HeatLossElement(
+            area=new_window_area,
+            Uvalue=1. / (1. / 2 + .04),
+            is_external=True,
+            element_type=HeatLossElementTypes.GLAZING,
     )]
 
     dwelling.heat_loss_elements = heat_loss_elements
 
-    ter_opening_type = sap.sap_types.OpeningType(
-        glazing_type=GlazingTypes.DOUBLE,
-        gvalue=.72,
-        frame_factor=0.7,
-        Uvalue=2,
-        roof_window=False)
+    ter_opening_type = OpeningType(
+            glazing_type=GlazingTypes.DOUBLE,
+            gvalue=.72,
+            frame_factor=0.7,
+            Uvalue=2,
+            roof_window=False)
 
-    new_openings = [sap.sap_types.Opening(
-        area=new_window_area,
-        orientation_degrees=90,
-        opening_type=ter_opening_type)
+    new_openings = [Opening(
+            area=new_window_area,
+            orientation_degrees=90,
+            opening_type=ter_opening_type)
     ]
 
     dwelling.openings = new_openings
@@ -306,7 +277,7 @@ def run_ter(input_dwelling):
     dwelling.main_sys_1.heating_effy_winter = 78 + .9
     dwelling.main_sys_1.heating_effy_summer = 78 - 9.2
 
-    perform_full_calc(dwelling)
+    worksheet.perform_full_calc(dwelling)
 
     worksheet.ter(dwelling, input_dwelling.ter_fuel)
 
@@ -378,7 +349,7 @@ def apply_solar_hot_water(base, d):
         assert d.hw_cylinder_volume > 0
         d.solar_storage_combined_cylinder = True
 
-        if d.hw_cylinder_volume < 190 and hasattr(d, 'measured_cylinder_loss'):
+        if d.hw_cylinder_volume < 190 and d.get('measured_cylinder_loss'):
             old_vol_fac = hw_volume_factor(d.hw_cylinder_volume)
             new_vol_fac = hw_volume_factor(190)
             d.measured_cylinder_loss *= new_vol_fac * 190 / (old_vol_fac * d.hw_cylinder_volume)
@@ -389,38 +360,40 @@ def apply_solar_hot_water(base, d):
     return True
 
 
-def apply_pv(base, d):
-    if d.is_flat:
+def apply_pv(base, dwelling):
+    if dwelling.is_flat:
         return False
-    if hasattr(d, 'photovoltaic_systems') and len(d.photovoltaic_systems) > 0:
+    if dwelling.get('photovoltaic_systems', 0) > 0:
         return False
 
     pv_system = dict(
-        kWp=2.5,
-        pitch=30,
-        orientation=180,
-        overshading_category=PVOvershading.MODEST
+            kWp=2.5,
+            pitch=30,
+            orientation=180,
+            overshading_category=PVOvershading.MODEST
     )
-    d.photovoltaic_systems = [pv_system, ]
+    dwelling.photovoltaic_systems = [pv_system, ]
     return True
 
 
-def apply_wind(base, d):
-    if d.is_flat:
+def apply_wind(base, dwelling):
+    if dwelling.is_flat:
         return False
-    if hasattr(d, 'N_wind_turbines') and d.N_wind_turbines > 0:
+
+    if dwelling.get('N_wind_turbines', 0) > 0:
         return False
-    d.N_wind_turbines = 1
-    d.wind_turbine_rotor_diameter = 2.0
-    d.wind_turbine_hub_height = 2.0
+
+    dwelling.N_wind_turbines = 1
+    dwelling.wind_turbine_rotor_diameter = 2.0
+    dwelling.wind_turbine_hub_height = 2.0
     return True
 
 
 IMPROVEMENTS = [
-    ("E", .45, apply_low_energy_lighting),
-    ("N", .95, apply_solar_hot_water),
-    ("U", .95, apply_pv),
-    ("V", .95, apply_wind),
+    ("E", 0.45, apply_low_energy_lighting),
+    ("N", 0.95, apply_solar_hot_water),
+    ("U", 0.95, apply_pv),
+    ("V", 0.95, apply_wind),
 ]
 
 
@@ -450,20 +423,25 @@ def apply_previous_improvements(base, target, previous):
 def run_improvements(dwelling):
     """
     Need to run the dwelling twice: once with pcdf fuel prices to
-    get cost chage, once with normal SAP fuel prices to get change
+    get cost change, once with normal SAP fuel prices to get change
     in SAP rating
 
     :param dwelling:
     :return:
     """
+    print('432 run_improvements', dwelling.has_room_thermostat)
 
     base_dwelling_pcdf_prices = DwellingResults(dwelling)
+
+    print('436 run_dwelling', dwelling.has_room_thermostat)
+    print('436 run_dwelling', base_dwelling_pcdf_prices.has_room_thermostat)
+
     base_dwelling_pcdf_prices.reduced_gains = False
     base_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
 
     lookup_sap_tables(base_dwelling_pcdf_prices)
-    perform_full_calc(base_dwelling_pcdf_prices)
 
+    worksheet.perform_full_calc(base_dwelling_pcdf_prices)
     worksheet.sap(base_dwelling_pcdf_prices)
 
     dwelling.improvement_results = ImprovementResults()
@@ -474,23 +452,23 @@ def run_improvements(dwelling):
 
     # Now improve the dwelling
     for name, min_improvement, improve in IMPROVEMENTS:
-        dwelling_pcdf_prices = copy.deepcopy(dwelling)
+        dwelling_pcdf_prices = DwellingResults(dwelling)
         dwelling_pcdf_prices.reduced_gains = False
         dwelling_pcdf_prices.use_pcdf_fuel_prices = True
 
-        dwelling_regular_prices = copy.deepcopy(dwelling)
+        dwelling_regular_prices = DwellingResults(dwelling)
         dwelling_regular_prices.reduced_gains = False
         dwelling_regular_prices.use_pcdf_fuel_prices = False
 
         apply_previous_improvements(
-            base_dwelling_pcdf_prices,
-            dwelling_regular_prices,
-            dwelling.improvement_results.improvement_effects)
+                base_dwelling_pcdf_prices,
+                dwelling_regular_prices,
+                dwelling.improvement_results.improvement_effects)
 
         apply_previous_improvements(
-            base_dwelling_pcdf_prices,
-            dwelling_pcdf_prices,
-            dwelling.improvement_results.improvement_effects)
+                base_dwelling_pcdf_prices,
+                dwelling_pcdf_prices,
+                dwelling.improvement_results.improvement_effects)
 
         if not improve(base_dwelling_pcdf_prices, dwelling_pcdf_prices):
             continue
@@ -498,26 +476,26 @@ def run_improvements(dwelling):
         improve(base_dwelling_pcdf_prices, dwelling_regular_prices)
 
         lookup_sap_tables(dwelling_pcdf_prices)
-        perform_full_calc(dwelling_pcdf_prices)
+        worksheet.perform_full_calc(dwelling_pcdf_prices)
         worksheet.sap(dwelling_pcdf_prices)
 
         lookup_sap_tables(dwelling_regular_prices)
-        perform_full_calc(dwelling_regular_prices)
+        worksheet.perform_full_calc(dwelling_regular_prices)
         worksheet.sap(dwelling_regular_prices)
 
         sap_improvement = dwelling_regular_prices.sap_value - base_sap
         if sap_improvement > min_improvement:
             dwelling.improvement_results.add(ImprovementResult(
-                name,
-                sap_improvement,
-                dwelling_pcdf_prices.fuel_cost - base_cost,
-                dwelling_regular_prices.emissions - base_co2))
+                    name,
+                    sap_improvement,
+                    dwelling_pcdf_prices.fuel_cost - base_cost,
+                    dwelling_regular_prices.emissions - base_co2))
 
             base_cost = dwelling_pcdf_prices.fuel_cost
             base_sap = dwelling_regular_prices.sap_value
             base_co2 = dwelling_regular_prices.emissions
 
-    improved_dwelling = copy.deepcopy(dwelling)
+    improved_dwelling = DwellingResults(dwelling)
     improved_dwelling.reduced_gains = False
     improved_dwelling.use_pcdf_fuel_prices = False
 
@@ -526,7 +504,8 @@ def run_improvements(dwelling):
         improve(base_dwelling_pcdf_prices, improved_dwelling)
 
     lookup_sap_tables(improved_dwelling)
-    perform_full_calc(improved_dwelling)
+
+    worksheet.perform_full_calc(improved_dwelling)
     worksheet.sap(improved_dwelling)
 
     dwelling.report.build_report()

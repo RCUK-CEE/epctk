@@ -6,7 +6,7 @@ and small- scale hydro-electric generators
 """
 import math
 
-from sap.sap_tables import TABLE_H2, TABLE_H4, TABLE_M1
+from ..sap_tables import TABLE_H2, TABLE_H4, TABLE_M1
 
 
 def configure_pv_system(pv_system):

@@ -2,12 +2,13 @@ import math
 
 import numpy
 
+import sap.appendix
 from .utils import sum_it, monthly_to_annual
 from .sap_constants import DAYS_PER_MONTH, HEATING_LATITUDE, SUMMER_MONTHS
 from .sap_tables import (MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
                          ELECTRICITY_SOLD, ELECTRICITY_OFFSET, TABLE_H5)
 from .sap_types import HeatingTypes, VentilationTypes
-from .appendix import appendix_g
+from .appendix import appendix_g, appendix_m
 
 
 def geometry(dwelling):
@@ -41,9 +42,9 @@ def geometry(dwelling):
         dwelling.Aextwall = 2 * (dwelling.room_height * dwelling.Nstoreys + dwelling.internal_floor_depth * (
             dwelling.Nstoreys - 1)) * (width + depth * (1 - dwelling.terrace_level)) - dwelling.Aglazing
 
-        dwelling.Apartywall = 2 * \
-                              (dwelling.room_height * dwelling.Nstoreys + dwelling.internal_floor_depth *
-                               (dwelling.Nstoreys - 1)) * (depth * dwelling.terrace_level)
+        dwelling.Apartywall = 2 * (dwelling.room_height * dwelling.Nstoreys +
+                                   dwelling.internal_floor_depth *
+                                   (dwelling.Nstoreys - 1)) * (depth * dwelling.terrace_level)
 
         if dwelling.type == "House":
             dwelling.Aroof = width * depth
@@ -98,8 +99,7 @@ def ventilation(dwelling):
     dwelling.inf_chimneys_ach = inf_chimneys_ach
 
     if dwelling.get('pressurisation_test_result') is not None:
-        base_infiltration_rate = dwelling.pressurisation_test_result / \
-                                 20. + inf_chimneys_ach
+        base_infiltration_rate = dwelling.pressurisation_test_result / 20 + inf_chimneys_ach
     elif dwelling.get('pressurisation_test_result_average') is not None:
         base_infiltration_rate = (
                                      dwelling.pressurisation_test_result_average + 2) / 20. + inf_chimneys_ach
@@ -126,6 +126,7 @@ def ventilation(dwelling):
             effective_inf_rate < 1.,
             0.5 + (effective_inf_rate ** 2) * 0.5,
             effective_inf_rate)
+
     elif dwelling.ventilation_type == VentilationTypes.MV:
         system_ach = 0.5
         dwelling.infiltration_ach = effective_inf_rate + system_ach
@@ -267,8 +268,8 @@ def hot_water_use(dwelling):
             dwelling.storage_loss = 0
 
     if dwelling.get("solar_storage_combined_cylinder"):
-        dwelling.storage_loss *= (
-                                     dwelling.hw_cylinder_volume - dwelling.solar_dedicated_storage_volume) / dwelling.hw_cylinder_volume
+        dwelling.storage_loss *= (dwelling.hw_cylinder_volume -
+                                  dwelling.solar_dedicated_storage_volume) / dwelling.hw_cylinder_volume
 
     if dwelling.get('primary_loss_override') is not None:
         primary_circuit_loss_annual = dwelling.primary_loss_override
@@ -1252,3 +1253,37 @@ def ter(dwelling, heating_fuel):
     r.add_single_result("Heating fuel emission factor adjustment", None, EFA_h)
     r.add_single_result("Electricity emission factor adjustment", None, EFA_l)
     r.add_single_result("TER", 273, dwelling.ter_rating)
+
+
+def perform_demand_calc(dwelling):
+    """
+    Calculate the SAP energy demand for a dwelling
+    :param dwelling:
+    :return:
+    """
+    ventilation(dwelling)
+    heat_loss(dwelling)
+    hot_water_use(dwelling)
+    internal_heat_gain(dwelling)
+    solar(dwelling)
+    heating_requirement(dwelling)
+    cooling_requirement(dwelling)
+    water_heater_output(dwelling)
+
+
+def perform_full_calc(dwelling):
+    """
+    Perform a full SAP worksheet calculation on a dwelling, adding the results
+    to the dwelling provided.
+    This performs a demand calculation, and a renewable energies calculation
+
+    :param dwelling:
+    :return:
+    """
+    perform_demand_calc(dwelling)
+    systems(dwelling)
+    appendix_m.pv(dwelling)
+    appendix_m.wind_turbines(dwelling)
+    appendix_m.hydro(dwelling)
+    chp(dwelling)
+    fuel_use(dwelling)
