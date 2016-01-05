@@ -8,7 +8,6 @@ from .utils import float_or_none, csv_to_dict
 
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
 
-
 PREFER_PCDF_FUEL_PRICES = False
 
 
@@ -32,6 +31,8 @@ class Fuel(object):
     def __init__(self, fuel_id):
         self.fuel_id = fuel_id
         self._fuel_data = None
+        self.is_electric = False
+        self.is_mains_gas = self.fuel_id == 1 or self.fuel_id == 51
 
     def __hash__(self):
         return self.fuel_id
@@ -49,13 +50,13 @@ class Fuel(object):
     def standing_charge(self):
         return self.fuel_data.standing_charge
 
-    @property
-    def is_mains_gas(self):
-        return self.fuel_id == 1 or self.fuel_id == 51
+    # @property
+    # def is_mains_gas(self):
+    #     return self.fuel_id == 1 or self.fuel_id == 51
 
-    @property
-    def is_electric(self):
-        return False
+    # @property
+    # def is_electric(self):
+    #     return False
 
     @property
     def type(self):
@@ -84,6 +85,7 @@ class Fuel(object):
     @property
     def fuel_data(self):
         # TODO: check if fuel_data is None
+        # FIXME: This is where you need to check USE PCDF DATA
         # if self.use_pcdf_prices:
         #     self._fuel_data = get_fuel_data_pcdf(self.fuel_id)
         # else:
@@ -110,36 +112,45 @@ class Fuel(object):
 
 class CommunityFuel(Fuel):
     def __init__(self, fuel_factor, emission_factor_adjustment):
+        super().__init__(None)
         self._fuel_factor = fuel_factor
         self._emission_factor_adjustment = emission_factor_adjustment
 
-    @property
-    def is_mains_gas(self):
-        return False
+        self.is_mains_gas = False
+
+    # @property
+    # def is_mains_gas(self):
+    #     return False
 
     @property
     def standing_charge(self):
         return 106
 
+    @property
     def fuel_factor(self):
         return self._fuel_factor
 
+    @property
     def emission_factor_adjustment(self):
         return self._emission_factor_adjustment
 
+    @property
+    def fuel_data(self):
+        raise NotImplementedError("No fuel data for Community Heating Fuel Type")
 
-class ElectricityTariff(object):
+class ElectricityTariff(Fuel):
     """
     Assumes that emissions for on and off peak are same
     Assumes that on and off peak standing charge is same
     """
+
     # TODO: Similar setup to Fuel, decide whether to just subclass...
 
     def __init__(self, on_peak_fuel_code, off_peak_fuel_code,
                  general_elec_on_peak_fraction, mech_vent_on_peak_fraction):
 
         self.is_electric = True
-        self.type = FuelTypes.ELECTRIC
+        # self.type = FuelTypes.ELECTRIC
         self.is_mains_gas = False
 
         self.general_elec_on_peak_fraction = general_elec_on_peak_fraction
@@ -148,6 +159,12 @@ class ElectricityTariff(object):
         self.on_peak_fuel_code = on_peak_fuel_code
         self.off_peak_fuel_code = off_peak_fuel_code
 
+        # fuel_id is used for getting emissions and standing charge data.
+        # set this to the on-peak value.
+        # Assumes that emissions for on and off peak are same
+        # Assumes that on and off peak standing charge is same
+        self.fuel_id = on_peak_fuel_code
+
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
@@ -155,38 +172,22 @@ class ElectricityTariff(object):
             return False
 
     def __hash__(self):
-        return hash((self.is_electric, self.type, self.is_mains_gas, self.general_elec_on_peak_fraction,
-                     self.mech_vent_elec_on_peak_fraction, self.on_peak_fuel_code, self.off_peak_fuel_code))
+        return hash((self.is_electric, self.type, self.is_mains_gas,
+                     self.general_elec_on_peak_fraction,
+                     self.mech_vent_elec_on_peak_fraction,
+                     self.on_peak_fuel_code, self.off_peak_fuel_code))
 
     def unit_price(self, onpeak_fraction=1):
         price_on_peak = self.on_peak_data.price
         price_off_peak = self.off_peak_data.price
-        return (price_on_peak * onpeak_fraction
-                + price_off_peak * (1 - onpeak_fraction))
+        return price_on_peak * onpeak_fraction + price_off_peak * (1 - onpeak_fraction)
 
-    @property
-    def co2_factor(self):
-        return self.on_peak_data.co2_factor
-
-    @property
-    def primary_energy_factor(self):
-        return self.on_peak_data.primary_energy_factor
-
-    @property
-    def fuel_factor(self):
-        return self.on_peak_data.fuel_factor
-
-    @property
-    def emission_factor_adjustment(self):
-        return self.on_peak_data.emission_factor_adjustment
-
-    @property
-    def standing_charge(self):
-        return self.on_peak_data.standing_charge
+    def type(self):
+        return FuelTypes.ELECTRIC
 
     @property
     def on_peak_data(self):
-        return get_fuel_data(self.on_peak_fuel_code)
+        return self.fuel_data
 
     @property
     def off_peak_data(self):
@@ -194,8 +195,34 @@ class ElectricityTariff(object):
 
     @property
     def name(self):
-        on_peak_name = self.on_peak_data.name
-        return on_peak_name.split("(")[0].strip()
+        return self.on_peak_data.name.split("(")[0].strip()
+
+    # Properties that are now inherited from Fuel
+    # Use the Fuel object for these parameters which use the fuel_data property,
+    # which is set to on-peak code
+    # @property
+    # def fuel_data(self):
+    #     return get_fuel_data(self.on_peak_fuel_code)
+    # @property
+    # def co2_factor(self):
+    #     return self.on_peak_data.co2_factor
+    #
+    # @property
+    # def primary_energy_factor(self):
+    #     return self.on_peak_data.primary_energy_factor
+    #
+    # @property
+    # def fuel_factor(self):
+    #     return self.on_peak_data.fuel_factor
+    #
+    # @property
+    # def emission_factor_adjustment(self):
+    #     return self.on_peak_data.emission_factor_adjustment
+    #
+    # @property
+    # def standing_charge(self):
+    #     return self.on_peak_data.standing_charge
+
 
 
 
@@ -218,7 +245,6 @@ def translate_12_row(fuels, row):
                  fuel_types[row[9]])
 
     fuels[f.fuel_id] = f
-
 
 
 # ELECTRICITY_FROM_CHP=Fuel(49,.529,None,None,None,106,2.92,FuelTypes.COMMUNAL)
@@ -314,5 +340,3 @@ def fuel_from_code(code):
         return copy.deepcopy(_TABLE_12_ELEC[code])
     else:
         return Fuel(code)
-
-
