@@ -4,7 +4,6 @@ import pickle
 import sys
 import unittest
 
-import sap.appendix.appendix_t
 from sap import runner
 from sap.dwelling import Dwelling, log_dwelling
 from sap.io import input_conversion_rules, yaml_io
@@ -67,17 +66,6 @@ def create_sap_dwelling(inputs):
 
     # dwelling.next_stage()
     return dwelling
-
-
-# def scan_file(fname, parser):
-#     with open(fname, 'r') as f:
-#         txt = f.read()
-#         txt = txt.replace('\\\'b', '')
-#         txt = txt.replace('\\f2', '')
-#         res = []
-#         for srvrtokens, startloc, endloc in parser.scanString(txt):
-#             res.append(srvrtokens)
-#         return res
 
 
 def parse_file(fname, parser):
@@ -239,7 +227,6 @@ class TestOfficialCases(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    from sap import pcdf
     from optparse import OptionParser
 
     parser = OptionParser()
@@ -277,8 +264,6 @@ if __name__ == '__main__':
     # logger.addHandler(h1)
     # logger.setLevel(logging.INFO)
 
-
-    pcdf.DATA_FILE = "./official_reference_cases/pcdf2009_test_322.dat"
 
     run_official_cases(
         OFFICIAL_CASES_THAT_WORK, reparse=options.reparse)

@@ -1,16 +1,14 @@
 import logging
 
 import win32com.client
-
-import sap.sap_types
 from output_checker import check_monthly_result
 from output_checker import check_result
 from output_checker import check_summer_monthly_result
+
+import sap.sap_types
 from sap import runner
-from sap import worksheet
 from sap.dwelling import Dwelling
-from sap.pcdf import VentilationTypes
-from sap.io import input_conversion_rules
+from sap.io import input_conversion_rules, pcdf
 from sap.sap_types import GlazingTypes, VentilationTypes
 from tests import reference_case_parser
 

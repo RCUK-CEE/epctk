@@ -1,17 +1,14 @@
+from sap.domestic_hot_water import configure_water_system
 from . import fuels
-from .fuels import ELECTRICITY_STANDARD
-from .heating_systems import pcdf_heating_system
-
-# FIXME: we calculate on peak already inside
+from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
 from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
-from .heating_system_types import DedicatedWaterSystem
-from .sap_types import HeatingTypes, WallTypes
+from .fuels import ELECTRICITY_STANDARD
 from .heating_systems import immersion_on_peak_fraction, sedbuk_2005_heating_system, sedbuk_2009_heating_system
+from .heating_systems import pcdf_heating_system
+from .sap_types import HeatingTypes, WallTypes
 from .tables import (TABLE_3, TABLE_6D, TABLE_10, TABLE_10C, table_1b_occupancy, table_1b_daily_hot_water,
                      table_2a_hot_water_vol_factor, table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,
-                     table_5a_fans_and_pumps_gain, FLOOR_INFILTRATION, TABLE_4A, TABLE_4D, TABLE_4E, get_4a_system, table_4f_fans_pumps_keep_hot, apply_table_4e)
-
-from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
+                     table_5a_fans_and_pumps_gain, FLOOR_INFILTRATION, TABLE_4D, TABLE_4E, table_4f_fans_pumps_keep_hot, apply_table_4e)
 from .ventilation import configure_ventilation
 
 
@@ -196,55 +193,6 @@ def configure_main_system_2(dwelling):
                 dwelling.main_sys_2_fuel,
                 dwelling.get('use_immersion_heater_summer', False),
                 dwelling.get('sys2_hetas_approved', False))
-
-
-def configure_water_system(dwelling):
-    # if dwelling.get('water_heating_type_code'):  # !!! Why this test?
-    code = dwelling.water_heating_type_code
-
-    if code in TABLE_4A:
-        water_system = get_4a_system(dwelling.electricity_tariff, code)
-        dwelling.water_sys = DedicatedWaterSystem(water_system['effy'],
-                                                  dwelling.use_immersion_heater_summer if dwelling.get(
-                                                          'use_immersion_heater_summer') else False)
-        dwelling.water_sys.table2b_row = water_system['table2b_row']
-        dwelling.water_sys.fuel = dwelling.water_sys_fuel
-
-    elif code == 999:  # no h/w system present - assume electric immersion
-        pass
-
-    elif code == 901:  # from main
-        if dwelling.main_sys_1 is None:
-            raise RuntimeError("Main system 1 must not be None")
-        dwelling.water_sys = dwelling.main_sys_1
-
-    elif code == 902:  # from secondary
-        dwelling.water_sys = dwelling.secondary_sys
-
-    elif code == 914:  # from second main
-        dwelling.water_sys = dwelling.main_sys_2
-
-    elif code == 950:  # community dhw only
-        # TODO Community hot water based on sap defaults not handled
-        dwelling.water_sys = appendix_c.CommunityHeating(
-                dwelling.community_heat_sources_dhw,
-                dwelling.get('sap_community_distribution_type_dhw'))
-
-        if dwelling.get('community_dhw_flat_rate_charging'):
-            dwelling.water_sys.dhw_charging_factor = 1.05
-
-        else:
-            dwelling.water_sys.dhw_charging_factor = 1.0
-
-        if dwelling.main_sys_1.system_type == HeatingTypes.community:
-            # Standing charge already covered by main system
-            dwelling.water_sys.fuel.standing_charge = 0
-
-        else:
-            # Only half of standing charge applies for DHW only
-            dwelling.water_sys.fuel.standing_charge /= 2
-    else:
-        assert False
 
 
 def configure_water_storage(dwelling):

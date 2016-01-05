@@ -12,3 +12,18 @@ COOLING_BASE_TEMPERATURE = 24
 SUMMER_MONTHS = list(range(5, 9))
 USE_TABLE_4D_FOR_RESPONSIVENESS = -99
 COMMUNITY_FUEL_ID = -42 # Arbitrary constant for community fuel type, mostly for use of hash function
+
+
+class SolarConstants:
+    def __init__(self, latitude):
+        declination = numpy.array(
+                [-20.7, -12.8, -1.8, 9.8, 18.8, 23.1, 21.2, 13.7, 2.9, -8.7, -18.4, -23])
+
+        delta_lat = latitude - declination
+        delta_lat_sq = delta_lat ** 2
+        self.A = .702 - .0119 * (delta_lat) + 0.000204 * delta_lat_sq
+        self.B = -.107 + 0.0081 * (delta_lat) - 0.000218 * delta_lat_sq
+        self.C = .117 - 0.0098 * (delta_lat) + 0.000143 * delta_lat_sq
+
+
+SOLAR_HEATING = SolarConstants(HEATING_LATITUDE)

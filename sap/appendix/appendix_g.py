@@ -5,12 +5,12 @@ Appendix G: Flue gas heat recovery systems and Waste water heat recovery systems
 """
 import numpy
 
-from ..tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
-                                   combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
-from .appendix_m import configure_pv_system
 from ..constants import DAYS_PER_MONTH
-from ..pcdf import get_wwhr_system, get_fghr_system
 from ..sap_types import HeatingTypes
+from ..tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
+                      combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
+from .appendix_m import configure_pv_system
+from ..io.pcdf import get_wwhr_system, get_fghr_system
 
 
 def configure_wwhr(dwelling):
@@ -122,7 +122,7 @@ def wwhr_savings(dwelling):
 
     Seff = S_sum / Nshower_and_bath
     Tcoldm = numpy.array(
-        [11.1, 10.8, 11.8, 14.7, 16.1, 18.2, 21.3, 19.2, 18.8, 16.3, 13.3, 11.8])
+            [11.1, 10.8, 11.8, 14.7, 16.1, 18.2, 21.3, 19.2, 18.8, 16.3, 13.3, 11.8])
     Awm = .33 * 25 * MONTHLY_HOT_WATER_TEMPERATURE_RISE / (41 - Tcoldm) + 26.1
     Bwm = .33 * 36 * MONTHLY_HOT_WATER_TEMPERATURE_RISE / (41 - Tcoldm)
 

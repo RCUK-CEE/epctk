@@ -56,7 +56,7 @@ def monthly_to_annual(var):
     return sum(var * DAYS_PER_MONTH) / 365.
 
 
-def sum_it(x):
+def sum_(x):
     try:
         return sum(x)
     except TypeError:

@@ -7,10 +7,9 @@ import sys
 import output_checker
 
 import sap.appendix.appendix_t
-from sap import pcdf
 from sap import runner
 from sap.dwelling import log_dwelling_params, log_dwelling, ParamTrackerDwelling
-from sap.io import input_conversion_rules, yaml_io
+from sap.io import input_conversion_rules, yaml_io, pcdf
 from sap.utils import SAPCalculationError, CALC_STAGE, ALL_PARAMS
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP

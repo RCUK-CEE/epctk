@@ -1,9 +1,8 @@
 import copy
 import os.path
-import logging
 
-from sap.constants import COMMUNITY_FUEL_ID
-from .pcdf import pcdf_fuel_prices
+from .constants import COMMUNITY_FUEL_ID
+from .io.pcdf import pcdf_fuel_prices
 from .sap_types import FuelTypes
 from .utils import float_or_none, csv_to_dict
 
