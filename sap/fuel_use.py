@@ -1,10 +1,15 @@
+"""
+SAP Section 12: Total energy use and fuel costs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
 import numpy
 
 from .constants import SUMMER_MONTHS
 from .utils import sum_
-
-from .fuels import ELECTRICITY_SOLD, ELECTRICITY_OFFSET
 from .sap_types import HeatingTypes
+from .fuels import ELECTRICITY_SOLD, ELECTRICITY_OFFSET
+from .heating_systems import immersion_on_peak_fraction
 
 
 def set_fuel_use(dwelling, label, regulated,
@@ -85,6 +90,7 @@ def fuel_use(dwelling):
     dwelling.primary_energy_offset = 0
 
     immersion_months = numpy.array([0, ] * 12)
+
     if dwelling.get('use_immersion_heater_summer', False):
         for i in SUMMER_MONTHS:
             immersion_months[i] = 1
@@ -266,3 +272,42 @@ def fuel_use(dwelling):
                              C_el,
                              cost_el,
                              PE_el)
+
+
+def configure_fuel_costs(dwelling):
+    dwelling.general_elec_co2_factor = dwelling.electricity_tariff.co2_factor
+    dwelling.general_elec_price = dwelling.electricity_tariff.unit_price(
+            dwelling.electricity_tariff.general_elec_on_peak_fraction)
+    dwelling.mech_vent_elec_price = dwelling.electricity_tariff.unit_price(
+            dwelling.electricity_tariff.mech_vent_elec_on_peak_fraction)
+
+    dwelling.general_elec_PE = dwelling.electricity_tariff.primary_energy_factor
+
+    if dwelling.water_sys.summer_immersion:
+        # Should this be here or in worksheet.py?
+        # FIXME: we calculate on-peak inside heatingSystem, do we need to do it again?
+        on_peak = immersion_on_peak_fraction(dwelling.Nocc,
+                                             dwelling.electricity_tariff,
+                                             dwelling.hw_cylinder_volume,
+                                             dwelling.immersion_type)
+        dwelling.water_fuel_price_immersion = dwelling.electricity_tariff.unit_price(on_peak)
+
+    fuels = set()
+    fuels.add(dwelling.main_sys_1.fuel)
+    fuels.add(dwelling.water_sys.fuel)
+    if dwelling.get("main_sys_2"):
+        fuels.add(dwelling.main_sys_2.fuel)
+
+    # Standing charge for electricity is only included if main heating or
+    # hw uses electricity
+    if (dwelling.get("secondary_sys") and
+            not dwelling.secondary_sys.fuel.is_electric):
+        fuels.add(dwelling.secondary_sys.fuel)
+
+    if dwelling.get('use_immersion_heater_summer'):
+        fuels.add(dwelling.electricity_tariff)
+
+    standing_charge = 0
+    for f in fuels:
+        standing_charge += f.standing_charge
+    dwelling.cost_standing = standing_charge

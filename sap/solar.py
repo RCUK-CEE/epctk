@@ -2,8 +2,25 @@ import math
 
 import numpy
 
+from .tables import TABLE_6D
 from .constants import SOLAR_HEATING, SolarConstants
 
+
+def overshading_factors(dwelling_overshading):
+    """
+    Set dwelling overshading factors from Table 6D, based on the shading amount
+
+    Args:
+        dwelling_overshading:
+
+    Returns:
+        dict: key -values for overshading, apply to dwelling using .update
+
+    """
+    overshading_factors = TABLE_6D[dwelling_overshading]
+    return { key: overshading_factors[key] for key in ['light_access_factor',
+                                                        'solar_access_factor_winter',
+                                                        'solar_access_factor_summer']}
 
 def incident_solar(Igh, details, orientation, is_roof_window):
     if not is_roof_window:
@@ -68,3 +85,4 @@ def solar(dwelling):
     dwelling.solar_gain_summer = sol_gain
 
     dwelling.summer_heat_gains = dwelling.total_internal_gains_summer + dwelling.solar_gain_summer
+

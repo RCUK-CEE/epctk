@@ -233,14 +233,11 @@ def water_heater_output(dwelling):
         dwelling.savings_from_fghrs = 0
 
     dwelling.output_from_water_heater = numpy.maximum(0,
-                                                      dwelling.total_water_heating
-                                                      +
-                                                      dwelling.input_from_solar
-                                                      +
-                                                      dwelling.fghrs_input_from_solar
-                                                      -
-                                                      dwelling.savings_from_wwhrs
-                                                      - dwelling.savings_from_fghrs)
+                                                      dwelling.total_water_heating +
+                                                      dwelling.input_from_solar +
+                                                      dwelling.fghrs_input_from_solar  -
+                                                      dwelling.savings_from_wwhrs -
+                                                      dwelling.savings_from_fghrs)
 
 
 def GL_sum(openings):

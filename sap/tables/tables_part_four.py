@@ -10,6 +10,8 @@ of the combination of heating system and heating system controls installed.
 """
 import os.path
 
+from sap.io.pcdf import TABLE_4h_in_use_approved_scheme, TABLE_4h_in_use, TABLE_4h_hr_effy_approved_scheme, \
+    TABLE_4h_hr_effy
 from sap.sap_types import VentilationTypes
 from ..fuels import ELECTRICITY_24HR, ELECTRICITY_10HR, ELECTRICITY_7HR
 from ..constants import USE_TABLE_4D_FOR_RESPONSIVENESS
@@ -430,7 +432,8 @@ def table_4f_fans_pumps_keep_hot(dwelling):
     dwelling.Q_fans_and_pumps = heating_fans_and_pumps_electricity(dwelling)
     dwelling.Q_mech_vent_fans = mech_vent_fans_electricity(dwelling)
 
-
+# ------------------------------------
+# Following functions describe Table 4h
 def mech_vent_default_in_use_factor():
     """
     Default In-use factor for Specific fan power
@@ -446,3 +449,35 @@ def mech_vent_default_hr_effy_factor():
     :return:
     """
     return 0.7
+
+
+def mech_vent_in_use_factor(vent_type, duct_type, approved_scheme):
+    """
+    Table 4h: In-use factors for mechanical ventilation systems
+
+    :param vent_type:
+    :param duct_type:
+    :param approved_scheme:
+    :return:
+    """
+
+    if approved_scheme:
+        return TABLE_4h_in_use_approved_scheme[vent_type][duct_type]
+    else:
+        return TABLE_4h_in_use[vent_type][duct_type]
+
+
+def mech_vent_in_use_factor_hr(vent_type, duct_type, approved_scheme):
+    """
+    Table 4h: In-use factors for mechanical ventilation systems with heat recovery
+
+    :param vent_type:
+    :param duct_type:
+    :param approved_scheme:
+    :return:
+    """
+
+    if approved_scheme:
+        return TABLE_4h_hr_effy_approved_scheme[vent_type][duct_type]
+    else:
+        return TABLE_4h_hr_effy[vent_type][duct_type]

@@ -10,7 +10,7 @@ from sap.io import input_conversion_rules, yaml_io
 from sap.utils import SAPCalculationError, ALL_PARAMS
 from tests import output_checker
 from tests import reference_case_parser
-from tests.reference_cases_lists import OFFICIAL_CASES_THAT_WORK, SKIP
+from tests.reference_cases_lists import OFFICIAL_CASES, SKIP
 
 _FOLDER = os.path.dirname(__file__)
 
@@ -219,7 +219,7 @@ def run_official_cases(cases, maxruns=None, reparse=False):
 class TestOfficialCases(unittest.TestCase):
     def test_run_all_known_working_noparse(self):
         run_official_cases(
-            OFFICIAL_CASES_THAT_WORK, reparse=False)
+            OFFICIAL_CASES, reparse=False)
     #
     # def test_run_all_known_working_parse(self):
     #     run_official_cases(
@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
 
     run_official_cases(
-        OFFICIAL_CASES_THAT_WORK, reparse=options.reparse)
+        OFFICIAL_CASES, reparse=options.reparse)
 
 
     # pv_cases = [11, 14, 15, ]

@@ -45,7 +45,7 @@ SKIP = [
 
 ]
 
-OFFICIAL_CASES_THAT_WORK = [
+OFFICIAL_CASES = [
     "EW-1a-detached.rtf",  # manufacturer's data
     "EW-1b-detached with semi-exposed elements.rtf",  # manufacturer's data
     "EW-1c-detached.rtf",
@@ -183,9 +183,4 @@ OFFICIAL_CASES_THAT_WORK = [
     "EW-10q- Heatpump Vaillant - index 100081 - standatd tariff.rtf",
     "EW-10r- Heatpump - warm air 493194.rtf",
     "EW-10s- semi - heat pump with PSR too large.rtf",
-]
-
-OFFICIAL_CASES = [
-    "EW-1a-detached.rtf",  # manufacturer's data
-
 ]

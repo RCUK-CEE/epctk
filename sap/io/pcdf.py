@@ -474,6 +474,7 @@ def pcdf_fuel_prices():
 
 TABLE_4h_in_use = None
 TABLE_4h_in_use_approved_scheme = None
+TABLE_4h_hr_effy = None
 TABLE_4h_hr_effy_approved_scheme = None
 
 
@@ -486,38 +487,6 @@ def load_4h_tables():
      TABLE_4h_hr_effy_approved_scheme
      ) = pcdf_mech_vent_in_use_factors()
 
-
-def mech_vent_in_use_factor(vent_type, duct_type, approved_scheme):
-    """
-    Table 4h: In-use factors for mechanical ventilation systems
-
-    :param vent_type:
-    :param duct_type:
-    :param approved_scheme:
-    :return:
-    """
-    if TABLE_4h_in_use is None:
-        load_4h_tables()
-
-    if approved_scheme:
-        return TABLE_4h_in_use_approved_scheme[vent_type][duct_type]
-    else:
-        return TABLE_4h_in_use[vent_type][duct_type]
+load_4h_tables()
 
 
-def mech_vent_in_use_factor_hr(vent_type, duct_type, approved_scheme):
-    """
-    Table 4h: In-use factors for mechanical ventilation systems with heat recovery
-
-    :param vent_type:
-    :param duct_type:
-    :param approved_scheme:
-    :return:
-    """
-    if TABLE_4h_in_use is None:
-        load_4h_tables()
-
-    if approved_scheme:
-        return TABLE_4h_hr_effy_approved_scheme[vent_type][duct_type]
-    else:
-        return TABLE_4h_hr_effy[vent_type][duct_type]

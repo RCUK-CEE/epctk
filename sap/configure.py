@@ -1,54 +1,18 @@
-from sap.domestic_hot_water import configure_water_system
+from sap.ventilation import infiltration
 from . import fuels
 from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
 from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
+from .domestic_hot_water import configure_water_system
+from .fuel_use import configure_fuel_costs
 from .fuels import ELECTRICITY_STANDARD
-from .heating_systems import immersion_on_peak_fraction, sedbuk_2005_heating_system, sedbuk_2009_heating_system
-from .heating_systems import pcdf_heating_system
-from .sap_types import HeatingTypes, WallTypes
-from .tables import (TABLE_3, TABLE_6D, TABLE_10, TABLE_10C, table_1b_occupancy, table_1b_daily_hot_water,
+from .heating_systems import sedbuk_2005_heating_system, sedbuk_2009_heating_system, pcdf_heating_system
+from .sap_types import HeatingTypes
+from .solar import overshading_factors
+from .tables import (table_1b_occupancy, table_1b_daily_hot_water, TABLE_3, TABLE_10, TABLE_10C,
                      table_2a_hot_water_vol_factor, table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,
-                     table_5a_fans_and_pumps_gain, FLOOR_INFILTRATION, TABLE_4D, TABLE_4E, table_4f_fans_pumps_keep_hot, apply_table_4e)
+                     TABLE_4D, TABLE_4E, table_4f_fans_pumps_keep_hot, apply_table_4e,
+                     table_5a_fans_and_pumps_gain)
 from .ventilation import configure_ventilation
-
-
-def configure_fuel_costs(dwelling):
-    dwelling.general_elec_co2_factor = dwelling.electricity_tariff.co2_factor
-    dwelling.general_elec_price = dwelling.electricity_tariff.unit_price(
-            dwelling.electricity_tariff.general_elec_on_peak_fraction)
-    dwelling.mech_vent_elec_price = dwelling.electricity_tariff.unit_price(
-            dwelling.electricity_tariff.mech_vent_elec_on_peak_fraction)
-
-    dwelling.general_elec_PE = dwelling.electricity_tariff.primary_energy_factor
-
-    if dwelling.water_sys.summer_immersion:
-        # Should this be here or in worksheet.py?
-        # FIXME: we calculate on-peak inside heatingSystem, do we need to do it again?
-        on_peak = immersion_on_peak_fraction(dwelling.Nocc,
-                                             dwelling.electricity_tariff,
-                                             dwelling.hw_cylinder_volume,
-                                             dwelling.immersion_type)
-        dwelling.water_fuel_price_immersion = dwelling.electricity_tariff.unit_price(on_peak)
-
-    fuels = set()
-    fuels.add(dwelling.main_sys_1.fuel)
-    fuels.add(dwelling.water_sys.fuel)
-    if dwelling.get("main_sys_2"):
-        fuels.add(dwelling.main_sys_2.fuel)
-
-    # Standing charge for electricity is only included if main heating or
-    # hw uses electricity
-    if (dwelling.get("secondary_sys") and
-            not dwelling.secondary_sys.fuel.is_electric):
-        fuels.add(dwelling.secondary_sys.fuel)
-
-    if dwelling.get('use_immersion_heater_summer'):
-        fuels.add(dwelling.electricity_tariff)
-
-    standing_charge = 0
-    for f in fuels:
-        standing_charge += f.standing_charge
-    dwelling.cost_standing = standing_charge
 
 
 def configure_responsiveness(dwelling):
@@ -113,7 +77,6 @@ def configure_control_system(dwelling, system_num):
 def configure_main_system(dwelling):
     """
     Configure the main heating system.
-
 
 
     Args:
@@ -449,27 +412,6 @@ def set_regional_properties(dwelling):
     dwelling['latitude'] = TABLE_10[region]['latitude']
 
 
-def set_infiltration(dwelling):
-    if dwelling.get("wall_type"):
-        dwelling['structural_infiltration'] = 0.35 if dwelling.wall_type == WallTypes.MASONRY else 0.25
-
-    if dwelling.get('floor_type'):
-        dwelling['floor_infiltration'] = FLOOR_INFILTRATION[dwelling.floor_type]
-
-
-def set_overshading_factors(dwelling):
-    """
-    Set dwelling overshading factors from Table 6D, based on the shading amount
-
-    :param dwelling:
-    :return:
-    """
-    overshading_factors = TABLE_6D[dwelling.overshading]
-    dwelling['light_access_factor'] = overshading_factors["light_access_factor"]
-    dwelling['solar_access_factor_winter'] = overshading_factors["solar_access_factor_winter"]
-    dwelling['solar_access_factor_summer'] = overshading_factors["solar_access_factor_summer"]
-
-
 def lookup_sap_tables(dwelling):
     """
     Lookup data from SAP tables for given dwelling
@@ -486,21 +428,24 @@ def lookup_sap_tables(dwelling):
 
     # Fix up fuel types
     if dwelling.get('water_sys_fuel') == ELECTRICITY_STANDARD:
-        dwelling['water_sys_fuel'] = dwelling.electricity_tariff
+        dwelling.water_sys_fuel = dwelling.electricity_tariff
 
     if dwelling.get('secondary_sys_fuel') == ELECTRICITY_STANDARD:
-        dwelling['secondary_sys_fuel'] = dwelling.electricity_tariff
+        dwelling.secondary_sys_fuel = dwelling.electricity_tariff
 
     dwelling.Nocc = table_1b_occupancy(dwelling.GFA)
-    dwelling['daily_hot_water_use'] = table_1b_daily_hot_water(dwelling.Nocc, dwelling.low_water_use)
+    dwelling.daily_hot_water_use = table_1b_daily_hot_water(dwelling.Nocc, dwelling.low_water_use)
 
     set_regional_properties(dwelling)
 
     if not dwelling.get('living_area_fraction'):
-        dwelling['living_area_fraction'] = dwelling.living_area / dwelling.GFA
+        dwelling.living_area_fraction = dwelling.living_area / dwelling.GFA
 
-    set_infiltration(dwelling)
-    set_overshading_factors(dwelling)
+    # Add infiltration factors
+    dwelling.update(infiltration(wall_type=dwelling.get("wall_type"),
+                                 floor_type=dwelling.get("floor_type")))
+    # Add overshading factors
+    dwelling.update(overshading_factors(dwelling.overshading))
 
     configure_ventilation(dwelling)
     configure_systems(dwelling)

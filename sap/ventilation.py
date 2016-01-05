@@ -7,11 +7,12 @@ Configure the ventilation according to section 2 of SAP
 """
 import numpy
 
-
+from .sap_types import VentilationTypes, DuctTypes, WallTypes
 from .utils import monthly_to_annual
-from .sap_types import VentilationTypes, DuctTypes
-from .io.pcdf import mech_vent_in_use_factor, mech_vent_in_use_factor_hr, get_mev_system
-from .tables import mech_vent_default_in_use_factor, mech_vent_default_hr_effy_factor
+from .tables import (mech_vent_default_in_use_factor, mech_vent_default_hr_effy_factor,
+                     mech_vent_in_use_factor, mech_vent_in_use_factor_hr, FLOOR_INFILTRATION)
+from .io.pcdf import get_mev_system
+
 
 
 def configure_ventilation(dwelling):
@@ -174,6 +175,16 @@ def set_piv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_
 
 
 def ventilation(dwelling):
+    """
+    Ventilation part of the worksheet calculation. This
+    is run after the dwelling has been suitably configured
+
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
     if dwelling.get('hlp') is not None:
         return
 
@@ -240,3 +251,13 @@ def ventilation(dwelling):
 
     dwelling.infiltration_ach_annual = monthly_to_annual(
             dwelling.infiltration_ach)
+
+
+def infiltration(wall_type=None, floor_type=None):
+    out = {}
+    if wall_type:
+        out['structural_infiltration'] = 0.35 if wall_type == WallTypes.MASONRY else 0.25
+
+    if floor_type:
+        out['floor_infiltration'] = FLOOR_INFILTRATION[floor_type]
+    return out
