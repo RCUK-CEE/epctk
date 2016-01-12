@@ -3,6 +3,7 @@ import math
 import numpy
 
 # Try to keep imports matching order of SAP document
+from sap.appendix.appendix_g import fghr_savings
 from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
 from .utils import monthly_to_annual
 from .ventilation import ventilation
@@ -124,108 +125,6 @@ def heat_loss(dwelling):
     dwelling.h_vent_annual = monthly_to_annual(h_vent)
 
 
-def fghr_savings(dwelling):
-    if dwelling.fghrs['heat_store'] == 1:
-        # !!! untested
-        assert False
-        Kfl = dwelling.fghrs['direct_useful_heat_recovered']
-        return Kfl * Kn * dwelling.total_water_heating
-
-    equation_space_heats = [e['space_heating_requirement']
-                            for e in dwelling.fghrs['equations']]
-
-    # !!! Should only use heat provided by this system
-    if dwelling.water_sys is dwelling.main_sys_1:
-        space_heat_frac = (dwelling.fraction_of_heat_from_main *
-                           dwelling.main_heating_fraction)
-    elif dwelling.water_sys is dwelling.main_sys_2:
-        space_heat_frac = (dwelling.fraction_of_heat_from_main *
-                           dwelling.main_heating_2_fraction)
-    else:
-        # !!! Not allowed to have fghrs on secondary system?
-        # !!! Are you even allowed fghrs on hw only systems?
-        space_heat_frac = 0
-
-    Qspm = dwelling.Q_required * space_heat_frac
-
-    closest_below = [max(x for x in equation_space_heats
-                         if x <= Qspm[month])
-                     if Qspm[month] >= min(equation_space_heats)
-                     else min(equation_space_heats)
-                     for month in range(12)]
-    closest_above = [min(x for x in equation_space_heats
-                         if x >= Qspm[month])
-                     if Qspm[month] <= max(equation_space_heats)
-                     else max(equation_space_heats)
-                     for month in range(12)]
-
-    closest_below_eqns = [[e for e in dwelling.fghrs['equations']
-                           if e['space_heating_requirement'] == Q_req][0]
-                          for Q_req in closest_below]
-    closest_above_eqns = [[e for e in dwelling.fghrs['equations']
-                           if e['space_heating_requirement'] == Q_req][0]
-                          for Q_req in closest_above]
-
-    # !!! For some reason solar input from FGHRS doesn't reduce Qhwm
-    Qhwm = (dwelling.hw_energy_content +
-            dwelling.input_from_solar -
-            dwelling.savings_from_wwhrs)
-
-    def calc_S0(equations):
-        a = numpy.array([e['a'] for e in equations])
-        b = numpy.array([e['b'] for e in equations])
-        c = numpy.array([e['c'] for e in equations])
-
-        res = [0, ] * 12
-        for month in range(12):
-            Q = min(309, max(80, Qhwm[month]))
-            res[month] = (a[month] * math.log(Q) +
-                          b[month] * Q +
-                          c[month]) * min(1, Qhwm[month] / Q)
-
-        return res
-
-    S0_below = calc_S0(closest_below_eqns)
-    S0_above = calc_S0(closest_above_eqns)
-    S0 = [0, ] * 12
-    for month in range(12):
-        if closest_above[month] != closest_below[month]:
-            S0[month] = S0_below[month] + (S0_above[month] - S0_below[month]) * (
-                Qspm[month] - closest_below[month]) / (closest_above[month] - closest_below[month])
-        else:
-            S0[month] = S0_below[month]
-
-    # !!! Should exit here for intant combi without keep hot and no
-    # !!! ext store - S0 is the result
-
-    # !!! Needs factor of 1.3 for CPSU or primary storage combi
-    Vk = (dwelling.hw_cylinder_volume if dwelling.get('hw_cylinder_volume')
-          else dwelling.fghrs['heat_store_total_volume'])
-
-    if Vk >= 144:
-        Kn = 0
-    elif Vk >= 75:
-        Kn = .48 - Vk / 300.
-    elif Vk >= 15:
-        Kn = 1.1925 - .77 * Vk / 60.
-    else:
-        Kn = 1
-
-    Kf2 = dwelling.fghrs['direct_total_heat_recovered']
-    Sm = S0 + 0.5 * Kf2 * (dwelling.storage_loss +
-                           dwelling.primary_circuit_loss +
-                           dwelling.combi_loss_monthly -
-                           (1 - Kn) * Qhwm)
-
-    # !!! Need to use this for combi with keep hot
-    # Sm=S0+0.5*Kf2*(dwelling.combi_loss_monthly-dwelling.water_sys.keep_hot_elec_consumption)
-
-    savings = numpy.where(Qhwm > 0,
-                          Sm,
-                          0)
-    return savings
-
-
 def water_heater_output(dwelling):
     if dwelling.get('fghrs') is not None:
         dwelling.savings_from_fghrs = fghr_savings(dwelling)
@@ -252,17 +151,19 @@ def lighting_consumption(dwelling):
                 100 * float(dwelling.lighting_outlets_low_energy) / dwelling.lighting_outlets_total + .5) / 100.
 
     C1 = 1 - 0.5 * dwelling.low_energy_bulb_ratio
-    GLwin = GL_sum(o for o in dwelling.openings if not o.opening_type.roof_window and not o.opening_type.bfrc_data) * \
-            dwelling.light_access_factor / dwelling.GFA
-    GLroof = GL_sum(
-            o for o in dwelling.openings if o.opening_type.roof_window and not o.opening_type.bfrc_data) / dwelling.GFA
+
+    window_openings = (o for o in dwelling.openings if not o.opening_type.roof_window and not o.opening_type.bfrc_data)
+    GLwin = GL_sum(window_openings) * dwelling.light_access_factor / dwelling.GFA
+
+    roof_openings = (o for o in dwelling.openings if o.opening_type.roof_window and not o.opening_type.bfrc_data)
+    GLroof = GL_sum(roof_openings) / dwelling.GFA
 
     # Use frame factor of 0.7 for bfrc rated windows
-    GLwin_bfrc = GL_sum(o for o in dwelling.openings if not o.opening_type.roof_window and o.opening_type.bfrc_data) * \
-                 .7 * .9 * dwelling.light_access_factor / dwelling.GFA
-    GLroof_bfrc = GL_sum(
-            o for o in dwelling.openings if
-            o.opening_type.roof_window and o.opening_type.bfrc_data) * .7 * .9 / dwelling.GFA
+    window_bfrc_openings = (o for o in dwelling.openings if not o.opening_type.roof_window and o.opening_type.bfrc_data)
+    GLwin_bfrc = GL_sum(window_bfrc_openings) * 0.7 * 0.9 * dwelling.light_access_factor / dwelling.GFA
+
+    roof_bfrc_openings = (o for o in dwelling.openings if o.opening_type.roof_window and o.opening_type.bfrc_data)
+    GLroof_bfrc = GL_sum(roof_bfrc_openings) * 0.7 * 0.9 / dwelling.GFA
 
     GL = GLwin + GLroof + GLwin_bfrc + GLroof_bfrc
     C2 = 52.2 * GL ** 2 - 9.94 * GL + 1.433 if GL <= 0.095 else 0.96
