@@ -11,8 +11,8 @@ from ..constants import DAYS_PER_MONTH
 from ..sap_types import HeatingTypes
 from ..tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
                       combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
-from .appendix_m import configure_pv_system
 from ..io.pcdf import get_wwhr_system, get_fghr_system
+from .appendix_m import configure_pv_system
 
 
 def configure_wwhr(dwelling):
@@ -217,7 +217,7 @@ def fghr_savings(dwelling):
     elif Vk >= 75:
         Kn = .48 - Vk / 300.
     elif Vk >= 15:
-        Kn = 1.1925 - .77 * Vk / 60.
+        Kn = 1.1925 - 0.77 * Vk / 60.
     else:
         Kn = 1
 

@@ -101,13 +101,6 @@ class Fuel(object):
     def fuel_data_table_12(self):
         return get_fuel_data_table_12(self.fuel_id)
 
-    # @property
-    # def is_mains_gas(self):
-    #     return self.fuel_id == 1 or self.fuel_id == 51
-
-    # @property
-    # def is_electric(self):
-    #     return False
 
 class CommunityFuel(Fuel):
     def __init__(self, fuel_factor, emission_factor_adjustment):
@@ -143,9 +136,6 @@ class CommunityFuel(Fuel):
     def fuel_data(self):
         raise NotImplementedError("No fuel data for Community Heating Fuel Type")
 
-    # @property
-    # def is_mains_gas(self):
-    #     return False
 
 class ElectricityTariff(Fuel):
     """

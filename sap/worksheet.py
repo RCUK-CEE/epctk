@@ -3,14 +3,13 @@ import math
 import numpy
 
 # Try to keep imports matching order of SAP document
-from sap.appendix.appendix_g import fghr_savings
 from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
 from .utils import monthly_to_annual
 from .ventilation import ventilation
 from .domestic_hot_water import hot_water_use
 from .solar import solar
 from .fuel_use import fuel_use
-from .appendix import appendix_m
+from .appendix import appendix_m, appendix_g
 
 
 def geometry(dwelling):
@@ -127,7 +126,7 @@ def heat_loss(dwelling):
 
 def water_heater_output(dwelling):
     if dwelling.get('fghrs') is not None:
-        dwelling.savings_from_fghrs = fghr_savings(dwelling)
+        dwelling.savings_from_fghrs = appendix_g.fghr_savings(dwelling)
     else:
         dwelling.savings_from_fghrs = 0
 

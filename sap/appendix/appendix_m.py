@@ -8,13 +8,21 @@ import math
 from ..tables import TABLE_H2, TABLE_H4, TABLE_M1
 
 
-def configure_pv_system(pv_system):
-    pv_system['overshading_factor'] = TABLE_H4[pv_system['overshading_category']]
-
-    if str(pv_system['pitch']).lower() != "Horizontal".lower():
-        pv_system['Igh'] = TABLE_H2[pv_system['pitch']][pv_system['orientation']]
+def pv_Igh(orientation, pitch):
+    if str(pitch).lower() != "Horizontal".lower():
+        Igh = TABLE_H2[pitch][orientation]
     else:
-        pv_system['Igh'] = TABLE_H2[pv_system['pitch']]
+        Igh = TABLE_H2[pitch]
+    return Igh
+
+
+def pv_overshading_factor(overshading_category):
+    return TABLE_H4[overshading_category]
+
+
+def configure_pv_system(pv_system):
+    pv_system['overshading_factor'] = pv_overshading_factor(pv_system['overshading_category'])
+    pv_system['Igh'] = pv_Igh(pv_system['orientation'], pv_system['pitch'])
 
 
 def configure_pv(dwelling):
