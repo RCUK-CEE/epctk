@@ -8,8 +8,10 @@ import math
 from ..tables import TABLE_H2, TABLE_H4, TABLE_M1
 
 
-def pv_Igh(orientation, pitch):
+def pv_Igh(pitch, orientation=None):
     if str(pitch).lower() != "Horizontal".lower():
+        if orientation is None:
+            raise ValueError('Appendix M: Orientation must be set for non-horizontal roof pitch')
         Igh = TABLE_H2[pitch][orientation]
     else:
         Igh = TABLE_H2[pitch]
@@ -21,8 +23,10 @@ def pv_overshading_factor(overshading_category):
 
 
 def configure_pv_system(pv_system):
-    pv_system['overshading_factor'] = pv_overshading_factor(pv_system['overshading_category'])
-    pv_system['Igh'] = pv_Igh(pv_system['orientation'], pv_system['pitch'])
+    pv_system['overshading_factor'] = TABLE_H4[pv_system['overshading_category']]
+
+    # orientation only set if pitch is not horizontal
+    pv_system['Igh'] = pv_Igh(pv_system['pitch'], pv_system.get('orientation'))
 
 
 def configure_pv(dwelling):
