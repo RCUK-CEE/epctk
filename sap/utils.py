@@ -25,6 +25,9 @@ class SAPCalculationError(RuntimeError):
     pass
 
 
+class SAPInputError(RuntimeError):
+    pass
+
 def csv_to_dict(filename, translator):
     results = {}
     with open(filename, 'r') as infile:

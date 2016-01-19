@@ -19,20 +19,23 @@ def configure_wwhr(dwelling):
     """
     Configure the waste water heat recovery systems (WWHR) for this dwelling
 
-    :param dwelling:
-    :return:
+    Args:
+        dwelling:
+
     """
-    if dwelling.get('wwhr_systems') and not dwelling.wwhr_systems is None:
+    if dwelling.get('wwhr_systems'):
         for sys in dwelling.wwhr_systems:
             sys['pcdf_sys'] = get_wwhr_system(sys['pcdf_id'])
 
 
 def configure_fghr(dwelling):
     """
-    Configure Flue Gas Heat Recovery (FGHR) for this dwelling
+    Configure Flue Gas Heat Recovery (FGHR) for this dwelling.
+    Requires water heating to have been configured already.
 
-    :param dwelling:
-    :return:
+    Args:
+        dwelling:
+
     """
     # TODO: Should check that fghr is allowed for this system
 
