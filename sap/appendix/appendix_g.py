@@ -12,7 +12,7 @@ from ..sap_types import HeatingTypes
 from ..tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
                       combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
 from ..io.pcdf import get_wwhr_system, get_fghr_system
-from .appendix_m import configure_pv_system
+from . import appendix_m
 
 
 def configure_wwhr(dwelling):
@@ -67,7 +67,7 @@ def configure_fghr(dwelling):
 
             if dwelling.fghrs["has_pv_module"]:
                 assert "PV_kWp" in dwelling.fghrs
-                configure_pv_system(dwelling.fghrs)
+                appendix_m.configure_pv_system(dwelling.fghrs)
                 dwelling.fghrs['monthly_solar_hw_factors'] = TABLE_H3[dwelling.fghrs['pitch']]
         else:
             assert not "PV_kWp" in dwelling.fghrs
