@@ -1,12 +1,13 @@
-from sap.ventilation import infiltration
-from . import fuels
+from .heating_loaders import sedbuk_2005_heating_system, sedbuk_2009_heating_system, pcdf_heating_system
+
+from .elements import HeatingTypes
+from .ventilation import infiltration
 from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
 from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
 from .domestic_hot_water import get_water_heater
 from .fuel_use import configure_fuel_costs
+from . import fuels
 from .fuels import ELECTRICITY_STANDARD
-from .heating_systems import sedbuk_2005_heating_system, sedbuk_2009_heating_system, pcdf_heating_system
-from .sap_types import HeatingTypes
 from .solar import overshading_factors
 from .tables import (table_1b_occupancy, table_1b_daily_hot_water, TABLE_3, TABLE_10, TABLE_10C,
                      table_2a_hot_water_vol_factor, table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,

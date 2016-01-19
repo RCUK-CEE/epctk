@@ -8,12 +8,11 @@ Input conversion rules for converting from parsed input file
 import copy
 import logging
 
-
-from ..sap_types import (WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes,
-                         ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading,
-                         OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes, DuctTypes,
-                         CommunityDistributionTypes, HeatLossElementTypes, OpeningType, HeatLossElement, Opening,
-                         ThermalMassElement)
+from sap.elements.sap_types import (WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes,
+                                    ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading,
+                                    OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes, DuctTypes,
+                                    CommunityDistributionTypes, HeatLossElementTypes, OpeningType, HeatLossElement, Opening,
+                                    ThermalMassElement)
 from ..fuels import ELECTRICITY_STANDARD, ELECTRICITY_7HR, ELECTRICITY_10HR, fuel_from_code
 
 

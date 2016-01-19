@@ -22,11 +22,10 @@ A2.1 Identifying the main system
        (obtained by dividing fuel cost by conversion efficiency).
 
 """
+from ..elements import HeatingTypes, HeatingSystem, SecondarySystem
+from ..fuels import ELECTRICITY_STANDARD
 from ..tables import (system_efficiency, system_type_from_sap_code, combi_loss_table_3a, TABLE_4A, TABLE_4B,
                       get_4a_system)
-from ..fuels import ELECTRICITY_STANDARD
-from ..heating_system_types import HeatingSystem, SecondarySystem
-from ..sap_types import HeatingTypes
 
 
 def apply_appendix_a():

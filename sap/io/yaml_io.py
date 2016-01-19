@@ -1,9 +1,10 @@
-import yaml
 import copy
-import numpy
 
+import numpy
+import yaml
+
+from ..elements import HeatLossElement, ThermalMassElement, Opening, OpeningType
 from .. import fuels
-from .. import sap_types
 from ..dwelling import Dwelling
 
 
@@ -78,13 +79,13 @@ def configure_yaml():
     yaml.add_representer(fuels.Fuel, fuel_representer)
     yaml.add_constructor('!fuel', fuel_constructor)
 
-    create_mapper(sap_types.HeatLossElement, "HeatLossElement")
-    create_mapper(sap_types.ThermalMassElement, "ThermalMassElement")
-    create_mapper(sap_types.Opening, "Opening")
+    create_mapper(HeatLossElement, "HeatLossElement")
+    create_mapper(ThermalMassElement, "ThermalMassElement")
+    create_mapper(Opening, "Opening")
 
-    yaml.add_representer(sap_types.OpeningType, opening_type_representer)
+    yaml.add_representer(OpeningType, opening_type_representer)
     yaml.add_constructor(
-        "!OpeningType", SimpleTagUnMapper(sap_types.OpeningType))
+        "!OpeningType", SimpleTagUnMapper(OpeningType))
 
     yaml.add_representer(numpy.ndarray, array_as_list_representer)
     yaml.add_constructor("!Array", array_as_list_constructor)

@@ -46,6 +46,7 @@ def living_area_fraction(nrooms):
 def Uroof(loft_ins_thickness_mm):
     return 1 / (1 / 2.3 + 0.021 * loft_ins_thickness_mm)
 
+
 CAVITY_WALL_U_VALUES = {  # Masonry cavity as built
     AgeBands.A: 2.1,
     AgeBands.B: 1.6,
@@ -201,7 +202,6 @@ def Ugnd(age_band, exposed_perimeter, wall_thickness, Agndfloor):
 
 
 class Glazing:
-
     def __init__(self, light_transmittance, gvalue, Uvalue, draught_proof):
         self.properties = {
             'light_transmittance': light_transmittance,

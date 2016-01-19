@@ -21,9 +21,9 @@ class SolarConstants:
 
         delta_lat = latitude - declination
         delta_lat_sq = delta_lat ** 2
-        self.A = .702 - .0119 * (delta_lat) + 0.000204 * delta_lat_sq
-        self.B = -.107 + 0.0081 * (delta_lat) - 0.000218 * delta_lat_sq
-        self.C = .117 - 0.0098 * (delta_lat) + 0.000143 * delta_lat_sq
+        self.A = 0.702 - 0.0119 * (delta_lat) + 0.000204 * delta_lat_sq
+        self.B = -0.107 + 0.0081 * (delta_lat) - 0.000218 * delta_lat_sq
+        self.C = 0.117 - 0.0098 * (delta_lat) + 0.000143 * delta_lat_sq
 
 
 SOLAR_HEATING = SolarConstants(HEATING_LATITUDE)

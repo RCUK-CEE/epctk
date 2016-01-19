@@ -3,9 +3,9 @@ import os.path
 
 import numpy
 
+from sap.elements.sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes,
+                                    HeatingTypes, PVOvershading, VentilationTypes, BoilerTypes, FloorTypes)
 from ..appendix.appendix_f import cpsu_store, elec_cpsu_store
-from ..sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes,
-                           HeatingTypes, PVOvershading, VentilationTypes, BoilerTypes, FloorTypes)
 from ..utils import csv_to_dict
 
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'data')

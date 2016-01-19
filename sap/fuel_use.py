@@ -5,11 +5,11 @@ SAP Section 12: Total energy use and fuel costs
 """
 import numpy
 
+from .heating_loaders import immersion_on_peak_fraction
+from .elements import HeatingTypes
 from .constants import SUMMER_MONTHS
-from .utils import sum_
-from .sap_types import HeatingTypes
 from .fuels import ELECTRICITY_SOLD, ELECTRICITY_OFFSET
-from .heating_systems import immersion_on_peak_fraction
+from .utils import sum_
 
 
 def set_fuel_use(dwelling, label, regulated,

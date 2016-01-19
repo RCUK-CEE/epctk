@@ -6,7 +6,7 @@ Relates to Appendix Q
 import logging
 import os
 
-from ..sap_types import VentilationTypes, DuctTypes
+from sap.elements.sap_types import VentilationTypes, DuctTypes
 from ..utils import int_or_none, float_or_none
 
 PCDF_DATA_FILE = os.path.join(os.path.dirname(__file__), '..' ,'data', 'pcdf2009.dat')

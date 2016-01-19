@@ -2,12 +2,11 @@ import math
 
 import numpy
 
-from sap.appendix import appendix_c, appendix_g
-from sap.constants import DAYS_PER_MONTH, SUMMER_MONTHS
-from sap.heating_system_types import DedicatedWaterSystem
-from sap.sap_types import HeatingTypes
-from sap.tables import TABLE_4A, get_4a_system, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE, TABLE_H5
-from sap.utils import SAPInputError
+from .appendix import appendix_c, appendix_g
+from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
+from .elements import HeatingTypes, DedicatedWaterSystem
+from .tables import TABLE_4A, get_4a_system, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE, TABLE_H5
+from .utils import SAPInputError
 
 
 def get_water_heater(dwelling):

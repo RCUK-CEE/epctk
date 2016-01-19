@@ -1,9 +1,8 @@
 import copy
 import os.path
 
+from .elements import FuelTypes
 from .constants import COMMUNITY_FUEL_ID
-from .io.pcdf import pcdf_fuel_prices
-from .sap_types import FuelTypes
 from .utils import float_or_none, csv_to_dict
 
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
@@ -197,33 +196,31 @@ class ElectricityTariff(Fuel):
     def name(self):
         return self.on_peak_data.name.split("(")[0].strip()
 
-    # Properties that are now inherited from Fuel
-    # Use the Fuel object for these parameters which use the fuel_data property,
-    # which is set to on-peak code
-    # @property
-    # def fuel_data(self):
-    #     return get_fuel_data(self.on_peak_fuel_code)
-    # @property
-    # def co2_factor(self):
-    #     return self.on_peak_data.co2_factor
-    #
-    # @property
-    # def primary_energy_factor(self):
-    #     return self.on_peak_data.primary_energy_factor
-    #
-    # @property
-    # def fuel_factor(self):
-    #     return self.on_peak_data.fuel_factor
-    #
-    # @property
-    # def emission_factor_adjustment(self):
-    #     return self.on_peak_data.emission_factor_adjustment
-    #
-    # @property
-    # def standing_charge(self):
-    #     return self.on_peak_data.standing_charge
-
-
+        # Properties that are now inherited from Fuel
+        # Use the Fuel object for these parameters which use the fuel_data property,
+        # which is set to on-peak code
+        # @property
+        # def fuel_data(self):
+        #     return get_fuel_data(self.on_peak_fuel_code)
+        # @property
+        # def co2_factor(self):
+        #     return self.on_peak_data.co2_factor
+        #
+        # @property
+        # def primary_energy_factor(self):
+        #     return self.on_peak_data.primary_energy_factor
+        #
+        # @property
+        # def fuel_factor(self):
+        #     return self.on_peak_data.fuel_factor
+        #
+        # @property
+        # def emission_factor_adjustment(self):
+        #     return self.on_peak_data.emission_factor_adjustment
+        #
+        # @property
+        # def standing_charge(self):
+        #     return self.on_peak_data.standing_charge
 
 
 def translate_12_row(fuels, row):
@@ -282,6 +279,7 @@ def get_fuel_data_pcdf(fuel_id):
     """
     global _PCDF_FUEL_PRICES_CACHE
     if _PCDF_FUEL_PRICES_CACHE is None:
+        from .io.pcdf import pcdf_fuel_prices
         _PCDF_FUEL_PRICES_CACHE = pcdf_fuel_prices()
 
     if fuel_id in _PCDF_FUEL_PRICES_CACHE:
@@ -342,5 +340,3 @@ def fuel_from_code(code):
         return copy.deepcopy(_TABLE_12_ELEC[code])
     else:
         return Fuel(code)
-
-

@@ -12,8 +12,7 @@ record for a solid fuel boiler includes:
 
 All efficiency values are gross (net-to-gross conversion factors are given in Table E4).
 """
-from sap.heating_system_types import HeatingSystem
-from sap.sap_types import HeatingTypes
+from ..elements import HeatingTypes, HeatingSystem
 
 
 def solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer):
@@ -30,13 +29,13 @@ def solid_fuel_boiler_from_pcdf(pcdf_data, fuel, use_immersion_in_summer):
 
     elif pcdf_data['part_load_fuel_use'] != '':
         # FIXME
-        raise NotImplementedError()
+        raise NotImplementedError("Appendix J: Part load fuel use not implemented")
         # !!! Need to tests for inside/outside of heated space
-        nominal_effy = 100 * (pcdf_data['nominal_heat_to_water'] + pcdf_data['nominal_heat_to_room']) / pcdf_data[
-            'nominal_fuel_use']
-        part_load_effy = 100 * (pcdf_data['part_load_heat_to_water'] + pcdf_data['part_load_heat_to_room']) / pcdf_data[
-            'part_load_fuel_use']
-        effy = 0.5 * (nominal_effy + part_load_effy)
+        # nominal_effy = 100 * (pcdf_data['nominal_heat_to_water'] + pcdf_data['nominal_heat_to_room']) / pcdf_data[
+        #     'nominal_fuel_use']
+        # part_load_effy = 100 * (pcdf_data['part_load_heat_to_water'] + pcdf_data['part_load_heat_to_room']) / pcdf_data[
+        #     'part_load_fuel_use']
+        # effy = 0.5 * (nominal_effy + part_load_effy)
 
     else:
         nominal_effy = 100 * (

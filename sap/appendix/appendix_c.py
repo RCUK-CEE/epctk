@@ -4,9 +4,8 @@ Appendix C: Community heating, including schemes with Combined Heat and Power (C
 
 
 """
-from ..heating_system_types import HeatingSystem
+from ..elements import CommunityDistributionTypes, HeatingTypes, HeatingSystem
 from ..fuels import CommunityFuel, Fuel
-from ..sap_types import CommunityDistributionTypes, HeatingTypes
 
 TABLE_12c = {
     CommunityDistributionTypes.PRE_1990_UNINSULATED: 1.2,

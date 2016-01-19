@@ -115,7 +115,7 @@ def run_dwelling(dwelling):
     sap.appendix.appendix_t.run_improvements(dwelling)
     runner.run_fee(dwelling)
     runner.run_der(dwelling)
-    runner.run_ter(dwelling)
+    sap.appendix.appendix_t.run_ter(dwelling)
 
 
 def get_dwelling(fname, force_reparse):

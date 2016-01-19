@@ -7,10 +7,10 @@ which is a subclass in appendix_c
 """
 import numpy
 
-from .constants import SUMMER_MONTHS
-from .fuels import ELECTRICITY_7HR, ELECTRICITY_10HR
-from .utils import weighted_effy
+from ..constants import SUMMER_MONTHS
 from .sap_types import FuelTypes, HeatingTypes
+from ..fuels import ELECTRICITY_7HR, ELECTRICITY_10HR
+from ..utils import weighted_effy
 
 
 class HeatingSystem:
@@ -120,7 +120,7 @@ class HeatingSystem:
         :return:
         """
         # Import locally to avoid circular reference problems when importing main module
-        from sap.heating_systems import dhw_fuel_cost
+        from ..heating_loaders import dhw_fuel_cost
         return dhw_fuel_cost(dwelling)
 
     def get(self, key, default=None):
@@ -156,7 +156,7 @@ class HeatingSystem:
         if self.system_type == HeatingTypes.cpsu:
             # Import locally to avoid circular reference problems when importing main module
             # FIXME: it should be possible to avoid this by better modularising the code.
-            from .appendix import appendix_f
+            from ..appendix import appendix_f
 
             return appendix_f.cpsu_on_peak(self, dwelling)
 

@@ -7,12 +7,11 @@ Encorporates parts of SAP main body and appendicies
 """
 import logging
 
-from .io.pcdf import (get_boiler, get_solid_fuel_boiler, get_twin_burner_cooker_boiler, get_heat_pump, get_microchp)
+from .elements import HeatingSystem, HeatingTypes, ThermalStoreTypes, CylinderInsulationTypes, ImmersionTypes, FuelTypes
 from .appendix import appendix_f, appendix_g, appendix_j, appendix_n
 from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
 from .fuels import ELECTRICITY_7HR, ELECTRICITY_10HR
-from .heating_system_types import HeatingSystem
-from .sap_types import HeatingTypes, ThermalStoreTypes, CylinderInsulationTypes, ImmersionTypes, FuelTypes
+from .io.pcdf import (get_boiler, get_solid_fuel_boiler, get_twin_burner_cooker_boiler, get_heat_pump, get_microchp)
 from .tables import (combi_loss_table_3a, combi_loss_instant_without_keep_hot,
                      combi_loss_instant_with_timed_heat_hot,
                      combi_loss_instant_with_untimed_heat_hot, TABLE_D7, get_seasonal_effy_offset)

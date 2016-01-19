@@ -1,5 +1,6 @@
 import argparse
 
+import sap.appendix.appendix_t
 from sap import runner
 from sap.io import yaml_io
 
@@ -13,7 +14,7 @@ def sap_from_yaml(fname):
     dwelling = yaml_io.from_yaml(fname)
     runner.run_sap(dwelling)
     runner.run_der(dwelling)
-    runner.run_ter(dwelling)
+    sap.appendix.appendix_t.run_ter(dwelling)
     runner.run_fee(dwelling)
 
     print_header("SAP RESULTS")

@@ -13,9 +13,8 @@ import types
 
 import numpy
 
+from ..elements import HeatingTypes, FuelTypes, HeatingSystem
 from ..constants import SUMMER_MONTHS, USE_TABLE_4D_FOR_RESPONSIVENESS
-from ..heating_system_types import HeatingSystem
-from ..sap_types import HeatingTypes, FuelTypes
 from ..tables import table_n4_heating_days, table_n8_secondary_fraction, interpolate_psr_table, interpolate_efficiency
 from ..utils import weighted_effy
 

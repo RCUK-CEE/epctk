@@ -2,7 +2,7 @@ import math
 
 import numpy
 
-from sap.constants import DAYS_PER_MONTH
+from .constants import DAYS_PER_MONTH
 
 
 def GL_sum(openings):

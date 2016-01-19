@@ -1,4 +1,4 @@
-from sap.sap_types import OpeningType, Opening, HeatLossElement, HeatLossElementTypes
+from sap.elements.sap_types import OpeningType, Opening, HeatLossElement, HeatLossElementTypes
 
 
 def convert_old_style_openings(dwelling):

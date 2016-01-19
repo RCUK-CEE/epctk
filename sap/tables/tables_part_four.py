@@ -10,12 +10,12 @@ of the combination of heating system and heating system controls installed.
 """
 import os.path
 
+from sap.elements.sap_types import LoadCompensators, HeatEmitters, HeatingTypes, ThermalStoreTypes, FuelTypes
+from sap.elements.sap_types import VentilationTypes
 from sap.io.pcdf import TABLE_4h_in_use_approved_scheme, TABLE_4h_in_use, TABLE_4h_hr_effy_approved_scheme, \
     TABLE_4h_hr_effy
-from sap.sap_types import VentilationTypes
-from ..fuels import ELECTRICITY_24HR, ELECTRICITY_10HR, ELECTRICITY_7HR
 from ..constants import USE_TABLE_4D_FOR_RESPONSIVENESS
-from ..sap_types import LoadCompensators, HeatEmitters, HeatingTypes, ThermalStoreTypes, FuelTypes
+from ..fuels import ELECTRICITY_24HR, ELECTRICITY_10HR, ELECTRICITY_7HR
 from ..utils import float_or_zero, csv_to_dict
 
 

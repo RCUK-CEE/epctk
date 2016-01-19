@@ -12,7 +12,7 @@ file.
 """
 import os.path
 
-from .sap_tables import (TABLE_3, TABLE_6D, TABLE_10, TABLE_10C, TABLE_D7,
+from .tables_ import (TABLE_3, TABLE_6D, TABLE_10, TABLE_10C, TABLE_D7,
                          TABLE_H1, TABLE_H2, TABLE_H3, TABLE_H4, TABLE_H5, TABLE_M1,
                          FLOOR_INFILTRATION, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
                          table_1b_occupancy, table_1b_daily_hot_water,
