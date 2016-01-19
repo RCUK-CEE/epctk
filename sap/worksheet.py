@@ -3,6 +3,7 @@ import math
 import numpy
 
 # Try to keep imports matching order of SAP document
+from .lighting import lighting_consumption
 from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
 from .utils import monthly_to_annual
 from .ventilation import ventilation
@@ -12,83 +13,6 @@ from .fuel_use import fuel_use
 from .appendix import appendix_m, appendix_g
 
 
-def geometry(dwelling):
-    if not dwelling.get('Aglazing'):
-        dwelling.Aglazing = dwelling.GFA * dwelling.glazing_ratio
-        dwelling.Aglazing_front = dwelling.glazing_asymmetry * \
-                                  dwelling.Aglazing
-        dwelling.Aglazing_back = (
-                                     1. - dwelling.glazing_asymmetry) * dwelling.Aglazing
-        dwelling.Aglazing_left = 0
-        dwelling.Aglazing_right = 0
-
-    elif not dwelling.get('Aglazing_front'):
-        dwelling.Aglazing_front = dwelling.Aglazing / 2
-        dwelling.Aglazing_back = dwelling.Aglazing / 2
-        dwelling.Aglazing_left = 0
-        dwelling.Aglazing_right = 0
-
-    if dwelling.get('hlp') is not None:
-        return
-
-    if dwelling.get('aspect_ratio') is not None:
-        # This is for converting for the parametric SAP style
-        # dimensions to the calculation dimensions
-        width = math.sqrt(dwelling.GFA / dwelling.Nstoreys / dwelling.aspect_ratio)
-
-        depth = math.sqrt(dwelling.GFA / dwelling.Nstoreys * dwelling.aspect_ratio)
-
-        dwelling.volume = width * depth * (dwelling.room_height * dwelling.Nstoreys +
-                                           dwelling.internal_floor_depth * (dwelling.Nstoreys - 1))
-
-        dwelling.Aextwall = 2 * (dwelling.room_height * dwelling.Nstoreys + dwelling.internal_floor_depth * (
-            dwelling.Nstoreys - 1)) * (width + depth * (1 - dwelling.terrace_level)) - dwelling.Aglazing
-
-        dwelling.Apartywall = 2 * (dwelling.room_height * dwelling.Nstoreys +
-                                   dwelling.internal_floor_depth *
-                                   (dwelling.Nstoreys - 1)) * (depth * dwelling.terrace_level)
-
-        if dwelling.type == "House":
-            dwelling.Aroof = width * depth
-            dwelling.Agndfloor = width * depth
-        elif dwelling.type == "MidFlat":
-            dwelling.Aroof = 0
-            dwelling.Agndfloor = 0
-        else:
-            raise RuntimeError('Unknown dwelling type: %s' % (dwelling.type,))
-
-    else:
-        if not dwelling.get('volume'):
-            dwelling.volume = dwelling.GFA * dwelling.storey_height
-
-        if not dwelling.get('Aextwall'):
-            if dwelling.get('wall_ratio') is not None:
-                dwelling.Aextwall = dwelling.GFA * dwelling.wall_ratio
-            else:
-                dwelling_height = dwelling.storey_height * dwelling.Nstoreys
-                total_wall_A = dwelling_height * dwelling.average_perimeter
-                if dwelling.get('Apartywall') is not None:
-                    dwelling.Aextwall = total_wall_A - dwelling.Apartywall
-                elif dwelling.get('party_wall_fraction') is not None:
-                    dwelling.Aextwall = total_wall_A * (
-                        1 - dwelling.party_wall_fraction)
-                else:
-                    dwelling.Aextwall = total_wall_A - \
-                                        dwelling.party_wall_ratio * dwelling.GFA
-
-        if not dwelling.get('Apartywall'):
-            if dwelling.get('party_wall_ratio') is not None:
-                dwelling.Apartywall = dwelling.GFA * dwelling.party_wall_ratio
-            else:
-                dwelling.Apartywall = dwelling.Aextwall * \
-                                      dwelling.party_wall_fraction / \
-                                      (1 - dwelling.party_wall_fraction)
-
-        if not dwelling.get('Aroof'):
-            dwelling.Aroof = dwelling.GFA / dwelling.Nstoreys
-            dwelling.Agndfloor = dwelling.GFA / dwelling.Nstoreys
-
-
 def heat_loss(dwelling):
     """
     Set the attributes `h`, `hlp`, `h_fabric`, `h_bridging`, `h_vent`, `h_vent_annual`
@@ -96,8 +20,6 @@ def heat_loss(dwelling):
 
     Args:
         dwelling:
-
-
     """
     if dwelling.get('hlp') is not None:
         # TODO: what is "h"?
@@ -105,8 +27,8 @@ def heat_loss(dwelling):
         return
 
     UA = sum(e.Uvalue * e.area for e in dwelling.heat_loss_elements)
-    A_bridging = sum(
-            e.area for e in dwelling.heat_loss_elements if e.is_external)
+    A_bridging = sum(e.area for e in dwelling.heat_loss_elements if e.is_external)
+
     if dwelling.get("Uthermalbridges") is not None:
         h_bridging = dwelling.Uthermalbridges * A_bridging
     else:
@@ -136,47 +58,6 @@ def water_heater_output(dwelling):
                                                       dwelling.fghrs_input_from_solar  -
                                                       dwelling.savings_from_wwhrs -
                                                       dwelling.savings_from_fghrs)
-
-
-def GL_sum(openings):
-    return sum(0.9 * o.area * o.opening_type.frame_factor * o.opening_type.light_transmittance for o in openings)
-
-
-def lighting_consumption(dwelling):
-    mean_light_energy = 59.73 * (dwelling.GFA * dwelling.Nocc) ** 0.4714
-
-    if not dwelling.get('low_energy_bulb_ratio'):
-        dwelling.low_energy_bulb_ratio = int(
-                100 * float(dwelling.lighting_outlets_low_energy) / dwelling.lighting_outlets_total + .5) / 100.
-
-    C1 = 1 - 0.5 * dwelling.low_energy_bulb_ratio
-
-    window_openings = (o for o in dwelling.openings if not o.opening_type.roof_window and not o.opening_type.bfrc_data)
-    GLwin = GL_sum(window_openings) * dwelling.light_access_factor / dwelling.GFA
-
-    roof_openings = (o for o in dwelling.openings if o.opening_type.roof_window and not o.opening_type.bfrc_data)
-    GLroof = GL_sum(roof_openings) / dwelling.GFA
-
-    # Use frame factor of 0.7 for bfrc rated windows
-    window_bfrc_openings = (o for o in dwelling.openings if not o.opening_type.roof_window and o.opening_type.bfrc_data)
-    GLwin_bfrc = GL_sum(window_bfrc_openings) * 0.7 * 0.9 * dwelling.light_access_factor / dwelling.GFA
-
-    roof_bfrc_openings = (o for o in dwelling.openings if o.opening_type.roof_window and o.opening_type.bfrc_data)
-    GLroof_bfrc = GL_sum(roof_bfrc_openings) * 0.7 * 0.9 / dwelling.GFA
-
-    GL = GLwin + GLroof + GLwin_bfrc + GLroof_bfrc
-    C2 = 52.2 * GL ** 2 - 9.94 * GL + 1.433 if GL <= 0.095 else 0.96
-    EL = mean_light_energy * C1 * C2
-    light_consumption = EL * \
-                        (1 + 0.5 * numpy.cos((2. * math.pi / 12.) * ((numpy.arange(12) + 1) - 0.2))) * \
-                        DAYS_PER_MONTH / 365
-    dwelling.annual_light_consumption = sum(light_consumption)
-    dwelling.full_light_gain = light_consumption * \
-                               (0.85 * 1000 / 24.) / DAYS_PER_MONTH
-
-    dwelling.lighting_C1 = C1
-    dwelling.lighting_GL = GL
-    dwelling.lighting_C2 = C2
 
 
 def internal_heat_gain(dwelling):
