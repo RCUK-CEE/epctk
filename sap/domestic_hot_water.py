@@ -7,9 +7,10 @@ from sap.constants import DAYS_PER_MONTH, SUMMER_MONTHS
 from sap.heating_system_types import DedicatedWaterSystem
 from sap.sap_types import HeatingTypes
 from sap.tables import TABLE_4A, get_4a_system, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE, TABLE_H5
+from sap.utils import SAPInputError
 
 
-def configure_water_system(dwelling):
+def get_water_heater(dwelling):
     """
     Configure the domestic hot water heating system
 
@@ -24,47 +25,49 @@ def configure_water_system(dwelling):
 
     if code in TABLE_4A:
         water_system = get_4a_system(dwelling.electricity_tariff, code)
-        dwelling.water_sys = DedicatedWaterSystem(water_system['effy'],
+        water_sys = DedicatedWaterSystem(dwelling.water_sys_fuel,
+                                                  water_system['effy'],
                                                   dwelling.use_immersion_heater_summer if dwelling.get(
                                                           'use_immersion_heater_summer') else False)
-        dwelling.water_sys.table2b_row = water_system['table2b_row']
-        dwelling.water_sys.fuel = dwelling.water_sys_fuel
-
-    elif code == 999:  # no h/w system present - assume electric immersion
-        pass
+        water_sys.table2b_row = water_system['table2b_row']
 
     elif code == 901:  # from main
         if dwelling.main_sys_1 is None:
             raise RuntimeError("Main system 1 must not be None")
-        dwelling.water_sys = dwelling.main_sys_1
-
-    elif code == 902:  # from secondary
-        dwelling.water_sys = dwelling.secondary_sys
+        water_sys = dwelling.main_sys_1
 
     elif code == 914:  # from second main
-        dwelling.water_sys = dwelling.main_sys_2
+        water_sys = dwelling.main_sys_2
+
+    elif code == 902:  # from secondary
+        water_sys = dwelling.secondary_sys
 
     elif code == 950:  # community dhw only
         # TODO Community hot water based on sap defaults not handled
-        dwelling.water_sys = appendix_c.CommunityHeating(
+        water_sys = appendix_c.CommunityHeating(
                 dwelling.community_heat_sources_dhw,
                 dwelling.get('sap_community_distribution_type_dhw'))
 
         if dwelling.get('community_dhw_flat_rate_charging'):
-            dwelling.water_sys.dhw_charging_factor = 1.05
+            water_sys.dhw_charging_factor = 1.05
 
         else:
-            dwelling.water_sys.dhw_charging_factor = 1.0
+            water_sys.dhw_charging_factor = 1.0
 
         if dwelling.main_sys_1.system_type == HeatingTypes.community:
             # Standing charge already covered by main system
-            dwelling.water_sys.fuel.standing_charge = 0
+            water_sys.fuel.standing_charge = 0
 
         else:
             # Only half of standing charge applies for DHW only
-            dwelling.water_sys.fuel.standing_charge /= 2
+            water_sys.fuel.standing_charge /= 2
+    elif code == 999:  # no h/w system present - assume electric immersion
+        return
     else:
-        assert False
+        raise SAPInputError("No valid water system code given")
+
+    # dwelling.water_sys = water_sys
+    return water_sys
 
 
 def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
@@ -95,7 +98,7 @@ def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
         HeatingTypes.regular_boiler,
         HeatingTypes.room_heater,  # must be back boiler
     ] and not dwelling.has_cylinderstat:
-        utilisation *= .9
+        utilisation *= 0.9
 
     if performance_ratio < 20:
         performance_factor = 0.97 - 0.0367 * performance_ratio + 0.0006 * performance_ratio ** 2

@@ -2,7 +2,7 @@ from sap.ventilation import infiltration
 from . import fuels
 from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
 from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
-from .domestic_hot_water import configure_water_system
+from .domestic_hot_water import get_water_heater
 from .fuel_use import configure_fuel_costs
 from .fuels import ELECTRICITY_STANDARD
 from .heating_systems import sedbuk_2005_heating_system, sedbuk_2009_heating_system, pcdf_heating_system
@@ -86,13 +86,13 @@ def configure_main_system(dwelling):
 
     """
     if dwelling.get('main_heating_pcdf_id') is not None:
-        dwelling.main_sys_1 = pcdf_heating_system(dwelling,
-                                                  dwelling.main_heating_pcdf_id,
-                                                  dwelling.main_sys_fuel,
-                                                  dwelling.get('use_immersion_heater_summer', False))
+        main_sys = pcdf_heating_system(dwelling,
+                                       dwelling.main_heating_pcdf_id,
+                                       dwelling.main_sys_fuel,
+                                       dwelling.get('use_immersion_heater_summer', False))
     # !!! Might need to enforce a secondary system?
     elif dwelling.get('sys1_sedbuk_2005_effy') is not None:
-        dwelling.main_sys_1 = sedbuk_2005_heating_system(
+        main_sys = sedbuk_2005_heating_system(
                 dwelling,
                 dwelling.main_sys_fuel,
                 dwelling.sys1_sedbuk_2005_effy,
@@ -103,7 +103,7 @@ def configure_main_system(dwelling):
                 dwelling.get('use_immersion_heater_summer', False))
 
     elif dwelling.get('sys1_sedbuk_2009_effy') is not None:
-        dwelling.main_sys_1 = sedbuk_2009_heating_system(
+        main_sys = sedbuk_2009_heating_system(
                 dwelling,
                 dwelling.main_sys_fuel,
                 dwelling.sys1_sedbuk_2009_effy,
@@ -116,14 +116,14 @@ def configure_main_system(dwelling):
 
     elif dwelling.get('main_heating_type_code') == "community":
         # TODO: Can Community can be second main system too?
-        dwelling.main_sys_1 = appendix_c.CommunityHeating(
+        main_sys = appendix_c.CommunityHeating(
                 dwelling.community_heat_sources,
                 dwelling.get('sap_community_distribution_type'))
 
-        dwelling.main_sys_fuel = dwelling.main_sys_1.fuel
+        dwelling.main_sys_fuel = main_sys.fuel
 
     else:
-        dwelling.main_sys_1 = appendix_a.sap_table_heating_system(
+        main_sys = appendix_a.sap_table_heating_system(
                 dwelling,
                 dwelling.main_heating_type_code,
                 dwelling.main_sys_fuel,
@@ -131,8 +131,11 @@ def configure_main_system(dwelling):
                 dwelling.sys1_hetas_approved if dwelling.get('sys1_hetas_approved') else False)
 
     # TODO Should check here for no main system specified, and use a default if that's the case
-    if dwelling.main_sys_1 is None:
+    if main_sys is None:
         raise RuntimeError('Main system 1 cannot be None')
+
+    # TODO: convert assignment to return value...
+    dwelling.main_sys_1 = main_sys
 
 
 def configure_main_system_2(dwelling):
@@ -141,21 +144,25 @@ def configure_main_system_2(dwelling):
     :param dwelling:
     :return:
     """
-    # Sedbuk systems
+    # TODO: Sedbuk systems
+    main_system = None
+
     if dwelling.get('main_heating_2_pcdf_id') is not None:
-        dwelling.main_sys_2 = pcdf_heating_system(dwelling,
+        main_system = pcdf_heating_system(dwelling,
                                                   dwelling.main_heating_2_pcdf_id,
                                                   dwelling.main_sys_2_fuel,
                                                   dwelling.get('use_immersion_heater_summer', False))
 
     # TODO: Might need to enforce a secondary system?
     elif dwelling.get('main_heating_2_type_code') is not None:
-        dwelling.main_sys_2 = appendix_a.sap_table_heating_system(
+        main_system = appendix_a.sap_table_heating_system(
                 dwelling,
                 dwelling.main_heating_2_type_code,
                 dwelling.main_sys_2_fuel,
                 dwelling.get('use_immersion_heater_summer', False),
                 dwelling.get('sys2_hetas_approved', False))
+
+    dwelling.main_sys_2 = main_system
 
 
 def configure_water_storage(dwelling):
@@ -246,6 +253,14 @@ def configure_controls(dwelling):
         configure_control_system(dwelling, 2)
 
 
+def configure_water(dwelling):
+    dwelling.water_sys = get_water_heater(dwelling)
+
+    appendix_g.configure_wwhr(dwelling)
+    appendix_g.configure_fghr(dwelling)
+    configure_water_storage(dwelling)
+
+
 def configure_systems(dwelling):
     """
     Configure space and water heating systems
@@ -274,18 +289,14 @@ def configure_systems(dwelling):
         dwelling.main_heating_2_fraction = 0
 
     # Apply Appendix A for the secondary heating system
-    appendix_a.configure_secondary_system(dwelling)
+    appendix_a.configure_secondary_system(dwelling, dwelling.get('force_secondary_heating', False))
 
     # Account for the heat provided by secondary system
     dwelling.fraction_of_heat_from_main = 1
     if dwelling.get('secondary_sys'):
         dwelling.fraction_of_heat_from_main -= dwelling.main_sys_1.default_secondary_fraction
 
-    configure_water_system(dwelling)
-    appendix_g.configure_wwhr(dwelling)
-    appendix_g.configure_fghr(dwelling)
-    configure_water_storage(dwelling)
-
+    configure_water(dwelling)
     configure_controls(dwelling)
 
 

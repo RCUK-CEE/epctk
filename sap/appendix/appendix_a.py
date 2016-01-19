@@ -75,14 +75,26 @@ def apply_appendix_a():
     pass
 
 
-def configure_secondary_system(dwelling):
+def _secondary_code_from_main(main_type_code, main_fuel):
+    # TODO: original code would let this part OVERRIDE the explcit heating code,
+    # but here we EITHER have heating code OR infer from main heating
+
+    # Check code in range 401-408 OR code in range 421-425 AND fuel is not ELECTRICITY_STANDARD
+    if main_type_code is not None and main_type_code != 'community' and (
+                (401 <= main_type_code <= 408) or
+                ((421 <= main_type_code <= 425) and
+                         main_fuel != ELECTRICITY_STANDARD)):
+        # TODO Does 24 hour tariff count as being offpeak?
+        return 693
+    else:
+        return None
+
+
+def configure_secondary_system(dwelling, force_secondary_heating=False):
     # TODO Need to apply the rules from A4 here - need to do this
     # before fraction_of_heat_from_main is set.  Also back boiler
     # should have secondary system - see section 9.2.8
-    heating_code = dwelling.get('secondary_heating_type_code')
     use_immersion = dwelling.get('use_immersion_heater_summer', False)
-    hetas_approved = dwelling.get('secondary_hetas_approved')
-    electricity_tariff = dwelling.electricity_tariff
 
     if dwelling.get('secondary_sys_manuf_effy'):
         dwelling.secondary_sys = get_manuf_data_secondary_system(dwelling.secondary_sys_fuel,
@@ -90,31 +102,28 @@ def configure_secondary_system(dwelling):
                                                                  use_immersion)
         return
 
-    elif heating_code is not None:
+    heating_code = dwelling.get('secondary_heating_type_code')
+    hetas_approved = dwelling.get('secondary_hetas_approved')
+    electricity_tariff = dwelling.electricity_tariff
+
+    if heating_code is None:
+        fuel = dwelling.electricity_tariff
+        heating_code = _secondary_code_from_main(dwelling.get('main_heating_type_code'), dwelling.main_sys_fuel)
+
+        if heating_code is None:
+            if force_secondary_heating:
+                heating_code = 693
+            else:
+                return
+
+    else:
         fuel = dwelling.secondary_sys_fuel
-    else:  # heating_code is None
-        # TODO: original code would let this part OVERRIDE the explcit heating code,
-        # but here we EITHER have heating code OR infer from main heating
-        main_type_code = dwelling.get('main_heating_type_code', -1)
-        # Check code in range 401-408 OR code in range 421-425 AND fuel is not ELECTRICITY_STANDARD
 
-        if main_type_code != 'community' and (
-                    (401 <= main_type_code <= 408) or ((421 <= main_type_code <= 425) and
-                                                               dwelling.main_sys_fuel != ELECTRICITY_STANDARD)):
-            # TODO Does 24 hour tariff count as being offpeak?
-            heating_code = 693
-            fuel = dwelling.electricity_tariff
-
-        elif dwelling.get('force_secondary_heating'):
-            heating_code = 693
-            fuel = dwelling.electricity_tariff
-        else:
-            return
-
-    dwelling.secondary_heating_type_code = heating_code
-    dwelling.secondary_sys_fuel = fuel
     dwelling.secondary_sys = get_4a_secondary_system(fuel, heating_code, electricity_tariff, use_immersion,
                                                      hetas_approved)
+
+    dwelling.secondary_heating_type_code = dwelling.secondary_sys.sap_code
+    dwelling.secondary_sys_fuel = dwelling.secondary_sys.fuel
 
 
 def sap_table_heating_system(dwelling, system_code, fuel,
@@ -219,7 +228,7 @@ def get_4a_secondary_system(fuel, sap_type_code, electricity_tariff, use_immersi
         effy = system_efficiency(system_data, fuel)
 
     sys = SecondarySystem(system_type_from_sap_code(sap_type_code, system_data), fuel, effy,
-                          use_immersion_heater_summer)
+                          use_immersion_heater_summer, sap_code=sap_type_code)
 
     sys.table2b_row = system_data['table2b_row']
 
