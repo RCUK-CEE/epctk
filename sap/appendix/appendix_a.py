@@ -22,7 +22,8 @@ A2.1 Identifying the main system
        (obtained by dividing fuel cost by conversion efficiency).
 
 """
-from ..tables import system_efficiency, system_type_from_sap_code, combi_loss_table_3a, TABLE_4A, TABLE_4B, get_4a_system
+from ..tables import (system_efficiency, system_type_from_sap_code, combi_loss_table_3a, TABLE_4A, TABLE_4B,
+                      get_4a_system)
 from ..fuels import ELECTRICITY_STANDARD
 from ..heating_system_types import HeatingSystem, SecondarySystem
 from ..sap_types import HeatingTypes
@@ -78,31 +79,42 @@ def configure_secondary_system(dwelling):
     # TODO Need to apply the rules from A4 here - need to do this
     # before fraction_of_heat_from_main is set.  Also back boiler
     # should have secondary system - see section 9.2.8
+    heating_code = dwelling.get('secondary_heating_type_code')
+    use_immersion = dwelling.get('use_immersion_heater_summer', False)
+    hetas_approved = dwelling.get('secondary_hetas_approved')
+    electricity_tariff = dwelling.electricity_tariff
 
-    if dwelling.get('secondary_heating_type_code'):
-        dwelling.secondary_sys = get_4a_secondary_system(dwelling)
-    elif dwelling.get('secondary_sys_manuf_effy'):
-        dwelling.secondary_sys = get_manuf_data_secondary_system(dwelling)
+    if dwelling.get('secondary_sys_manuf_effy'):
+        dwelling.secondary_sys = get_manuf_data_secondary_system(dwelling.secondary_sys_fuel,
+                                                                 dwelling.secondary_sys_manuf_effy,
+                                                                 use_immersion)
+        return
 
-    # There must be a secondary system if electric storage heaters or off peak underfloor electric
-    # But not if we use community heating
-    if dwelling.get('main_heating_type_code') and dwelling.get('main_heating_type_code') != 'community':
-        # Check that the code is in range 401-408 OR that
-        # the fuel is not ELECTRICITY_STANDARD and the code is in range 421-425
-        type_code_in_range = (401 <= dwelling.main_heating_type_code <= 408) or (
-            (421 <= dwelling.main_heating_type_code <= 425) and dwelling.main_sys_fuel != ELECTRICITY_STANDARD)
+    elif heating_code is not None:
+        fuel = dwelling.secondary_sys_fuel
+    else:  # heating_code is None
+        # TODO: original code would let this part OVERRIDE the explcit heating code,
+        # but here we EITHER have heating code OR infer from main heating
+        main_type_code = dwelling.get('main_heating_type_code', -1)
+        # Check code in range 401-408 OR code in range 421-425 AND fuel is not ELECTRICITY_STANDARD
 
-        if not dwelling.get('secondary_sys') and type_code_in_range:
-            # !!! Does 24 hour tariff count as being offpeak?
-            dwelling.secondary_heating_type_code = 693
-            dwelling.secondary_sys_fuel = dwelling.electricity_tariff
-            dwelling.secondary_sys = get_4a_secondary_system(dwelling)
+        if main_type_code != 'community' and (
+                    (401 <= main_type_code <= 408) or ((421 <= main_type_code <= 425) and
+                                                               dwelling.main_sys_fuel != ELECTRICITY_STANDARD)):
+            # TODO Does 24 hour tariff count as being offpeak?
+            heating_code = 693
+            fuel = dwelling.electricity_tariff
 
-    # If there is still no secondary heating system and we want to force there to be one...
-    if not dwelling.get('secondary_sys') and dwelling.get('force_secondary_heating', False):
-        dwelling.secondary_heating_type_code = 693
-        dwelling.secondary_sys_fuel = dwelling.electricity_tariff
-        dwelling.secondary_sys = get_4a_secondary_system(dwelling)
+        elif dwelling.get('force_secondary_heating'):
+            heating_code = 693
+            fuel = dwelling.electricity_tariff
+        else:
+            return
+
+    dwelling.secondary_heating_type_code = heating_code
+    dwelling.secondary_sys_fuel = fuel
+    dwelling.secondary_sys = get_4a_secondary_system(fuel, heating_code, electricity_tariff, use_immersion,
+                                                     hetas_approved)
 
 
 def sap_table_heating_system(dwelling, system_code, fuel,
@@ -184,31 +196,32 @@ def get_4a_main_system(dwelling, system_code, fuel,
     return system
 
 
-def get_4a_secondary_system(dwelling):
+def get_4a_secondary_system(fuel, sap_type_code, electricity_tariff, use_immersion_heater_summer,
+                            hetas_approved):
     """
     Get the secondary heating system according to Table 4a for the
     given dwelling
 
     Args:
-        dwelling:
+        sap_type_code:
+        electricity_tariff:
+        use_immersion_heater_summer:
+        hetas_approved:
 
     Returns:
         SecondarySystem: Secondary heating system configured from Table 4a
     """
-    system_data = get_4a_system(dwelling.electricity_tariff, dwelling.secondary_heating_type_code)
+    system_data = get_4a_system(electricity_tariff, sap_type_code)
 
-    if dwelling.get('secondary_hetas_approved') and system_data['effy_hetas'] > 0:
+    if hetas_approved and system_data['effy_hetas'] > 0:
         effy = system_data["effy_hetas"]
     else:
-        effy = system_efficiency(system_data, dwelling.secondary_sys_fuel)
+        effy = system_efficiency(system_data, fuel)
 
-    sys = SecondarySystem(
-            system_type_from_sap_code(dwelling.secondary_heating_type_code, system_data),
-            effy,
-            dwelling.get('use_immersion_heater_summer', False))
+    sys = SecondarySystem(system_type_from_sap_code(sap_type_code, system_data), fuel, effy,
+                          use_immersion_heater_summer)
 
     sys.table2b_row = system_data['table2b_row']
-    sys.fuel = dwelling.secondary_sys_fuel
 
     if system_data['water_effy'] != "same" and system_data['water_effy'] != "":
         sys.water_effy = float(system_data['water_effy'])
@@ -253,13 +266,8 @@ def get_4b_main_system(dwelling, system_code, fuel, use_immersion_in_summer):
     return system
 
 
-def get_manuf_data_secondary_system(dwelling):
-    effy = dwelling.secondary_sys_manuf_effy
-    sys = SecondarySystem(
-            HeatingTypes.misc,
-            effy,
-            dwelling.get('use_immersion_heater_summer', False))
+def get_manuf_data_secondary_system(fuel, effy, use_immersion_heater_summer):
+    sys = SecondarySystem(HeatingTypes.misc, fuel, effy, use_immersion_heater_summer)
 
     # sys.table2b_row=system_data['table2b_row']
-    sys.fuel = dwelling.secondary_sys_fuel
     return sys

@@ -197,10 +197,10 @@ class HeatingSystem:
 
 class DedicatedWaterSystem(HeatingSystem):
     def __init__(self, effy, summer_immersion):
+        self.system_type = HeatingTypes.misc
         self.base_effy = numpy.array([effy, ] * 12)
         self.summer_immersion = summer_immersion
         self.water_mult = 1  # Might be changed after init
-        self.system_type = HeatingTypes.misc
         self.is_community_heating = False
 
     def water_heat_effy(self, _Q_water):
@@ -225,10 +225,11 @@ class SecondarySystem(HeatingSystem):
 
     """
 
-    def __init__(self, system_type, effy, summer_immersion):
+    def __init__(self, system_type, fuel, effy, summer_immersion):
+        self.system_type = system_type
+        self.fuel = fuel
         self.effy = effy
         self.summer_immersion = summer_immersion
-        self.system_type = system_type
         self.is_community_heating = False
 
     def space_heat_effy(self, _Q_space):
