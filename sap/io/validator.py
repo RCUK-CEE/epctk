@@ -1,6 +1,6 @@
 import logging
 
-from .elements import FuelTypes
+from sap.elements import FuelTypes
 
 
 class SchemaValidator:
@@ -38,7 +38,7 @@ class required:
                 val = dwelling[self.name]
                 self.vtype(val)
                 print(("ok ", self.name))
-            except:
+            except TypeError:
                 return False, ("Bad type for attribute %s: %s" % (self.name, val),)
         return True, []
 
@@ -89,7 +89,6 @@ class required_if_and_only_if:
 
 
 class group:
-
     """ 
     All sub rules must validate 
     """

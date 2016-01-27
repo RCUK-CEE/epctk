@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 def readme():
     with open('README.rst') as f:
         return f.read()
@@ -22,7 +23,7 @@ setup(name='epc_tk',
       packages=['sap'],
       install_requires=[
           'yaml',
-          'numpy'
+          'numpy', 'pyparsing'
       ],
       include_package_data=True,
       zip_safe=False)

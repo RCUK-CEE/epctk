@@ -86,3 +86,11 @@ def weighted_effy(Q_space, Q_water, wintereff, summereff):
         else:
             water_effy[i] = 100
     return water_effy
+
+
+def sum_summer(l):
+    return sum(l[5:9])
+
+
+def sum_winter(l):
+    return sum(l[0:5]) + sum(l[9:])

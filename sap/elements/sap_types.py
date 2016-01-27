@@ -1,27 +1,30 @@
-class WallTypes(object):
+from enum import Enum, IntEnum
+
+
+class WallTypes(IntEnum):
     MASONRY = 1
     OTHER = 2
 
 
-class FloorTypes(object):
+class FloorTypes(IntEnum):
     SUSPENDED_TIMBER_UNSEALED = 1
     SUSPENDED_TIMBER_SEALED = 2
     NOT_SUSPENDED_TIMBER = 3
     OTHER = 4
 
 
-class ImmersionTypes(object):
+class ImmersionTypes(IntEnum):
     SINGLE = 1
     DUAL = 2
 
 
-class TerrainTypes(object):
+class TerrainTypes(IntEnum):
     DENSE_URBAN = 1
     SUBURBAN = 2
     RURAL = 3
 
 
-class FuelTypes(object):
+class FuelTypes(IntEnum):
     GAS = 1
     OIL = 2
     SOLID = 3
@@ -29,13 +32,13 @@ class FuelTypes(object):
     COMMUNAL = 5
 
 
-class CylinderInsulationTypes:
+class CylinderInsulationTypes(IntEnum):
     NONE = 0
     FOAM = 1
     JACKET = 2
 
 
-class GlazingTypes:
+class GlazingTypes(IntEnum):
     SINGLE = 1
     DOUBLE = 2
     TRIPLE = 3
@@ -50,36 +53,26 @@ _light_transmittance = {
 }
 
 
-class OpeningType:
-    def __init__(self, glazing_type, gvalue, frame_factor, Uvalue, roof_window, bfrc_data=False):
-        self.gvalue = gvalue
-        self.light_transmittance = _light_transmittance[glazing_type] # will raise KeyError if wrong glazing type
-        self.frame_factor = frame_factor
-        self.Uvalue = Uvalue
-        self.roof_window = roof_window
-        self.bfrc_data = bfrc_data
-        self.glazing_type = glazing_type
 
-
-class ThermalStoreTypes(object):
+class ThermalStoreTypes(IntEnum):
     HW_ONLY = 1
     INTEGRATED = 2
 
 
-class OvershadingTypes(object):
+class OvershadingTypes(IntEnum):
     HEAVY = 0
     MORE_THAN_AVERAGE = 1
     AVERAGE = 2
     VERY_LITTLE = 3
 
 
-class SHWCollectorTypes(object):
+class SHWCollectorTypes(IntEnum):
     EVACUATED_TUBE = 1
     FLAT_PLATE_GLAZED = 2
     UNGLAZED = 3
 
 
-class HeatingTypes:
+class HeatingTypes(IntEnum):
     misc = 0
     combi = 1
     cpsu = 2
@@ -97,20 +90,20 @@ class HeatingTypes:
     microchp = 14
 
 
-class PVOvershading(object):
+class PVOvershading(IntEnum):
     HEAVY = 1
     SIGNIFICANT = 2
     MODEST = 3
     NONE_OR_VERY_LITTLE = 4
 
 
-class OpeningTypeDataSource:
+class OpeningTypeDataSource(IntEnum):
     SAP = 1
     BFRC = 2
     MANUFACTURER = 3
 
 
-class HeatLossElementTypes:
+class HeatLossElementTypes(IntEnum):
     EXTERNAL_WALL = 1
     PARTY_WALL = 2
     EXTERNAL_FLOOR = 3
@@ -120,7 +113,7 @@ class HeatLossElementTypes:
 
 
 # Table 4c
-class HeatEmitters(object):
+class HeatEmitters(IntEnum):
     RADIATORS = 1
     UNDERFLOOR_TIMBER = 2
     UNDERFLOOR_SCREED = 3
@@ -131,13 +124,13 @@ class HeatEmitters(object):
     FAN_COILS = 8
 
 
-class LoadCompensators(object):
+class LoadCompensators(IntEnum):
     LOAD_COMPENSATOR = 1
     ENHANCED_LOAD_COMPENSATOR = 2
     WEATHER_COMPENSATOR = 3
 
 
-class VentilationTypes:
+class VentilationTypes(IntEnum):
     NATURAL = 0
     MEV_CENTRALISED = 1
     MEV_DECENTRALISED = 2
@@ -146,7 +139,7 @@ class VentilationTypes:
     PIV_FROM_OUTSIDE = 5
 
 
-class DuctTypes:
+class DuctTypes(IntEnum):
     FLEXIBLE = 1
     RIGID = 2
     FLEXIBLE_INSULATED = 3  # For use with mvhr
@@ -154,18 +147,29 @@ class DuctTypes:
     NONE = 5
 
 
-class BoilerTypes:
+class BoilerTypes(IntEnum):
     REGULAR = 1
     COMBI = 2
     CPSU = 3
     OTHER = 4
 
 
-class CommunityDistributionTypes:
+class CommunityDistributionTypes(IntEnum):
     PRE_1990_UNINSULATED = 1
     PRE_1990_INSULATED = 2
     MODERN_HIGH_TEMP = 3
     MODERN_LOW_TEMP = 4
+
+
+class OpeningType:
+    def __init__(self, glazing_type, gvalue, frame_factor, Uvalue, roof_window, bfrc_data=False):
+        self.gvalue = gvalue
+        self.light_transmittance = _light_transmittance[glazing_type] # will raise KeyError if wrong glazing type
+        self.frame_factor = frame_factor
+        self.Uvalue = Uvalue
+        self.roof_window = roof_window
+        self.bfrc_data = bfrc_data
+        self.glazing_type = glazing_type
 
 
 class HeatLossElement:

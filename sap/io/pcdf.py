@@ -6,11 +6,11 @@ Relates to Appendix Q
 import logging
 import os
 
-from sap.elements.sap_types import VentilationTypes, DuctTypes
+from ..elements import VentilationTypes, DuctTypes
 from ..utils import int_or_none, float_or_none
 
-PCDF_DATA_FILE = os.path.join(os.path.dirname(__file__), '..' ,'data', 'pcdf2009.dat')
-PCDF = None
+_PCDF_DATA_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'pcdf2009.dat')
+_PCDF_CACHE = None
 
 FUELS = {'1': 'Gas',
          '2': 'LPG',
@@ -82,9 +82,9 @@ def row_id(table_id, toks):
         return toks[0]
 
 
-def load_pcdf():
-    logging.info("LOADING PCDF: " + PCDF_DATA_FILE)
-    with open(PCDF_DATA_FILE, 'rU') as datafile:
+def load_pcdf(pcdf_data_file):
+    logging.info("LOADING PCDF: " + pcdf_data_file)
+    with open(pcdf_data_file, 'rU') as datafile:
         pcdf_data = dict()
         current = dict()
         currentid = None
@@ -102,14 +102,14 @@ def load_pcdf():
                 # existing table
                 id = row_id(currentid, tokens)
                 current[id] = tokens
-    global PCDF
-    PCDF = pcdf_data
+    return pcdf_data
 
 
 def get_table(table):
-    if PCDF is None:
-        load_pcdf()
-    return PCDF[table]
+    global _PCDF_CACHE
+    if _PCDF_CACHE is None:
+        _PCDF_CACHE = load_pcdf(_PCDF_DATA_FILE)
+    return _PCDF_CACHE[table]
 
 
 def get_product(table, product_id):
@@ -168,9 +168,9 @@ def get_boiler(boiler_id):
     return result
 
 
-def get_solid_fuel_boiler(id):
+def get_solid_fuel_boiler(boiler_id):
     try:
-        fields = get_product('121', id)
+        fields = get_product('121', boiler_id)
     except KeyError:
         return None
     return dict(
@@ -467,10 +467,6 @@ def pcdf_fuel_prices():
         )
     return fuels
 
-
-
-# Lazy load these, to give a chance to swap the pcdf database file if necessary
-# FIXME: if it's possible to swap the PCDF file, make this explicit!
 
 TABLE_4h_in_use = None
 TABLE_4h_in_use_approved_scheme = None

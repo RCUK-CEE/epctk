@@ -4,12 +4,12 @@ import os
 import pickle
 import sys
 
-import output_checker
+from tests import  output_checker
 
 import sap.appendix.appendix_t
 from sap import runner
 from sap.dwelling import log_dwelling_params, log_dwelling, ParamTrackerDwelling
-from sap.io import input_conversion_rules, yaml_io, pcdf
+from sap.io import input_conversion_rules, yaml_io
 from sap.utils import SAPCalculationError, CALC_STAGE, ALL_PARAMS
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES, SKIP
@@ -237,7 +237,6 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
 
-    pcdf.DATA_FILE = "./official_reference_cases/pcdf2009_test_322.dat"
 
     run_official_cases(
         OFFICIAL_CASES, maxruns=options.maxruns, reparse=options.reparse)

@@ -1,5 +1,7 @@
 import logging
 
+from sap.utils import sum_summer, sum_winter, float_or_zero
+
 
 def check_result(calctype, actual, target, desc, max_err=0.1):
     if abs(actual - target) > max_err:
@@ -28,18 +30,6 @@ def check_summer_monthly_result(calctype, actual, target, desc, max_err=0.1):
             print(("ERROR: %s: Mismatched %s (month %d): %.2f vs %.2f" % (
                 calctype, desc, month + 1, actual[month], target[month])))
             return
-
-
-def sum_summer(l):
-    return sum(l[5:9])
-
-
-def sum_winter(l):
-    return sum(l[0:5]) + sum(l[9:])
-
-
-def float_or_zero(f):
-    return float(f) if f != "" else 0
 
 
 def check_cost_results(calctype, d, results):
@@ -171,8 +161,7 @@ def check_emissions_results(calctype, d, results):
             if r == "(368)":
                 res_368 += float(prev)
             prev = r
-        emissions_not_chp = emissions_not_chp - \
-            float_or_zero(results.emissions_community_2) + res_368
+        emissions_not_chp = emissions_not_chp - float_or_zero(results.emissions_community_2) + res_368
         # !!!!! end of nastiness
 
         check_result(calctype, d.emissions_heating_main + d.emissions_water,
@@ -428,7 +417,7 @@ def check_fee(d, res):
 
 def check_der(d, res):
     if res.der == "":
-        logging.warn("No DER section")
+        logging.warning("No DER section")
         return
 
     check_basic_calc_results("DER", d, res.der)
@@ -440,7 +429,7 @@ def check_der(d, res):
 
 def check_ter(d, res):
     if res.ter == "":
-        logging.warn("No TER section")
+        logging.warning("No TER section")
         return
 
     check_basic_calc_results("TER", d, res.ter)

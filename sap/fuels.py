@@ -1,4 +1,5 @@
 import copy
+import logging
 import os.path
 
 from .elements import FuelTypes
@@ -35,6 +36,9 @@ class Fuel(object):
 
     def __hash__(self):
         return self.fuel_id
+
+    def __repr__(self):
+        return "Fuel Id: {}, Fuel Type: {}".format(self.fuel_id, self.type)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -103,7 +107,7 @@ class Fuel(object):
 
 class CommunityFuel(Fuel):
     def __init__(self, fuel_factor, emission_factor_adjustment):
-        super().__init__(None)
+        super().__init__('community')
         self._fuel_factor = fuel_factor
         self._emission_factor_adjustment = emission_factor_adjustment
 
@@ -121,6 +125,16 @@ class CommunityFuel(Fuel):
 
     @standing_charge.setter
     def standing_charge(self, value):
+        """
+        For community fuel we want to be able to set the standing
+        charge after init.
+
+        Args:
+            value:
+
+        Returns:
+
+        """
         self._standing_charge = value
 
     @property
@@ -303,7 +317,7 @@ def get_fuel_data_pcdf(fuel_id):
         return fuel_prices
 
     else:
-        # logging.warning("fuels.py: THERE IS NO PCDF DATA FOR THIS FUEL ID %d" % fuel_id)
+        logging.warning("fuels.py: THERE IS NO PCDF DATA FOR THIS FUEL ID %d" % fuel_id)
         # raise RuntimeError("THERE IS NO PCDF DATA FOR THIS FUEL ID")
         return get_fuel_data_table_12(fuel_id)
 

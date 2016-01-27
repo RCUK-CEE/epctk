@@ -3,8 +3,8 @@ import copy
 import numpy
 import yaml
 
-from ..elements import HeatLossElement, ThermalMassElement, Opening, OpeningType
 from .. import fuels
+from ..elements import HeatLossElement, ThermalMassElement, Opening, OpeningType
 from ..dwelling import Dwelling
 
 
@@ -109,6 +109,6 @@ def from_yaml(fname):
 
     dwelling = Dwelling()
     for key, value in loaded.items():
-        dwelling[key] =  value
+        dwelling[key] = value
 
     return dwelling
