@@ -1,10 +1,5 @@
-.. SAPcalc documentation master file, created by
-   sphinx-quickstart on Sat Jan  2 14:41:59 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Energy Perforamnce Certificate toolkit - EPCTK
-==============================================
+UK Energy Performance Certificate toolkit - EPCTK
+=================================================
 
 Introduction
 ------------
@@ -27,12 +22,22 @@ with large datasets. To acheive this goal a number of features are required
 - Reusable, documented and unit-tested code
 
 
+Motivation
+----------
+
+Currently available EPC/RdSAP/SAP are both proprietary and not
+well suited for inclusion in highly automated workflows. This
+project provides code that is auditable and readily improved,
+and easily integrated into other python codebases.
+
 
 Contents:
 ---------
 .. toctree::
     :maxdepth: 2
 
+
+    about
     part_2
     tables
 
