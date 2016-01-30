@@ -1,0 +1,531 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>epctk.appendix.appendix_t &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epctk.appendix.appendix_t</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Appendix T : Improvement measures</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">..elements</span> <span class="kn">import</span> <span class="n">HeatLossElementTypes</span><span class="p">,</span> <span class="n">HeatLossElement</span><span class="p">,</span> <span class="n">OpeningType</span><span class="p">,</span> <span class="n">GlazingTypes</span><span class="p">,</span> <span class="n">Opening</span><span class="p">,</span> <span class="n">OvershadingTypes</span><span class="p">,</span> \
+    <span class="n">VentilationTypes</span><span class="p">,</span> <span class="n">HeatEmitters</span><span class="p">,</span> <span class="n">CylinderInsulationTypes</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="p">,</span> <span class="n">PVOvershading</span>
+<span class="kn">from</span> <span class="nn">..fuels</span> <span class="kn">import</span> <span class="n">fuel_from_code</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">worksheet</span>
+<span class="kn">from</span> <span class="nn">..configure</span> <span class="kn">import</span> <span class="n">lookup_sap_tables</span>
+<span class="kn">from</span> <span class="nn">..dwelling</span> <span class="kn">import</span> <span class="n">DwellingResults</span>
+<span class="kn">from</span> <span class="nn">..tables</span> <span class="kn">import</span> <span class="n">table_2a_hot_water_vol_factor</span>
+
+
+<div class="viewcode-block" id="apply_low_energy_lighting"><a class="viewcode-back" href="../../../appendix_t.html#epctk.appendix.appendix_t.apply_low_energy_lighting">[docs]</a><span class="k">def</span> <span class="nf">apply_low_energy_lighting</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply low energy lighting improvement</span>
+<span class="sd">    :param base: base performance is ignored, but necessary to maintain consisten interface</span>
+<span class="sd">    :param dwelling:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;low_energy_bulb_ratio&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">low_energy_bulb_ratio</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="n">dwelling</span><span class="o">.</span><span class="n">lighting_outlets_low_energy</span> <span class="o">==</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">lighting_outlets_total</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">low_energy_bulb_ratio</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="needs_separate_solar_cylinder"><a class="viewcode-back" href="../../../appendix_t.html#epctk.appendix.appendix_t.needs_separate_solar_cylinder">[docs]</a><span class="k">def</span> <span class="nf">needs_separate_solar_cylinder</span><span class="p">(</span><span class="n">base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base: The base dwelling configuration</span>
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">system_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">,</span>
+                                      <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">,</span>
+                                      <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">,</span>
+                                      <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">heat_pump</span><span class="p">,</span>
+                                      <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">pcdf_heat_pump</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;instantaneous_pou_water_heating&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">system_type</span> <span class="o">==</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">community</span> <span class="ow">and</span> <span class="n">base</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hw_cylinder_volume&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">system_type</span> <span class="o">==</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">microchp</span>
+        <span class="ow">and</span> <span class="n">base</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">has_integral_store</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+
+</div>
+<div class="viewcode-block" id="apply_solar_hot_water"><a class="viewcode-back" href="../../../appendix_t.html#epctk.appendix.appendix_t.apply_solar_hot_water">[docs]</a><span class="k">def</span> <span class="nf">apply_solar_hot_water</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply the solar hot water improvement</span>
+<span class="sd">    Args:</span>
+<span class="sd">        base: The base dwelling configuration</span>
+<span class="sd">        dwelling: The improved dwelling configuration</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">is_flat</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;solar_collector_aperture&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">solar_collector_aperture</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">collector_zero_loss_effy</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">collector_heat_loss_coeff</span> <span class="o">=</span> <span class="mf">1.8</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">collector_orientation</span> <span class="o">=</span> <span class="mf">180.</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">collector_pitch</span> <span class="o">=</span> <span class="mf">30.</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">collector_overshading</span> <span class="o">=</span> <span class="n">PVOvershading</span><span class="o">.</span><span class="n">MODEST</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">has_electric_shw_pump</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">solar_dedicated_storage_volume</span> <span class="o">=</span> <span class="mf">75.</span>
+
+    <span class="k">if</span> <span class="n">needs_separate_solar_cylinder</span><span class="p">(</span><span class="n">base</span><span class="p">):</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">solar_storage_combined_cylinder</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">solar_storage_combined_cylinder</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">&lt;</span> <span class="mi">190</span> <span class="ow">and</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;measured_cylinder_loss&#39;</span><span class="p">):</span>
+            <span class="n">old_vol_fac</span> <span class="o">=</span> <span class="n">table_2a_hot_water_vol_factor</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span><span class="p">)</span>
+            <span class="n">new_vol_fac</span> <span class="o">=</span> <span class="n">table_2a_hot_water_vol_factor</span><span class="p">(</span><span class="mi">190</span><span class="p">)</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">measured_cylinder_loss</span> <span class="o">*=</span> <span class="n">new_vol_fac</span> <span class="o">*</span> <span class="mi">190</span> <span class="o">/</span> <span class="p">(</span><span class="n">old_vol_fac</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span><span class="p">)</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">=</span> <span class="mi">190</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span><span class="p">,</span> <span class="mf">190.</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="apply_pv"><a class="viewcode-back" href="../../../appendix_t.html#epctk.appendix.appendix_t.apply_pv">[docs]</a><span class="k">def</span> <span class="nf">apply_pv</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply PV improvements. Only valid if the dwelling is not a flat</span>
+<span class="sd">    and there are no photovoltaic systems already installed</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base: The base dwelling configuration</span>
+<span class="sd">        dwelling: The improved dwelling configuration</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Update the dwelling configuration and return bool indicating</span>
+<span class="sd">        whether the PV improvement applies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># TODO: check whether the is_flat etc checks should be on the base dwelling or the improved one</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">is_flat</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;photovoltaic_systems&#39;</span><span class="p">,</span> <span class="p">[]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="n">pv_system</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">kWp</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
+            <span class="n">pitch</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+            <span class="n">overshading_category</span><span class="o">=</span><span class="n">PVOvershading</span><span class="o">.</span><span class="n">MODEST</span>
+    <span class="p">)</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">photovoltaic_systems</span> <span class="o">=</span> <span class="p">[</span><span class="n">pv_system</span><span class="p">,</span> <span class="p">]</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="apply_wind"><a class="viewcode-back" href="../../../appendix_t.html#epctk.appendix.appendix_t.apply_wind">[docs]</a><span class="k">def</span> <span class="nf">apply_wind</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        base: The base dwelling configuration</span>
+<span class="sd">        dwelling: The improved dwelling configuration</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Update the dwelling configuration and return bool indicating</span>
+<span class="sd">        whether the wind improvement applies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">is_flat</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;N_wind_turbines&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">N_wind_turbines</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_turbine_rotor_diameter</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">wind_turbine_hub_height</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<span class="n">IMPROVEMENTS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s">&quot;E&quot;</span><span class="p">,</span> <span class="mf">0.45</span><span class="p">,</span> <span class="n">apply_low_energy_lighting</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&quot;N&quot;</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">apply_solar_hot_water</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&quot;U&quot;</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">apply_pv</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&quot;V&quot;</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">apply_wind</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">apply_previous_improvements</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">previous</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">improvement</span> <span class="ow">in</span> <span class="n">previous</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">improve</span> <span class="o">=</span> <span class="p">[</span><span class="n">improve</span> <span class="k">for</span> <span class="n">improve</span> <span class="ow">in</span> <span class="n">IMPROVEMENTS</span> <span class="k">if</span> <span class="n">improve</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">improvement</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">improve</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+        <span class="n">improve</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="run_improvements"><a class="viewcode-back" href="../../../appendix_t.html#epctk.appendix.appendix_t.run_improvements">[docs]</a><span class="k">def</span> <span class="nf">run_improvements</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Need to run the dwelling twice: once with pcdf fuel prices to</span>
+<span class="sd">    get cost change, once with normal SAP fuel prices to get change</span>
+<span class="sd">    in SAP rating</span>
+
+<span class="sd">    :param dwelling:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">base_dwelling_pcdf_prices</span> <span class="o">=</span> <span class="n">DwellingResults</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+    <span class="c"># print(&#39;478: &#39;, dwelling.get(&#39;hw_cylinder_volume&#39;))</span>
+    <span class="c"># print(&#39;479: &#39;, base_dwelling_pcdf_prices.get(&#39;hw_cylinder_volume&#39;))</span>
+
+    <span class="n">base_dwelling_pcdf_prices</span><span class="o">.</span><span class="n">reduced_gains</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">base_dwelling_pcdf_prices</span><span class="o">.</span><span class="n">use_pcdf_fuel_prices</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">lookup_sap_tables</span><span class="p">(</span><span class="n">base_dwelling_pcdf_prices</span><span class="p">)</span>
+
+    <span class="n">worksheet</span><span class="o">.</span><span class="n">perform_full_calc</span><span class="p">(</span><span class="n">base_dwelling_pcdf_prices</span><span class="p">)</span>
+    <span class="n">worksheet</span><span class="o">.</span><span class="n">sap</span><span class="p">(</span><span class="n">base_dwelling_pcdf_prices</span><span class="p">)</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">improvement_results</span> <span class="o">=</span> <span class="n">ImprovementResults</span><span class="p">()</span>
+
+    <span class="n">base_cost</span> <span class="o">=</span> <span class="n">base_dwelling_pcdf_prices</span><span class="o">.</span><span class="n">fuel_cost</span>
+    <span class="n">base_sap</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">sap_value</span>
+    <span class="n">base_co2</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">emissions</span>
+
+    <span class="c"># Now improve the dwelling</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">min_improvement</span><span class="p">,</span> <span class="n">improve</span> <span class="ow">in</span> <span class="n">IMPROVEMENTS</span><span class="p">:</span>
+        <span class="n">dwelling_pcdf_prices</span> <span class="o">=</span> <span class="n">DwellingResults</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+        <span class="n">dwelling_pcdf_prices</span><span class="o">.</span><span class="n">reduced_gains</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">dwelling_pcdf_prices</span><span class="o">.</span><span class="n">use_pcdf_fuel_prices</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="n">dwelling_regular_prices</span> <span class="o">=</span> <span class="n">DwellingResults</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+        <span class="n">dwelling_regular_prices</span><span class="o">.</span><span class="n">reduced_gains</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">dwelling_regular_prices</span><span class="o">.</span><span class="n">use_pcdf_fuel_prices</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="n">apply_previous_improvements</span><span class="p">(</span>
+                <span class="n">base_dwelling_pcdf_prices</span><span class="p">,</span>
+                <span class="n">dwelling_regular_prices</span><span class="p">,</span>
+                <span class="n">dwelling</span><span class="o">.</span><span class="n">improvement_results</span><span class="o">.</span><span class="n">improvement_effects</span><span class="p">)</span>
+
+        <span class="n">apply_previous_improvements</span><span class="p">(</span>
+                <span class="n">base_dwelling_pcdf_prices</span><span class="p">,</span>
+                <span class="n">dwelling_pcdf_prices</span><span class="p">,</span>
+                <span class="n">dwelling</span><span class="o">.</span><span class="n">improvement_results</span><span class="o">.</span><span class="n">improvement_effects</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">improve</span><span class="p">(</span><span class="n">base_dwelling_pcdf_prices</span><span class="p">,</span> <span class="n">dwelling_pcdf_prices</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="n">improve</span><span class="p">(</span><span class="n">base_dwelling_pcdf_prices</span><span class="p">,</span> <span class="n">dwelling_regular_prices</span><span class="p">)</span>
+
+        <span class="n">lookup_sap_tables</span><span class="p">(</span><span class="n">dwelling_pcdf_prices</span><span class="p">)</span>
+        <span class="n">worksheet</span><span class="o">.</span><span class="n">perform_full_calc</span><span class="p">(</span><span class="n">dwelling_pcdf_prices</span><span class="p">)</span>
+        <span class="n">worksheet</span><span class="o">.</span><span class="n">sap</span><span class="p">(</span><span class="n">dwelling_pcdf_prices</span><span class="p">)</span>
+
+        <span class="n">lookup_sap_tables</span><span class="p">(</span><span class="n">dwelling_regular_prices</span><span class="p">)</span>
+        <span class="n">worksheet</span><span class="o">.</span><span class="n">perform_full_calc</span><span class="p">(</span><span class="n">dwelling_regular_prices</span><span class="p">)</span>
+        <span class="n">worksheet</span><span class="o">.</span><span class="n">sap</span><span class="p">(</span><span class="n">dwelling_regular_prices</span><span class="p">)</span>
+
+        <span class="n">sap_improvement</span> <span class="o">=</span> <span class="n">dwelling_regular_prices</span><span class="o">.</span><span class="n">sap_value</span> <span class="o">-</span> <span class="n">base_sap</span>
+
+        <span class="k">if</span> <span class="n">sap_improvement</span> <span class="o">&gt;</span> <span class="n">min_improvement</span><span class="p">:</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">improvement_results</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ImprovementResult</span><span class="p">(</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="n">sap_improvement</span><span class="p">,</span>
+                    <span class="n">dwelling_pcdf_prices</span><span class="o">.</span><span class="n">fuel_cost</span> <span class="o">-</span> <span class="n">base_cost</span><span class="p">,</span>
+                    <span class="n">dwelling_regular_prices</span><span class="o">.</span><span class="n">emissions</span> <span class="o">-</span> <span class="n">base_co2</span><span class="p">))</span>
+
+            <span class="n">base_cost</span> <span class="o">=</span> <span class="n">dwelling_pcdf_prices</span><span class="o">.</span><span class="n">fuel_cost</span>
+            <span class="n">base_sap</span> <span class="o">=</span> <span class="n">dwelling_regular_prices</span><span class="o">.</span><span class="n">sap_value</span>
+            <span class="n">base_co2</span> <span class="o">=</span> <span class="n">dwelling_regular_prices</span><span class="o">.</span><span class="n">emissions</span>
+
+    <span class="n">improved_dwelling</span> <span class="o">=</span> <span class="n">DwellingResults</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+    <span class="n">improved_dwelling</span><span class="o">.</span><span class="n">reduced_gains</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">improved_dwelling</span><span class="o">.</span><span class="n">use_pcdf_fuel_prices</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">for</span> <span class="n">improvement</span> <span class="ow">in</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">improvement_results</span><span class="o">.</span><span class="n">improvement_effects</span><span class="p">:</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">improve</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">IMPROVEMENTS</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">improvement</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">improve</span><span class="p">(</span><span class="n">base_dwelling_pcdf_prices</span><span class="p">,</span> <span class="n">improved_dwelling</span><span class="p">)</span>
+
+    <span class="n">lookup_sap_tables</span><span class="p">(</span><span class="n">improved_dwelling</span><span class="p">)</span>
+
+    <span class="n">worksheet</span><span class="o">.</span><span class="n">perform_full_calc</span><span class="p">(</span><span class="n">improved_dwelling</span><span class="p">)</span>
+    <span class="n">worksheet</span><span class="o">.</span><span class="n">sap</span><span class="p">(</span><span class="n">improved_dwelling</span><span class="p">)</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">build_report</span><span class="p">()</span>
+    <span class="c"># print improved_dwelling.report.print_report()</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">improved_results</span> <span class="o">=</span> <span class="n">improved_dwelling</span><span class="o">.</span><span class="n">results</span>
+
+</div>
+<span class="k">class</span> <span class="nc">ImprovementResult</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">sap_change</span><span class="p">,</span> <span class="n">cost_change</span><span class="p">,</span> <span class="n">co2_change</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sap_change</span> <span class="o">=</span> <span class="n">sap_change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co2_change</span> <span class="o">=</span> <span class="n">co2_change</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost_change</span> <span class="o">=</span> <span class="n">cost_change</span>
+
+
+<span class="k">class</span> <span class="nc">ImprovementResults</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">improvement_effects</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">improvement_effects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">element_type_area</span><span class="p">(</span><span class="n">etype</span><span class="p">,</span> <span class="n">els</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">area</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">els</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">element_type</span> <span class="o">==</span> <span class="n">etype</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="run_ter"><a class="viewcode-back" href="../../../appendix_t.html#epctk.appendix.appendix_t.run_ter">[docs]</a><span class="k">def</span> <span class="nf">run_ter</span><span class="p">(</span><span class="n">input_dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the Target Energy Rating (TER) for the input dwelling.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dwelling:</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">          COPY of the dwelling with the TER results</span>
+<span class="sd">          Assigns the .results to the input_dwelling.ter_results</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Note this previously wrapped dwelling in Dwelling Wrapper</span>
+    <span class="n">dwelling</span> <span class="o">=</span> <span class="n">DwellingResults</span><span class="p">(</span><span class="n">input_dwelling</span><span class="p">)</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">reduced_gains</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="n">net_wall_area</span> <span class="o">=</span> <span class="n">element_type_area</span><span class="p">(</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">EXTERNAL_WALL</span><span class="p">,</span>
+                                      <span class="n">dwelling</span><span class="o">.</span><span class="n">heat_loss_elements</span><span class="p">)</span>
+
+    <span class="n">opaque_door_area</span> <span class="o">=</span> <span class="n">element_type_area</span><span class="p">(</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">OPAQUE_DOOR</span><span class="p">,</span>
+                                         <span class="n">dwelling</span><span class="o">.</span><span class="n">heat_loss_elements</span><span class="p">)</span>
+
+    <span class="n">window_area</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">area</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">openings</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">opening_type</span><span class="o">.</span><span class="n">roof_window</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="n">roof_window_area</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">area</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">openings</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">opening_type</span><span class="o">.</span><span class="n">roof_window</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="n">gross_wall_area</span> <span class="o">=</span> <span class="n">net_wall_area</span> <span class="o">+</span> <span class="n">window_area</span> <span class="o">+</span> <span class="n">opaque_door_area</span>
+
+    <span class="n">new_opening_area</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">GFA</span> <span class="o">*</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="n">gross_wall_area</span><span class="p">)</span>
+    <span class="n">new_window_area</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">new_opening_area</span> <span class="o">-</span> <span class="mf">1.85</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">floor_area</span> <span class="o">=</span> <span class="n">element_type_area</span><span class="p">(</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">EXTERNAL_FLOOR</span><span class="p">,</span>
+                                   <span class="n">dwelling</span><span class="o">.</span><span class="n">heat_loss_elements</span><span class="p">)</span>
+    <span class="n">net_roof_area</span> <span class="o">=</span> <span class="n">element_type_area</span><span class="p">(</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">EXTERNAL_ROOF</span><span class="p">,</span>
+                                      <span class="n">dwelling</span><span class="o">.</span><span class="n">heat_loss_elements</span><span class="p">)</span>
+    <span class="n">roof_area</span> <span class="o">=</span> <span class="n">net_roof_area</span> <span class="o">+</span> <span class="n">roof_window_area</span>
+
+    <span class="n">heat_loss_elements</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">HeatLossElement</span><span class="p">(</span>
+            <span class="n">area</span><span class="o">=</span><span class="n">gross_wall_area</span> <span class="o">-</span> <span class="n">new_window_area</span> <span class="o">-</span> <span class="mf">1.85</span><span class="p">,</span>
+            <span class="n">Uvalue</span><span class="o">=.</span><span class="mi">35</span><span class="p">,</span>
+            <span class="n">is_external</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">element_type</span><span class="o">=</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">EXTERNAL_WALL</span>
+        <span class="p">),</span>
+        <span class="n">HeatLossElement</span><span class="p">(</span>
+            <span class="n">area</span><span class="o">=</span><span class="mf">1.85</span><span class="p">,</span>
+            <span class="n">Uvalue</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">is_external</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">element_type</span><span class="o">=</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">OPAQUE_DOOR</span>
+        <span class="p">),</span>
+        <span class="n">HeatLossElement</span><span class="p">(</span>
+            <span class="n">area</span><span class="o">=</span><span class="n">floor_area</span><span class="p">,</span>
+            <span class="n">Uvalue</span><span class="o">=.</span><span class="mi">25</span><span class="p">,</span>
+            <span class="n">is_external</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">element_type</span><span class="o">=</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">EXTERNAL_FLOOR</span>
+        <span class="p">),</span>
+        <span class="n">HeatLossElement</span><span class="p">(</span>
+            <span class="n">area</span><span class="o">=</span><span class="n">roof_area</span><span class="p">,</span>
+            <span class="n">Uvalue</span><span class="o">=.</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">is_external</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">element_type</span><span class="o">=</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">EXTERNAL_ROOF</span>
+        <span class="p">),</span>
+        <span class="n">HeatLossElement</span><span class="p">(</span>
+            <span class="n">area</span><span class="o">=</span><span class="n">new_window_area</span><span class="p">,</span>
+            <span class="n">Uvalue</span><span class="o">=</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="o">.</span><span class="mo">04</span><span class="p">),</span>
+            <span class="n">is_external</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">element_type</span><span class="o">=</span><span class="n">HeatLossElementTypes</span><span class="o">.</span><span class="n">GLAZING</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">heat_loss_elements</span> <span class="o">=</span> <span class="n">heat_loss_elements</span>
+
+    <span class="n">ter_opening_type</span> <span class="o">=</span> <span class="n">OpeningType</span><span class="p">(</span>
+            <span class="n">glazing_type</span><span class="o">=</span><span class="n">GlazingTypes</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">,</span>
+            <span class="n">gvalue</span><span class="o">=.</span><span class="mi">72</span><span class="p">,</span>
+            <span class="n">frame_factor</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+            <span class="n">Uvalue</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">roof_window</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">new_openings</span> <span class="o">=</span> <span class="p">[</span><span class="n">Opening</span><span class="p">(</span>
+            <span class="n">area</span><span class="o">=</span><span class="n">new_window_area</span><span class="p">,</span>
+            <span class="n">orientation_degrees</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+            <span class="n">opening_type</span><span class="o">=</span><span class="n">ter_opening_type</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">openings</span> <span class="o">=</span> <span class="n">new_openings</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">thermal_mass_parameter</span> <span class="o">=</span> <span class="mi">250</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">overshading</span> <span class="o">=</span> <span class="n">OvershadingTypes</span><span class="o">.</span><span class="n">AVERAGE</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">Nshelteredsides</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">Uthermalbridges</span> <span class="o">=</span> <span class="o">.</span><span class="mi">11</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">ventilation_type</span> <span class="o">=</span> <span class="n">VentilationTypes</span><span class="o">.</span><span class="n">NATURAL</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">pressurisation_test_result</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">Nchimneys</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">Nflues</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">input_dwelling</span><span class="o">.</span><span class="n">GFA</span> <span class="o">&gt;</span> <span class="mi">80</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">Nfansandpassivevents</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">Nfansandpassivevents</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_type_code</span> <span class="o">=</span> <span class="mi">102</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_pcdf_id</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">heating_emitter_type</span> <span class="o">=</span> <span class="n">HeatEmitters</span><span class="o">.</span><span class="n">RADIATORS</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">heating_emitter_type2</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_fraction</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_2_fraction</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_fuel</span> <span class="o">=</span> <span class="n">fuel_from_code</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_oil_pump_inside_dwelling</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_2_oil_pump_inside_dwelling</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">control_type_code</span> <span class="o">=</span> <span class="mi">2106</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">sys1_has_boiler_interlock</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">sys1_load_compensator</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">central_heating_pump_in_heated_space</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">appendix_q_systems</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">has_hw_time_control</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">water_heating_type_code</span> <span class="o">=</span> <span class="mi">901</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">use_immersion_heater_summer</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">has_hw_cylinder</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">=</span> <span class="mi">150</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">cylinder_in_heated_space</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_insulation_type</span> <span class="o">=</span> <span class="n">CylinderInsulationTypes</span><span class="o">.</span><span class="n">FOAM</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_insulation</span> <span class="o">=</span> <span class="mi">35</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">primary_pipework_insulated</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">has_cylinderstat</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">hwsys_has_boiler_interlock</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">measured_cylinder_loss</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">solar_collector_aperture</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">has_electric_shw_pump</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">solar_storage_combined_cylinder</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">wwhr_systems</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">fghrs</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">cylinder_is_thermal_store</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">thermal_store_type</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">sys1_sedbuk_2005_effy</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">sys1_sedbuk_2009_effy</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">sys1_delayed_start_thermostat</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">low_water_use</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys_fuel</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">electricity_tariff</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_heating_type_code</span> <span class="o">=</span> <span class="mi">691</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_hetas_approved</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">low_energy_bulb_ratio</span> <span class="o">=</span> <span class="o">.</span><span class="mi">3</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">cooled_area</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c"># Need to make sure no summer immersion and no renewables</span>
+
+    <span class="n">lookup_sap_tables</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">heating_effy_winter</span> <span class="o">=</span> <span class="mi">78</span> <span class="o">+</span> <span class="o">.</span><span class="mi">9</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_1</span><span class="o">.</span><span class="n">heating_effy_summer</span> <span class="o">=</span> <span class="mi">78</span> <span class="o">-</span> <span class="mf">9.2</span>
+
+    <span class="n">worksheet</span><span class="o">.</span><span class="n">perform_full_calc</span><span class="p">(</span><span class="n">dwelling</span><span class="p">)</span>
+
+    <span class="n">worksheet</span><span class="o">.</span><span class="n">ter</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">input_dwelling</span><span class="o">.</span><span class="n">ter_fuel</span><span class="p">)</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">build_report</span><span class="p">()</span>
+
+    <span class="c"># Assign the TER results to the original dwelling</span>
+    <span class="n">input_dwelling</span><span class="o">.</span><span class="n">ter_results</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">results</span>
+    <span class="k">return</span> <span class="n">input_dwelling</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

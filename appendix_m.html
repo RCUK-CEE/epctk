@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Appendix M &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="index.html" />
+    <link rel="next" title="Appendix N" href="appendix_n.html" />
+    <link rel="prev" title="Appendix J" href="appendix_j.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-epctk.appendix.appendix_m">
+<span id="appendix-m"></span><h1>Appendix M<a class="headerlink" href="#module-epctk.appendix.appendix_m" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="appendix-m-energy-from-photovoltaic-pv-technology-small-and-micro-wind-turbines-and-small-scale-hydro-electric-generators">
+<h2>Appendix M: Energy from Photovoltaic (PV) technology, small and micro wind turbines and small- scale hydro-electric generators<a class="headerlink" href="#appendix-m-energy-from-photovoltaic-pv-technology-small-and-micro-wind-turbines-and-small-scale-hydro-electric-generators" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="epctk.appendix.appendix_m.configure_wind_turbines">
+<code class="descclassname">epctk.appendix.appendix_m.</code><code class="descname">configure_wind_turbines</code><span class="sig-paren">(</span><em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epctk/appendix/appendix_m.html#configure_wind_turbines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epctk.appendix.appendix_m.configure_wind_turbines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the wind turbine speed correction factor <cite>wind_turbine_speed_correction_factor</cite>
+if the dwelling has 1 or more wind turbines, using interpolated values from Table M1</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dwelling</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="epctk.appendix.appendix_m.m1_correction_factor">
+<code class="descclassname">epctk.appendix.appendix_m.</code><code class="descname">m1_correction_factor</code><span class="sig-paren">(</span><em>terrain_type</em>, <em>wind_speed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epctk/appendix/appendix_m.html#m1_correction_factor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epctk.appendix.appendix_m.m1_correction_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpolate the correction factor for the given terrain type
+and standardised wind speed using Table M1</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>terrain_type</strong> &#8211; </li>
+<li><strong>wind_speed</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="epctk.appendix.appendix_m.wind_turbines">
+<code class="descclassname">epctk.appendix.appendix_m.</code><code class="descname">wind_turbines</code><span class="sig-paren">(</span><em>dwelling</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epctk/appendix/appendix_m.html#wind_turbines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epctk.appendix.appendix_m.wind_turbines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the wind power generated and the graction of wind energy generated onsite</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dwelling</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Appendix M</a><ul>
+<li><a class="reference internal" href="#appendix-m-energy-from-photovoltaic-pv-technology-small-and-micro-wind-turbines-and-small-scale-hydro-electric-generators">Appendix M: Energy from Photovoltaic (PV) technology, small and micro wind turbines and small- scale hydro-electric generators</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="appendix_j.html" title="previous chapter">Appendix J</a></li>
+      <li>Next: <a href="appendix_n.html" title="next chapter">Appendix N</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/appendix_m.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/appendix_m.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

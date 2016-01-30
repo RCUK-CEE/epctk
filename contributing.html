@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Contributing &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>We welcome and encourage contributions using Github issues to describe
+changes and pull requests to make changes to code. We aim for code that
+is readable, documented, tested, and reusable.</p>
+<div class="section" id="steps-for-contributing-to-epctk">
+<h2>Steps for contributing to epctk<a class="headerlink" href="#steps-for-contributing-to-epctk" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Choose a github issue to work on. If none exists which describes the changes
+you want to make, please write one detailing the problem you aim to solve or
+the feature you want to add.</li>
+<li>Checkout the code from github</li>
+<li>Create a new branch to work on. This will help with organisation.</li>
+<li>Make your changes, following the coding guidelines for style and testing described below.</li>
+<li>Create a pull request. See the Github documentation.</li>
+</ol>
+<p>We will review pull requests and aim to ensure that all tests pass.</p>
+</div>
+<div class="section" id="important-note-on-tests">
+<h2>Important note on tests<a class="headerlink" href="#important-note-on-tests" title="Permalink to this headline">¶</a></h2>
+<p>Internally, we use test cases provided by BRE. However these cannot
+be made public at the moment. Testing against these cases will therefore
+be performed in a private repository. Therefore, pull requests may initially
+be accepted, to be later rejected if they do not pass internal testing.</p>
+</div>
+<div class="section" id="coding-guidelines">
+<h2>Coding guidelines<a class="headerlink" href="#coding-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>Code should be formatted according to the <a href="#id1"><span class="problematic" id="id2">`Python PEP8 https://www.python.org/dev/peps/pep-0008/`_</span></a>
+guidelines, with the exception that lines should merely be of &#8220;reasonable&#8221; length (80 - 120 characters).
+In general, readability trumps line length.</p>
+<p>Documentation is <strong>not optional</strong>! Please follow the
+<a href="#id3"><span class="problematic" id="id4">`Google python documentation http://google.github.io/styleguide/pyguide.html?showone=Comments#Comments`_</span></a>
+style for documentation comments in modules, functions, classes, and methods.
+In addition, project-wide documentation is created with Sphinx, using
+&#8220;narrative&#8221; style documentation written in the <code class="docutils literal"><span class="pre">.rst</span></code> format files in the <code class="docutils literal"><span class="pre">doc/</span></code> folder.</p>
+<p>Code should be covered by <strong>unit tests</strong>, to be added in the <code class="docutils literal"><span class="pre">tests/</span></code> folder. Unit tests
+should be written for new functionality and for &#8220;public&#8221; apis (ones that users of the package
+are expected to access). The project aims to run under a continuous integration model - every
+change will be tested automatically as new code is uploaded to ensure that no errors are
+introduced which break working code.</p>
+<p>Code should be as simple as possible, but no simpler - follow the Python
+recommendation that &#8220;Simple is better than complex, but complex is better than complicated&#8221;.
+Aim for descriptive variable names, intuitive logic flow, straightforward architecture.</p>
+<p>Package dependencies are defined in setup.py and requirements.txt. If you add a dependency,
+add it to both theses files - just be name in setup.py and with a recommended version
+in requirements.txt. See <a href="#id5"><span class="problematic" id="id6">`here https://caremad.io/2013/07/setup-vs-requirement/`_</span></a> for
+more information on how to do this.</p>
+</div>
+<div class="section" id="project-layout">
+<h2>Project Layout<a class="headerlink" href="#project-layout" title="Permalink to this headline">¶</a></h2>
+<p>The important folders are:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">epctk</span></code> : the main source folder for the epctk library.</li>
+<li><code class="docutils literal"><span class="pre">doc</span></code> : the documentation folder</li>
+<li><code class="docutils literal"><span class="pre">tests</span></code> : containtin all the unit tests</li>
+<li><code class="docutils literal"><span class="pre">scripts</span></code> : containing command-line style utilites and apps, which use epctk library for their functionality</li>
+</ul>
+<p>Please note the distinction between the epctk &#8220;library&#8221;, which should be used
+as a python package (imported into other scripts) and the &#8220;scripts&#8221;, which
+should contain &#8220;app&#8221; style code - scripts to be run from the command line
+for example.</p>
+</div>
+<div class="section" id="building-documentation-pages">
+<h2>Building documentation pages<a class="headerlink" href="#building-documentation-pages" title="Permalink to this headline">¶</a></h2>
+<p>Currently, the documentation is built as a webpage and hosted using github-pages
+for simplicity, following the method described <a href="#id7"><span class="problematic" id="id8">`here http://lucasbardella.com/blog/2010/02/hosting-your-sphinx-docs-in-github`_</span></a>.
+In summary, you must checkout the gh-pages branch into a new folder separate
+from the folder you normally edit epctk in and set Sphinx to output the generated
+html pages into that folder by setting the <code class="docutils literal"><span class="pre">BUILDDIR</span></code> option. Generate the page
+and commit and push the result to gh-pages.</p>
+<p>Notes:</p>
+<ul class="simple">
+<li>Do not delete the <code class="docutils literal"><span class="pre">.nojekyll</span></code> file.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="contributors">
+<h1>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h1>
+<p>Andy Stone</p>
+<p>Jonathan Chambers</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Contributing</a><ul>
+<li><a class="reference internal" href="#steps-for-contributing-to-epctk">Steps for contributing to epctk</a></li>
+<li><a class="reference internal" href="#important-note-on-tests">Important note on tests</a></li>
+<li><a class="reference internal" href="#coding-guidelines">Coding guidelines</a></li>
+<li><a class="reference internal" href="#project-layout">Project Layout</a></li>
+<li><a class="reference internal" href="#building-documentation-pages">Building documentation pages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contributors">Contributors</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/contributing.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/contributing.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

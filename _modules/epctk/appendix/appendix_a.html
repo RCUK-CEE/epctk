@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>epctk.appendix.appendix_a &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epctk.appendix.appendix_a</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Appendix A: Main and secondary heating systems</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">The main heating system is that which heats the largest proportion of dwelling.</span>
+<span class="sd">It is a heating system which is not usually based on individual room heaters</span>
+<span class="sd">(although it can be), and often provides hot water as well as space heating.</span>
+<span class="sd">Main heating systems are either identified via the Product Characteristics Database</span>
+<span class="sd">or are categorised on the basis of the generic types in Tables 4a and 4b.</span>
+
+
+<span class="sd">A2.1 Identifying the main system</span>
+
+<span class="sd">    1. If there is a central system that provides both space and water heating and</span>
+<span class="sd">        it is capable of heating at least 30% of the dwelling, select that system</span>
+<span class="sd">        as the main heating system. If there is no system that provides both space</span>
+<span class="sd">        and water heating, then select the system that has the capability of heating</span>
+<span class="sd">        the greatest part of the dwelling. For this purpose only habitable rooms should</span>
+<span class="sd">        be considered (i.e. ignore heaters in non-habitable rooms).</span>
+<span class="sd">    2. If there is still doubt about which system should be selected as the main system,</span>
+<span class="sd">       select the system that supplies useful heat to the dwelling at lowest cost</span>
+<span class="sd">       (obtained by dividing fuel cost by conversion efficiency).</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">..elements</span> <span class="kn">import</span> <span class="n">HeatingTypes</span><span class="p">,</span> <span class="n">HeatingSystem</span><span class="p">,</span> <span class="n">SecondarySystem</span>
+<span class="kn">from</span> <span class="nn">..fuels</span> <span class="kn">import</span> <span class="n">ELECTRICITY_STANDARD</span>
+<span class="kn">from</span> <span class="nn">..tables</span> <span class="kn">import</span> <span class="p">(</span><span class="n">system_efficiency</span><span class="p">,</span> <span class="n">system_type_from_sap_code</span><span class="p">,</span> <span class="n">combi_loss_table_3a</span><span class="p">,</span> <span class="n">TABLE_4A</span><span class="p">,</span> <span class="n">TABLE_4B</span><span class="p">,</span>
+                      <span class="n">get_4a_system</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="apply_appendix_a"><a class="viewcode-back" href="../../../appendix_a.html#epctk.appendix.appendix_a.apply_appendix_a">[docs]</a><span class="k">def</span> <span class="nf">apply_appendix_a</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .. todo::</span>
+<span class="sd">     Move the main logic relating to appendix A from wherever it is now into this function!</span>
+
+<span class="sd">    A4 Description of the dwelling&#39;s heating systems and software implementation</span>
+
+<span class="sd">    a) If there is no heating system, assign electric heaters as the main</span>
+<span class="sd">       system heating all rooms (no secondary system).</span>
+
+<span class="sd">    b) If 25% or less of the habitable rooms are heated and their heating is by</span>
+<span class="sd">       a room heater (not electric), assign electric heaters as the main system</span>
+<span class="sd">       and the identified room heaters as the secondary system, applying the</span>
+<span class="sd">       secondary fraction according to Table 11 for electric room heaters as the</span>
+<span class="sd">       main system.</span>
+
+<span class="sd">       If two main heating systems have been identified (e.g. a gas fire in one room,</span>
+<span class="sd">       a coal fire in another room, plus 6 unheated habitable rooms) then:</span>
+
+<span class="sd">        - assign electric heaters as main system1</span>
+<span class="sd">        - assign the room heater entered as main system1 as the secondary system</span>
+<span class="sd">        - main system2 remains as it is</span>
+<span class="sd">        - set the fraction of heat from main system2 equal to heated habitable rooms</span>
+<span class="sd">          divided by total habitable rooms</span>
+
+<span class="sd">    c) Otherwise if there are any unheated habitable rooms and no secondary system</span>
+<span class="sd">       has been identified, undertake the calculation with electric secondary heating</span>
+<span class="sd">      (portable electric heaters).</span>
+
+<span class="sd">    d) If any fixed secondary heater has been identified, the calculation proceeds</span>
+<span class="sd">       with the identified secondary heater, whether or not there are unheated habitable rooms.</span>
+
+<span class="sd">    e) If there are no unheated habitable rooms and no fixed secondary heater</span>
+<span class="sd">       in a habitable room, undertake the calculation with no secondary heating.</span>
+
+<span class="sd">    f) An assumed heater, where main or secondary, is an electric portable heater.</span>
+<span class="sd">       In case of main heating it does not have thermostatic control.</span>
+
+
+<span class="sd">    Table 11 gives the fraction of the heating that is assumed to be supplied by the secondary system.</span>
+<span class="sd">    The treatment of secondary systems is not affected by any control options for the secondary system.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_secondary_code_from_main</span><span class="p">(</span><span class="n">main_type_code</span><span class="p">,</span> <span class="n">main_fuel</span><span class="p">):</span>
+    <span class="c"># TODO: original code would let this part OVERRIDE the explcit heating code,</span>
+    <span class="c"># but here we EITHER have heating code OR infer from main heating</span>
+
+    <span class="c"># Check code in range 401-408 OR code in range 421-425 AND fuel is not ELECTRICITY_STANDARD</span>
+    <span class="k">if</span> <span class="n">main_type_code</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">main_type_code</span> <span class="o">!=</span> <span class="s">&#39;community&#39;</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="p">(</span><span class="mi">401</span> <span class="o">&lt;=</span> <span class="n">main_type_code</span> <span class="o">&lt;=</span> <span class="mi">408</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="p">((</span><span class="mi">421</span> <span class="o">&lt;=</span> <span class="n">main_type_code</span> <span class="o">&lt;=</span> <span class="mi">425</span><span class="p">)</span> <span class="ow">and</span>
+                         <span class="n">main_fuel</span> <span class="o">!=</span> <span class="n">ELECTRICITY_STANDARD</span><span class="p">)):</span>
+        <span class="c"># TODO Does 24 hour tariff count as being offpeak?</span>
+        <span class="k">return</span> <span class="mi">693</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">configure_secondary_system</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">force_secondary_heating</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="c"># TODO Need to apply the rules from A4 here - need to do this</span>
+    <span class="c"># before fraction_of_heat_from_main is set.  Also back boiler</span>
+    <span class="c"># should have secondary system - see section 9.2.8</span>
+    <span class="n">use_immersion</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;use_immersion_heater_summer&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;secondary_sys_manuf_effy&#39;</span><span class="p">):</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys</span> <span class="o">=</span> <span class="n">get_manuf_data_secondary_system</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys_fuel</span><span class="p">,</span>
+                                                                 <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys_manuf_effy</span><span class="p">,</span>
+                                                                 <span class="n">use_immersion</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">heating_code</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;secondary_heating_type_code&#39;</span><span class="p">)</span>
+    <span class="n">hetas_approved</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;secondary_hetas_approved&#39;</span><span class="p">)</span>
+    <span class="n">electricity_tariff</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">electricity_tariff</span>
+
+    <span class="k">if</span> <span class="n">heating_code</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">fuel</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">electricity_tariff</span>
+        <span class="n">heating_code</span> <span class="o">=</span> <span class="n">_secondary_code_from_main</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;main_heating_type_code&#39;</span><span class="p">),</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">main_sys_fuel</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">heating_code</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">force_secondary_heating</span><span class="p">:</span>
+                <span class="n">heating_code</span> <span class="o">=</span> <span class="mi">693</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fuel</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys_fuel</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys</span> <span class="o">=</span> <span class="n">get_4a_secondary_system</span><span class="p">(</span><span class="n">fuel</span><span class="p">,</span> <span class="n">heating_code</span><span class="p">,</span> <span class="n">electricity_tariff</span><span class="p">,</span> <span class="n">use_immersion</span><span class="p">,</span>
+                                                     <span class="n">hetas_approved</span><span class="p">)</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_heating_type_code</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys</span><span class="o">.</span><span class="n">sap_code</span>
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys_fuel</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys</span><span class="o">.</span><span class="n">fuel</span>
+
+
+<div class="viewcode-block" id="sap_table_heating_system"><a class="viewcode-back" href="../../../appendix_a.html#epctk.appendix.appendix_a.sap_table_heating_system">[docs]</a><span class="k">def</span> <span class="nf">sap_table_heating_system</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system_code</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span>
+                             <span class="n">use_immersion_in_summer</span><span class="p">,</span> <span class="n">hetas_approved</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a HeatingSystem definition from SAP Table 4a if available, otherwise</span>
+<span class="sd">    from Table 4b</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dwelling:</span>
+<span class="sd">        system_code:</span>
+<span class="sd">        fuel:</span>
+<span class="sd">        use_immersion_in_summer:</span>
+<span class="sd">        hetas_approved:</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        HeatingSystem: A heating system object with data loaded from the appropriate SAP table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">system_code</span> <span class="ow">in</span> <span class="n">TABLE_4A</span><span class="p">:</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">get_4a_main_system</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system_code</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span>
+                                    <span class="n">use_immersion_in_summer</span><span class="p">,</span> <span class="n">hetas_approved</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">system</span> <span class="o">=</span> <span class="n">get_4b_main_system</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system_code</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span>
+                                    <span class="n">use_immersion_in_summer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">system</span>
+
+</div>
+<span class="k">def</span> <span class="nf">has_ch_pump</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;heating_emitter_type&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;heating_emitter_type2&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="get_4a_main_system"><a class="viewcode-back" href="../../../appendix_a.html#epctk.appendix.appendix_a.get_4a_main_system">[docs]</a><span class="k">def</span> <span class="nf">get_4a_main_system</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system_code</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span>
+                       <span class="n">use_immersion_in_summer</span><span class="p">,</span> <span class="n">hetas_approved</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the main heating system according to Table 4a for the given dwelling</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dwelling:</span>
+<span class="sd">        system_code:</span>
+<span class="sd">        fuel:</span>
+<span class="sd">        use_immersion_in_summer:</span>
+<span class="sd">        hetas_approved:</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HeatingSystem: heating system configured according to Table 4A</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">system_data</span> <span class="o">=</span> <span class="n">get_4a_system</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">electricity_tariff</span><span class="p">,</span> <span class="n">system_code</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hetas_approved</span> <span class="ow">and</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy_hetas&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">effy</span> <span class="o">=</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&quot;effy_hetas&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">effy</span> <span class="o">=</span> <span class="n">system_efficiency</span><span class="p">(</span><span class="n">system_data</span><span class="p">,</span> <span class="n">fuel</span><span class="p">)</span>
+
+    <span class="n">system</span> <span class="o">=</span> <span class="n">HeatingSystem</span><span class="p">(</span><span class="n">system_type_from_sap_code</span><span class="p">(</span><span class="n">system_code</span><span class="p">,</span> <span class="n">system_data</span><span class="p">),</span>
+                           <span class="n">effy</span><span class="p">,</span>
+                           <span class="n">effy</span><span class="p">,</span>
+                           <span class="n">use_immersion_in_summer</span><span class="p">,</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;flue_fan&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;TRUE&#39;</span><span class="p">,</span>
+                           <span class="n">has_ch_pump</span><span class="p">(</span><span class="n">dwelling</span><span class="p">),</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;table2b_row&#39;</span><span class="p">],</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;fraction_of_heat_from_secondary&#39;</span><span class="p">],</span>
+                           <span class="n">fuel</span><span class="p">)</span>
+
+    <span class="n">system</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="o">=</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;warm_air_fan&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;TRUE&quot;</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">responsiveness</span> <span class="o">=</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;responsiveness&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;water_effy&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;same&quot;</span><span class="p">:</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">water_effy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">system_data</span><span class="p">[</span><span class="s">&#39;water_effy&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">system_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">,</span>
+                              <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">]:</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">combi_loss</span> <span class="o">=</span> <span class="n">combi_loss_table_3a</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">system</span><span class="o">.</span><span class="n">system_type</span> <span class="o">==</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">:</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">cpsu_Tw</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">cpsu_Tw</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">cpsu_not_in_airing_cupboard</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;cpsu_not_in_airing_cupboard&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">system</span>
+
+</div>
+<div class="viewcode-block" id="get_4a_secondary_system"><a class="viewcode-back" href="../../../appendix_a.html#epctk.appendix.appendix_a.get_4a_secondary_system">[docs]</a><span class="k">def</span> <span class="nf">get_4a_secondary_system</span><span class="p">(</span><span class="n">fuel</span><span class="p">,</span> <span class="n">sap_type_code</span><span class="p">,</span> <span class="n">electricity_tariff</span><span class="p">,</span> <span class="n">use_immersion_heater_summer</span><span class="p">,</span>
+                            <span class="n">hetas_approved</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the secondary heating system according to Table 4a for the</span>
+<span class="sd">    given dwelling</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sap_type_code:</span>
+<span class="sd">        electricity_tariff:</span>
+<span class="sd">        use_immersion_heater_summer:</span>
+<span class="sd">        hetas_approved:</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SecondarySystem: Secondary heating system configured from Table 4a</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">system_data</span> <span class="o">=</span> <span class="n">get_4a_system</span><span class="p">(</span><span class="n">electricity_tariff</span><span class="p">,</span> <span class="n">sap_type_code</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">hetas_approved</span> <span class="ow">and</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy_hetas&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">effy</span> <span class="o">=</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&quot;effy_hetas&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">effy</span> <span class="o">=</span> <span class="n">system_efficiency</span><span class="p">(</span><span class="n">system_data</span><span class="p">,</span> <span class="n">fuel</span><span class="p">)</span>
+
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">SecondarySystem</span><span class="p">(</span><span class="n">system_type_from_sap_code</span><span class="p">(</span><span class="n">sap_type_code</span><span class="p">,</span> <span class="n">system_data</span><span class="p">),</span> <span class="n">fuel</span><span class="p">,</span> <span class="n">effy</span><span class="p">,</span>
+                          <span class="n">use_immersion_heater_summer</span><span class="p">,</span> <span class="n">sap_code</span><span class="o">=</span><span class="n">sap_type_code</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">table2b_row</span> <span class="o">=</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;table2b_row&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;water_effy&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;same&quot;</span> <span class="ow">and</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;water_effy&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">water_effy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">system_data</span><span class="p">[</span><span class="s">&#39;water_effy&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">sys</span>
+
+</div>
+<div class="viewcode-block" id="get_4b_main_system"><a class="viewcode-back" href="../../../appendix_a.html#epctk.appendix.appendix_a.get_4b_main_system">[docs]</a><span class="k">def</span> <span class="nf">get_4b_main_system</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system_code</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span> <span class="n">use_immersion_in_summer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the secondary heating system according to Table 4b for the</span>
+<span class="sd">    given dwelling</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dwelling (Dwelling):</span>
+<span class="sd">        system_code:</span>
+<span class="sd">        fuel:</span>
+<span class="sd">        use_immersion_in_summer:</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SecondarySystem: Secondary heating system configured from Table 4b</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">system_data</span> <span class="o">=</span> <span class="n">TABLE_4B</span><span class="p">[</span><span class="n">system_code</span><span class="p">]</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">HeatingSystem</span><span class="p">(</span><span class="n">system_type_from_sap_code</span><span class="p">(</span><span class="n">system_code</span><span class="p">,</span> <span class="n">system_data</span><span class="p">),</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy_winter&#39;</span><span class="p">],</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;effy_summer&#39;</span><span class="p">],</span>
+                           <span class="n">use_immersion_in_summer</span><span class="p">,</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;flue_fan&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;TRUE&#39;</span><span class="p">,</span>
+                           <span class="n">has_ch_pump</span><span class="p">(</span><span class="n">dwelling</span><span class="p">),</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;table2b_row&#39;</span><span class="p">],</span>
+                           <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;fraction_of_heat_from_secondary&#39;</span><span class="p">],</span>
+                           <span class="n">fuel</span><span class="p">)</span>
+
+    <span class="n">system</span><span class="o">.</span><span class="n">responsiveness</span> <span class="o">=</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;responsiveness&#39;</span><span class="p">]</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">is_condensing</span> <span class="o">=</span> <span class="n">system_data</span><span class="p">[</span><span class="s">&#39;condensing&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">system_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">HeatingTypes</span><span class="o">.</span><span class="n">combi</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">storage_combi</span><span class="p">]:</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">combi_loss</span> <span class="o">=</span> <span class="n">combi_loss_table_3a</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">system</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">system</span><span class="o">.</span><span class="n">system_type</span> <span class="o">==</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">cpsu</span><span class="p">:</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">cpsu_not_in_airing_cupboard</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;cpsu_not_in_airing_cupboard&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">system</span>
+
+</div>
+<span class="k">def</span> <span class="nf">get_manuf_data_secondary_system</span><span class="p">(</span><span class="n">fuel</span><span class="p">,</span> <span class="n">effy</span><span class="p">,</span> <span class="n">use_immersion_heater_summer</span><span class="p">):</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">SecondarySystem</span><span class="p">(</span><span class="n">HeatingTypes</span><span class="o">.</span><span class="n">misc</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span> <span class="n">effy</span><span class="p">,</span> <span class="n">use_immersion_heater_summer</span><span class="p">)</span>
+
+    <span class="c"># sys.table2b_row=system_data[&#39;table2b_row&#39;]</span>
+    <span class="k">return</span> <span class="n">sys</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

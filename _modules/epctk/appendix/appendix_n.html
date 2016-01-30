@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>epctk.appendix.appendix_n &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epctk.appendix.appendix_n</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Appendix N: Heat Pumps and Micro CHP</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">Additional tables and functions implementing Appendix N of SAP</span>
+<span class="sd">which describes heat pumps and micro CHP units</span>
+
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c"># types is used for MethodType, which is use to dynamically add methods to heating systems</span>
+<span class="kn">import</span> <span class="nn">types</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">..elements</span> <span class="kn">import</span> <span class="n">HeatingTypes</span><span class="p">,</span> <span class="n">FuelTypes</span><span class="p">,</span> <span class="n">HeatingSystem</span>
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">SUMMER_MONTHS</span><span class="p">,</span> <span class="n">USE_TABLE_4D_FOR_RESPONSIVENESS</span>
+<span class="kn">from</span> <span class="nn">..tables</span> <span class="kn">import</span> <span class="n">table_n4_heating_days</span><span class="p">,</span> <span class="n">table_n8_secondary_fraction</span><span class="p">,</span> <span class="n">interpolate_psr_table</span><span class="p">,</span> <span class="n">interpolate_efficiency</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">weighted_effy</span>
+
+
+<div class="viewcode-block" id="add_appendix_n_equations_heat_pumps"><a class="viewcode-back" href="../../../appendix_n.html#epctk.appendix.appendix_n.add_appendix_n_equations_heat_pumps">[docs]</a><span class="k">def</span> <span class="nf">add_appendix_n_equations_heat_pumps</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add the appendix n equations, which overwrite the default methods in some</span>
+<span class="sd">    cases</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dwelling:</span>
+<span class="sd">        sys:</span>
+<span class="sd">        pcdf_data:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">add_appendix_n_equations_shared</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">heat_pump_space_effy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q_space</span><span class="p">):</span>
+        <span class="n">h_mean</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span>
+        <span class="n">psr</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;maximum_output&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">h_mean</span> <span class="o">*</span> <span class="mf">24.2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;number_of_air_flow_rates&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">throughput</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c"># !!!</span>
+            <span class="n">flow_rate</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span> <span class="o">*</span> <span class="n">throughput</span> <span class="o">/</span> <span class="mf">3.6</span>
+
+            <span class="k">if</span> <span class="n">flow_rate</span> <span class="o">&lt;</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;air_flow_2&#39;</span><span class="p">]:</span>
+                <span class="k">assert</span> <span class="n">flow_rate</span> <span class="o">&gt;=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;air_flow_1&#39;</span><span class="p">]</span>  <span class="c"># !!!</span>
+                <span class="n">flowrateset1</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">flowrateset2</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># doesn&#39;t matter if flow rate &gt; flowrate_3 because</span>
+                <span class="c"># when we do the interpolation we limit frac to 1</span>
+                <span class="n">flowrateset1</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">flowrateset2</span> <span class="o">=</span> <span class="mi">2</span>
+
+            <span class="n">flowrate1</span> <span class="o">=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;air_flow_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">flowrateset1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="n">flowrate2</span> <span class="o">=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;air_flow_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">flowrateset2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="n">frac</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">flow_rate</span> <span class="o">-</span> <span class="n">flowrate1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">flowrate2</span> <span class="o">-</span> <span class="n">flowrate1</span><span class="p">))</span>
+
+            <span class="n">effy1</span> <span class="o">=</span> <span class="n">interpolate_efficiency</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;psr_datasets&#39;</span><span class="p">][</span><span class="n">flowrateset1</span><span class="p">])</span>
+            <span class="n">effy2</span> <span class="o">=</span> <span class="n">interpolate_efficiency</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;psr_datasets&#39;</span><span class="p">][</span><span class="n">flowrateset2</span><span class="p">])</span>
+            <span class="n">effy</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">frac</span><span class="p">)</span> <span class="o">*</span> <span class="n">effy1</span> <span class="o">+</span> <span class="n">frac</span> <span class="o">*</span> <span class="n">effy2</span>
+            <span class="n">run_hrs1</span> <span class="o">=</span> <span class="n">interpolate_psr_table</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span>
+                                             <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;psr_datasets&#39;</span><span class="p">][</span><span class="n">flowrateset1</span><span class="p">],</span>
+                                             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;psr&#39;</span><span class="p">],</span>
+                                             <span class="n">data</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;running_hours&#39;</span><span class="p">])</span>
+            <span class="n">run_hrs2</span> <span class="o">=</span> <span class="n">interpolate_psr_table</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;psr_datasets&#39;</span><span class="p">][</span><span class="n">flowrateset2</span><span class="p">],</span>
+                                             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;psr&#39;</span><span class="p">],</span>
+                                             <span class="n">data</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;running_hours&#39;</span><span class="p">])</span>
+            <span class="n">running_hours</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">)((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">frac</span><span class="p">)</span> <span class="o">*</span> <span class="n">run_hrs1</span> <span class="o">+</span> <span class="n">frac</span> <span class="o">*</span> <span class="n">run_hrs2</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+            <span class="n">Rhp</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c"># !!!</span>
+            <span class="n">Qfans</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">volume</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">adjusted_fan_sfp</span> <span class="o">*</span> <span class="n">throughput</span> <span class="o">*</span> <span class="n">Rhp</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="mi">8760</span> <span class="o">-</span> <span class="n">running_hours</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3600</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">Q_mech_vent_fans</span> <span class="o">=</span> <span class="n">Qfans</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">effy</span> <span class="o">=</span> <span class="n">interpolate_efficiency</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;psr_datasets&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">space_heat_in_use_factor</span> <span class="o">=</span> <span class="mf">0.95</span>
+        <span class="k">return</span> <span class="n">effy</span> <span class="o">*</span> <span class="n">space_heat_in_use_factor</span>
+
+    <span class="k">def</span> <span class="nf">heat_pump_water_effy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q_water</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;hw_vessel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c"># integral</span>
+            <span class="n">in_use_factor</span> <span class="o">=</span> <span class="o">.</span><span class="mi">95</span>
+        <span class="k">elif</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;hw_vessel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c"># separate, specified</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_area</span> <span class="o">=</span> <span class="mf">9e9</span>  <span class="c"># !!! Should be input</span>
+            <span class="c"># !!! Need to check performance criteria of cylinder (table N7)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">&gt;=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;vessel_volume&#39;</span><span class="p">]</span> <span class="ow">and</span>
+                <span class="c"># !!! Might not always have measured loss - can also come from insulation type, etc</span>
+                        <span class="n">dwelling</span><span class="o">.</span><span class="n">measured_cylinder_loss</span> <span class="o">&lt;=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;vessel_heat_loss&#39;</span><span class="p">]</span> <span class="ow">and</span>
+                        <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_area</span> <span class="o">&gt;=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;vessel_heat_exchanger&#39;</span><span class="p">]):</span>
+                <span class="n">in_use_factor</span> <span class="o">=</span> <span class="o">.</span><span class="mi">95</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">in_use_factor</span> <span class="o">=</span> <span class="o">.</span><span class="mi">6</span>
+        <span class="k">elif</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;hw_vessel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span class="c"># separate, unspecified</span>
+            <span class="n">in_use_factor</span> <span class="o">=</span> <span class="o">.</span><span class="mi">6</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">False</span>
+            <span class="n">in_use_factor</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c"># !!! also need sch3 option</span>
+        <span class="n">water_effy</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;water_heating_effy_sch2&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">in_use_factor</span><span class="p">),</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">summer_immersion</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">SUMMER_MONTHS</span><span class="p">:</span>
+                <span class="n">water_effy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+
+        <span class="k">return</span> <span class="n">water_effy</span>
+
+    <span class="c"># Dynamically add a method to the system</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">water_heat_effy</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">heat_pump_water_effy</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">space_heat_effy</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">heat_pump_space_effy</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">sch3_calc</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sch2val</span><span class="p">,</span> <span class="n">sch3val</span><span class="p">):</span>
+    <span class="n">Vd</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">daily_hot_water_use</span>
+    <span class="k">return</span> <span class="n">sch2val</span> <span class="o">+</span> <span class="p">(</span><span class="n">sch3val</span> <span class="o">-</span> <span class="n">sch2val</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Vd</span> <span class="o">-</span> <span class="mf">100.2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">99.6</span>
+
+
+<div class="viewcode-block" id="table_n3"><a class="viewcode-back" href="../../../appendix_n.html#epctk.appendix.appendix_n.table_n3">[docs]</a><span class="k">def</span> <span class="nf">table_n3</span><span class="p">(</span><span class="n">heating_duration</span><span class="p">,</span> <span class="n">psr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        heating_duration:</span>
+<span class="sd">        psr:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;V&quot;</span><span class="p">:</span>
+        <span class="n">N24_16</span><span class="p">,</span> <span class="n">N24_9</span><span class="p">,</span> <span class="n">N16_9</span> <span class="o">=</span> <span class="n">table_n4_heating_days</span><span class="p">(</span><span class="n">psr</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;24&quot;</span><span class="p">:</span>
+        <span class="n">N24_16</span><span class="p">,</span> <span class="n">N24_9</span><span class="p">,</span> <span class="n">N16_9</span> <span class="o">=</span> <span class="p">(</span><span class="mi">104</span><span class="p">,</span> <span class="mi">261</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;16&quot;</span><span class="p">:</span>
+        <span class="n">N24_16</span><span class="p">,</span> <span class="n">N24_9</span><span class="p">,</span> <span class="n">N16_9</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">261</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">heating_duration</span> <span class="o">==</span> <span class="s">&quot;11&quot;</span>
+        <span class="n">N24_16</span><span class="p">,</span> <span class="n">N24_9</span><span class="p">,</span> <span class="n">N16_9</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">N16_9</span><span class="p">,</span> <span class="n">N24_16</span><span class="p">,</span> <span class="n">N24_9</span>
+
+</div>
+<span class="k">def</span> <span class="nf">add_appendix_n_equations_shared</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">longer_heating_days</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">h_mean</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span>
+        <span class="n">psr</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;maximum_output&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">h_mean</span> <span class="o">*</span> <span class="mf">24.2</span><span class="p">)</span>
+
+        <span class="c"># !!! Not the best place to set this</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">fraction_of_heat_from_main</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">table_n8_secondary_fraction</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;heating_duration&#39;</span><span class="p">])</span>
+
+        <span class="c"># TABLE N3</span>
+        <span class="n">N16_9</span><span class="p">,</span> <span class="n">N24_16</span><span class="p">,</span> <span class="n">N24_9</span> <span class="o">=</span> <span class="n">table_n3</span><span class="p">(</span><span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;heating_duration&#39;</span><span class="p">],</span> <span class="n">psr</span><span class="p">)</span>
+
+        <span class="c"># TABLE N5</span>
+        <span class="n">MONTH_ORDER</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+        <span class="n">N_WE</span> <span class="o">=</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+        <span class="n">N_WD</span> <span class="o">=</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">22</span><span class="p">]</span>
+
+        <span class="n">N24_9_m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="n">N16_9_m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="n">N24_16_m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">12</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">):</span>
+            <span class="n">month</span> <span class="o">=</span> <span class="n">MONTH_ORDER</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+            <span class="c"># Allocate weekdays</span>
+            <span class="n">N24_9_m</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">N_WD</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">N24_9</span><span class="p">)</span>
+            <span class="n">N24_9</span> <span class="o">-=</span> <span class="n">N24_9_m</span><span class="p">[</span><span class="n">month</span><span class="p">]</span>
+            <span class="n">N_WD</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">N24_9_m</span><span class="p">[</span><span class="n">month</span><span class="p">]</span>
+
+            <span class="n">N16_9_m</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">N_WD</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">N16_9</span><span class="p">)</span>
+            <span class="n">N16_9</span> <span class="o">-=</span> <span class="n">N16_9_m</span><span class="p">[</span><span class="n">month</span><span class="p">]</span>
+
+            <span class="c"># Allocate weekends</span>
+            <span class="n">N24_16_m</span><span class="p">[</span><span class="n">month</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">N_WE</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">N24_16</span><span class="p">)</span>
+            <span class="n">N24_16</span> <span class="o">-=</span> <span class="n">N24_16_m</span><span class="p">[</span><span class="n">month</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">N24_16_m</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">N24_9_m</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">N16_9_m</span><span class="p">),</span>
+
+    <span class="n">dwelling</span><span class="o">.</span><span class="n">longer_heating_days</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">longer_heating_days</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">add_appendix_n_equations_microchp</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">):</span>
+    <span class="n">add_appendix_n_equations_shared</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">micro_chp_space_effy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q_space</span><span class="p">):</span>
+        <span class="n">h_mean</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span>
+        <span class="n">psr</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;maximum_output&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">h_mean</span> <span class="o">*</span> <span class="mf">24.2</span><span class="p">)</span>
+        <span class="n">effy</span> <span class="o">=</span> <span class="n">interpolate_efficiency</span><span class="p">(</span><span class="n">psr</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;psr_datasets&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">effy_space</span> <span class="o">=</span> <span class="n">effy</span>
+        <span class="n">space_heat_in_use_factor</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q_space</span> <span class="o">=</span> <span class="n">Q_space</span>
+
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">chp_space_elec</span> <span class="o">=</span> <span class="n">interpolate_psr_table</span><span class="p">(</span>
+                <span class="n">psr</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;psr_datasets&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;psr&#39;</span><span class="p">],</span>
+                <span class="n">data</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;specific_elec_consumed&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">effy</span> <span class="o">*</span> <span class="n">space_heat_in_use_factor</span>
+
+    <span class="k">def</span> <span class="nf">micro_chp_water_effy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Q_water</span><span class="p">):</span>
+        <span class="c"># !!! Can this all be replaced with regular water function?</span>
+        <span class="c"># !!! Winter effy might be the problem as it needs psr</span>
+
+        <span class="c"># !!! adjustments can apply??</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;water_heating_effy_sch3&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">Vd</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">daily_hot_water_use</span>
+            <span class="n">summereff</span> <span class="o">=</span> <span class="n">sch3_calc</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span>
+                                  <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;water_heating_effy_sch2&#39;</span><span class="p">],</span>
+                                  <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;water_heating_effy_sch3&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">summereff</span> <span class="o">=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;water_heating_effy_sch2&#39;</span><span class="p">]</span>
+        <span class="n">wintereff</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">effy_space</span>
+
+        <span class="n">water_effy</span> <span class="o">=</span> <span class="n">weighted_effy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Q_space</span><span class="p">,</span> <span class="n">Q_water</span><span class="p">,</span> <span class="n">wintereff</span><span class="p">,</span> <span class="n">summereff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">summer_immersion</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">SUMMER_MONTHS</span><span class="p">:</span>
+                <span class="n">water_effy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+
+        <span class="k">return</span> <span class="n">water_effy</span>
+
+    <span class="c"># Dynamically set the efficiency methods to micro chp methods, overriding the default ones.</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">water_heat_effy</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">micro_chp_water_effy</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">space_heat_effy</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">micro_chp_space_effy</span><span class="p">,</span> <span class="n">sys</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">micro_chp_from_pcdf</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span> <span class="n">use_immersion_in_summer</span><span class="p">):</span>
+    <span class="c"># !!! Probably should check provision type in here for consistency</span>
+    <span class="c"># !!! with water sys inputs (e.g. summer immersion, etc)</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">HeatingSystem</span><span class="p">(</span><span class="n">HeatingTypes</span><span class="o">.</span><span class="n">microchp</span><span class="p">,</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">summer_immersion</span><span class="o">=</span><span class="n">use_immersion_in_summer</span><span class="p">,</span>
+                        <span class="n">has_flue_fan</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>  <span class="c"># !!!</span>
+                        <span class="n">has_ch_pump</span><span class="o">=</span><span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;separate_circulator&#39;</span><span class="p">],</span>
+                        <span class="n">table2b_row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">default_secondary_fraction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c"># overwritten below</span>
+                        <span class="n">fuel</span><span class="o">=</span><span class="n">fuel</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">responsiveness</span> <span class="o">=</span> <span class="n">USE_TABLE_4D_FOR_RESPONSIVENESS</span>
+
+    <span class="c"># It seems that oil based micro chp needs to include a 10W gain</span>
+    <span class="c"># inside the dwelling, but doesn&#39;t include the electricity</span>
+    <span class="c"># consumption of the pump</span>
+    <span class="k">if</span> <span class="n">fuel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">FuelTypes</span><span class="o">.</span><span class="n">OIL</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">main_heating_oil_pump_inside_dwelling</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c"># !!! Effy adjustments for condensing underfloor heating can be applied?</span>
+
+    <span class="k">if</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;hw_vessel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c"># integral vessel</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">measured_cylinder_loss</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">has_cylinderstat</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">has_hw_time_control</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">cylinder_in_heated_space</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">has_integral_store</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">has_integral_store</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;secondary_heating_type_code&#39;</span><span class="p">):</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_heating_type_code</span> <span class="o">=</span> <span class="mi">693</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys_fuel</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">electricity_tariff</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;net_specific_elec_consumed_sch3&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">chp_water_elec</span> <span class="o">=</span> <span class="n">sch3_calc</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span>
+                                            <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;net_specific_elec_consumed_sch2&#39;</span><span class="p">],</span>
+                                            <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;net_specific_elec_consumed_sch3&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">chp_water_elec</span> <span class="o">=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;net_specific_elec_consumed_sch2&#39;</span><span class="p">]</span>
+
+    <span class="n">add_appendix_n_equations_microchp</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sys</span>
+
+
+<span class="k">def</span> <span class="nf">heat_pump_from_pcdf</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span> <span class="n">use_immersion_in_summer</span><span class="p">):</span>
+    <span class="c"># !!! Probably should check provision type in here for consistency</span>
+    <span class="c"># !!! with water sys inputs (e.g. summer immersion, etc)</span>
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">HeatingSystem</span><span class="p">(</span><span class="n">HeatingTypes</span><span class="o">.</span><span class="n">pcdf_heat_pump</span><span class="p">,</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">summer_immersion</span><span class="o">=</span><span class="n">use_immersion_in_summer</span><span class="p">,</span>
+                        <span class="n">has_flue_fan</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>  <span class="c"># !!!</span>
+                        <span class="n">has_ch_pump</span><span class="o">=</span><span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;separate_circulator&#39;</span><span class="p">],</span>
+                        <span class="n">table2b_row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">default_secondary_fraction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c"># overwritten below</span>
+                        <span class="n">fuel</span><span class="o">=</span><span class="n">fuel</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;emitter_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;4&quot;</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">responsiveness</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">has_ch_pump</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># !!! Assumes we have a heat emitter - is that always the case?</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">responsiveness</span> <span class="o">=</span> <span class="n">USE_TABLE_4D_FOR_RESPONSIVENESS</span>
+
+    <span class="k">if</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;hw_vessel&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c"># integral vessel</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">measured_cylinder_loss</span> <span class="o">=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;vessel_heat_loss&#39;</span><span class="p">]</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span> <span class="o">=</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;vessel_volume&#39;</span><span class="p">]</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">has_cylinderstat</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">has_hw_time_control</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">cylinder_in_heated_space</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c"># !!! Not sure why this applies?</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">has_integral_store</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">has_integral_store</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;secondary_heating_type_code&#39;</span><span class="p">):</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_heating_type_code</span> <span class="o">=</span> <span class="mi">693</span>
+        <span class="n">dwelling</span><span class="o">.</span><span class="n">secondary_sys_fuel</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">electricity_tariff</span>
+
+    <span class="n">add_appendix_n_equations_heat_pumps</span><span class="p">(</span><span class="n">dwelling</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">pcdf_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sys</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

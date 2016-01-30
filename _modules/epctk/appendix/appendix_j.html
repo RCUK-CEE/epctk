@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>epctk.appendix.appendix_j &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epctk.appendix.appendix_j</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Appendix J: Seasonal efficiency for solid fuel boilers from test data</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">This appendix specifies how to obtain a seasonal efficiency from test data on a solid</span>
+<span class="sd">fuel boiler that is provided in the Product Characteristics Database. A database</span>
+<span class="sd">record for a solid fuel boiler includes:</span>
+
+<span class="sd">- SAP seasonal efficiency, %</span>
+<span class="sd">- Fuel input, heat to water and heat to room from test at full load, kW</span>
+<span class="sd">- Fuel input, heat to water and heat to room from test at part load, kW</span>
+
+<span class="sd">All efficiency values are gross (net-to-gross conversion factors are given in Table E4).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">..elements</span> <span class="kn">import</span> <span class="n">HeatingTypes</span><span class="p">,</span> <span class="n">HeatingSystem</span>
+
+
+<div class="viewcode-block" id="solid_fuel_boiler_from_pcdf"><a class="viewcode-back" href="../../../appendix_j.html#epctk.appendix.appendix_j.solid_fuel_boiler_from_pcdf">[docs]</a><span class="k">def</span> <span class="nf">solid_fuel_boiler_from_pcdf</span><span class="p">(</span><span class="n">pcdf_data</span><span class="p">,</span> <span class="n">fuel</span><span class="p">,</span> <span class="n">use_immersion_in_summer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements Appendix J</span>
+
+<span class="sd">    :param pcdf_data:</span>
+<span class="sd">    :param fuel:</span>
+<span class="sd">    :param use_immersion_in_summer:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;seasonal_effy&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">effy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;seasonal_effy&#39;</span><span class="p">])</span>
+
+    <span class="k">elif</span> <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;part_load_fuel_use&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+        <span class="c"># FIXME</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Appendix J: Part load fuel use not implemented&quot;</span><span class="p">)</span>
+        <span class="c"># !!! Need to tests for inside/outside of heated space</span>
+        <span class="c"># nominal_effy = 100 * (pcdf_data[&#39;nominal_heat_to_water&#39;] + pcdf_data[&#39;nominal_heat_to_room&#39;]) / pcdf_data[</span>
+        <span class="c">#     &#39;nominal_fuel_use&#39;]</span>
+        <span class="c"># part_load_effy = 100 * (pcdf_data[&#39;part_load_heat_to_water&#39;] + pcdf_data[&#39;part_load_heat_to_room&#39;]) / pcdf_data[</span>
+        <span class="c">#     &#39;part_load_fuel_use&#39;]</span>
+        <span class="c"># effy = 0.5 * (nominal_effy + part_load_effy)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">nominal_effy</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;nominal_heat_to_water&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;nominal_heat_to_room&#39;</span><span class="p">]))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span>
+                <span class="n">pcdf_data</span><span class="p">[</span><span class="s">&#39;nominal_fuel_use&#39;</span><span class="p">])</span>
+        <span class="n">effy</span> <span class="o">=</span> <span class="o">.</span><span class="mi">975</span> <span class="o">*</span> <span class="n">nominal_effy</span>
+
+    <span class="n">sys</span> <span class="o">=</span> <span class="n">HeatingSystem</span><span class="p">(</span><span class="n">HeatingTypes</span><span class="o">.</span><span class="n">regular_boiler</span><span class="p">,</span>  <span class="c"># !!!</span>
+                        <span class="n">effy</span><span class="p">,</span>
+                        <span class="n">effy</span><span class="p">,</span>
+                        <span class="n">summer_immersion</span><span class="o">=</span><span class="n">use_immersion_in_summer</span><span class="p">,</span>
+                        <span class="n">has_flue_fan</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>  <span class="c"># !!!</span>
+                        <span class="n">has_ch_pump</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">table2b_row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="c"># !!! Solid fuel boilers can only have indirect boiler?</span>
+                        <span class="n">default_secondary_fraction</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c"># !!! Assumes 10% secondary fraction</span>
+                        <span class="n">fuel</span><span class="o">=</span><span class="n">fuel</span><span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">responsiveness</span> <span class="o">=</span> <span class="o">.</span><span class="mi">5</span>  <span class="c"># !!! Needs to depend on &quot;main type&quot; input</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">return</span> <span class="n">sys</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

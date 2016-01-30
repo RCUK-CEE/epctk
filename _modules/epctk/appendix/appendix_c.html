@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>epctk.appendix.appendix_c &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epctk.appendix.appendix_c</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Appendix C: Community heating, including schemes with Combined Heat and Power (CHP) and schemes that recover heat from power stations</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">..elements</span> <span class="kn">import</span> <span class="n">CommunityDistributionTypes</span><span class="p">,</span> <span class="n">HeatingTypes</span><span class="p">,</span> <span class="n">HeatingSystem</span>
+<span class="kn">from</span> <span class="nn">..fuels</span> <span class="kn">import</span> <span class="n">CommunityFuel</span><span class="p">,</span> <span class="n">Fuel</span>
+
+<span class="n">TABLE_12c</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">CommunityDistributionTypes</span><span class="o">.</span><span class="n">PRE_1990_UNINSULATED</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span>
+    <span class="n">CommunityDistributionTypes</span><span class="o">.</span><span class="n">PRE_1990_INSULATED</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span>
+    <span class="n">CommunityDistributionTypes</span><span class="o">.</span><span class="n">MODERN_HIGH_TEMP</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span>
+    <span class="n">CommunityDistributionTypes</span><span class="o">.</span><span class="n">MODERN_LOW_TEMP</span><span class="p">:</span> <span class="mf">1.05</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="CommunityHeating"><a class="viewcode-back" href="../../../appendix_c.html#epctk.appendix.appendix_c.CommunityHeating">[docs]</a><span class="k">class</span> <span class="nc">CommunityHeating</span><span class="p">(</span><span class="n">HeatingSystem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data container for Community heating systems</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        heat_sources (List[dict]): list of heat source dicts</span>
+<span class="sd">        sap_distribution_type (CommunityDistributionTypes):</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">heat_sources</span><span class="p">,</span> <span class="n">sap_distribution_type</span><span class="p">):</span>
+        <span class="c"># TODO use the super class initializer</span>
+        <span class="c"># super().__init__(HeatingTypes.community, winter_effy, summer_effy,</span>
+        <span class="c">#          False, False, False,</span>
+        <span class="c">#          2, 0.1, CommunityFuel(fuel_factor, emission_factor_adjustment))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_community_heating</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table2b_row</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c"># !!! Assume indirect cylinder inside dwelling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_type</span> <span class="o">=</span> <span class="n">HeatingTypes</span><span class="o">.</span><span class="n">community</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_ch_pump</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_oil_pump</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_flue_fan</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_warm_air_fan</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responsiveness</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summer_immersion</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_secondary_fraction</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="c"># Set these to None, so that if you try to use them before setting them</span>
+        <span class="c"># you generate an error</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">space_heat_charging_factor</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dhw_charging_factor</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">sap_distribution_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distribution_loss_factor</span> <span class="o">=</span> <span class="n">TABLE_12c</span><span class="p">[</span><span class="n">sap_distribution_type</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distribution_loss_factor</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chp_heat_to_power</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chp_effy</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">boiler_effy_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">boiler_co2_factor_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">boiler_pe_factor_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">boiler_price_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">boiler_fraction_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">chp_system</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">biggest_contributor</span> <span class="o">=</span> <span class="n">heat_sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">hs</span> <span class="ow">in</span> <span class="n">heat_sources</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;heat_to_power&#39;</span> <span class="ow">in</span> <span class="n">hs</span><span class="p">:</span>
+                <span class="c"># chp</span>
+                <span class="k">assert</span> <span class="n">chp_system</span> <span class="ow">is</span> <span class="bp">None</span>  <span class="c"># should only find one?</span>
+                <span class="n">chp_system</span> <span class="o">=</span> <span class="n">hs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">boiler_effy_sum</span> <span class="o">+=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;efficiency&#39;</span><span class="p">]</span>
+                <span class="n">boiler_fraction_sum</span> <span class="o">+=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]</span>
+                <span class="n">boiler_co2_factor_sum</span> <span class="o">+=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">co2_factor</span> <span class="o">*</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;efficiency&#39;</span><span class="p">]</span>
+                <span class="n">boiler_pe_factor_sum</span> <span class="o">+=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">primary_energy_factor</span> <span class="o">*</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;efficiency&#39;</span><span class="p">]</span>
+                <span class="n">boiler_price_sum</span> <span class="o">+=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unit_price</span><span class="p">()</span> <span class="o">*</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">biggest_contributor</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]:</span>
+                <span class="n">biggest_contributor</span> <span class="o">=</span> <span class="n">hs</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">boiler_effy</span> <span class="o">=</span> <span class="n">boiler_fraction_sum</span> <span class="o">/</span> <span class="n">boiler_effy_sum</span>
+
+        <span class="n">boiler_co2_factor</span> <span class="o">=</span> <span class="n">boiler_co2_factor_sum</span> <span class="o">/</span> <span class="n">boiler_fraction_sum</span>
+        <span class="n">boiler_pe_factor</span> <span class="o">=</span> <span class="n">boiler_pe_factor_sum</span> <span class="o">/</span> <span class="n">boiler_fraction_sum</span>
+        <span class="n">boiler_price</span> <span class="o">=</span> <span class="n">boiler_price_sum</span> <span class="o">/</span> <span class="n">boiler_fraction_sum</span>
+
+        <span class="k">if</span> <span class="n">chp_system</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_chp</span><span class="p">(</span><span class="n">chp_system</span><span class="p">,</span> <span class="n">boiler_co2_factor</span><span class="p">,</span> <span class="n">boiler_price</span><span class="p">,</span> <span class="n">boiler_pe_factor</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heat_to_power_ratio</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">co2_factor_</span> <span class="o">=</span> <span class="n">boiler_co2_factor</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pe_factor</span> <span class="o">=</span> <span class="n">boiler_pe_factor</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fuel_price_</span> <span class="o">=</span> <span class="n">boiler_price</span>
+
+        <span class="c"># FIXME: This code was setting fuel_factor and emission factor, but values were always overridden afterwards...</span>
+        <span class="c"># this is for TER, not completely sure this is right - how do you</span>
+        <span class="c"># pick the TER fuel if you also have a second main system?</span>
+        <span class="n">fuel_factor</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">emission_factor_adjustment</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">hs</span> <span class="ow">in</span> <span class="n">heat_sources</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_mains_gas</span><span class="p">:</span>
+                <span class="n">fuel_factor</span> <span class="o">=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fuel_factor</span>
+                <span class="n">emission_factor_adjustment</span> <span class="o">=</span> <span class="n">hs</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">emission_factor_adjustment</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fuel</span> <span class="o">=</span> <span class="n">CommunityFuel</span><span class="p">(</span><span class="n">fuel_factor</span><span class="p">,</span> <span class="n">emission_factor_adjustment</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fuel_factor</span> <span class="o">=</span> <span class="n">biggest_contributor</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fuel_factor</span>
+            <span class="n">emission_factor_adjustment</span> <span class="o">=</span> <span class="n">biggest_contributor</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">emission_factor_adjustment</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fuel</span> <span class="o">=</span> <span class="n">CommunityFuel</span><span class="p">(</span><span class="n">fuel_factor</span><span class="p">,</span> <span class="n">emission_factor_adjustment</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CommunityHeating.space_heat_effy"><a class="viewcode-back" href="../../../appendix_c.html#epctk.appendix.appendix_c.CommunityHeating.space_heat_effy">[docs]</a>    <span class="k">def</span> <span class="nf">space_heat_effy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_Q_space</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the space heating efficiency.</span>
+
+<span class="sd">        .. note:</span>
+
+<span class="sd">          Requires that apply_4c3 has been run on this system in order to set space_heat_charging_factor</span>
+<span class="sd">          This happens when we apply_table_4e()</span>
+<span class="sd">          TODO: avoid this requirement by applying the table to the system on initialisation</span>
+
+<span class="sd">        Efficiencies work a bit differently for community systems -</span>
+<span class="sd">        system efficiency is not accounted to in calculating energy</span>
+<span class="sd">        consumption and cost (so we return 100% here, scaled for</span>
+<span class="sd">        additional loss factors.  System effy is included in CO2 and</span>
+<span class="sd">        primary energy factors.</span>
+
+<span class="sd">        :param _Q_space: ignored, included for compatiblity with equivalent function for regular heating</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">space_mult</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space_heat_charging_factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_loss_factor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">space_mult</span>
+</div>
+    <span class="k">def</span> <span class="nf">water_heat_effy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_Q_water</span><span class="p">):</span>
+        <span class="n">space_mult</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dhw_charging_factor</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution_loss_factor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">space_mult</span>
+
+    <span class="k">def</span> <span class="nf">fuel_price</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_price_</span>
+
+    <span class="k">def</span> <span class="nf">co2_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">co2_factor_</span>
+
+    <span class="k">def</span> <span class="nf">primary_energy_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pe_factor</span>
+
+    <span class="k">def</span> <span class="nf">water_fuel_price</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fuel_price_</span>
+
+    <span class="k">def</span> <span class="nf">_setup_chp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chp_system</span><span class="p">,</span> <span class="n">boiler_co2_factor</span><span class="p">,</span> <span class="n">boiler_price</span><span class="p">,</span> <span class="n">boiler_pe_factor</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span> <span class="o">+=</span> <span class="n">chp_system</span><span class="p">[</span><span class="s">&#39;fraction&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chp_heat_to_power</span> <span class="o">=</span> <span class="n">chp_system</span><span class="p">[</span><span class="s">&#39;heat_to_power&#39;</span><span class="p">]</span>
+
+        <span class="n">total_effy</span> <span class="o">=</span> <span class="n">chp_system</span><span class="p">[</span><span class="s">&#39;efficiency&#39;</span><span class="p">]</span>
+        <span class="n">heat_effy</span> <span class="o">=</span> <span class="n">total_effy</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">chp_heat_to_power</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">chp_heat_to_power</span><span class="p">)</span>
+        <span class="n">chp_effy</span> <span class="o">=</span> <span class="n">heat_effy</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">heat_to_power_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chp_heat_to_power</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">co2_factor_</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span> <span class="o">*</span> <span class="n">chp_system</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">co2_factor</span> <span class="o">/</span> <span class="n">chp_effy</span> <span class="o">+</span>
+            <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">boiler_co2_factor</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pe_factor</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span> <span class="o">*</span> <span class="n">chp_system</span><span class="p">[</span><span class="s">&#39;fuel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">primary_energy_factor</span> <span class="o">/</span> <span class="n">chp_effy</span> <span class="o">+</span>
+            <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">boiler_pe_factor</span><span class="p">)</span>
+
+        <span class="n">chp_price</span> <span class="o">=</span> <span class="n">Fuel</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span><span class="o">.</span><span class="n">unit_price</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fuel_price_</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span> <span class="o">*</span> <span class="n">chp_price</span> <span class="o">+</span>
+                            <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">chp_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="n">boiler_price</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

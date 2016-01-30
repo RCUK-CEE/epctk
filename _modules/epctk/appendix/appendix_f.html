@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>epctk.appendix.appendix_f &mdash; SAPcalc 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SAPcalc 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epctk.appendix.appendix_f</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Appendix F: Electric CPSUs</span>
+<span class="sd">~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">An electric CPSU is a central heating system providing space and domestic water heating.</span>
+<span class="sd">Primary water heated mainly during low-rate periods to up to 95°C in winter is stored</span>
+<span class="sd">in a thermal store. If the CPSU volume is less than 270 litres, the resulting high-rate</span>
+<span class="sd">fraction can lead to a poor SAP rating.</span>
+
+<span class="sd">The procedure in this appendix applies for a 10-hour off-peak tariff providing 3 low-rate</span>
+<span class="sd">periods per day. It is not valid for other tariffs.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">DAYS_PER_MONTH</span><span class="p">,</span> <span class="n">SUMMER_MONTHS</span>
+
+
+<div class="viewcode-block" id="cpsu_on_peak"><a class="viewcode-back" href="../../../appendix_f.html#epctk.appendix.appendix_f.cpsu_on_peak">[docs]</a><span class="k">def</span> <span class="nf">cpsu_on_peak</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">dwelling</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    39m=dwelling.h</span>
+<span class="sd">    45m=hw_energy_content</span>
+<span class="sd">    93m=Tmean</span>
+<span class="sd">    95m=useful gains</span>
+<span class="sd">    98m=Q_required</span>
+
+<span class="sd">    :param dwelling:</span>
+<span class="sd">    :param system:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Vcs</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_cylinder_volume</span>
+    <span class="n">Tw</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">cpsu_Tw</span>
+    <span class="n">Cmax</span> <span class="o">=</span> <span class="o">.</span><span class="mi">1456</span> <span class="o">*</span> <span class="n">Vcs</span> <span class="o">*</span> <span class="p">(</span><span class="n">Tw</span> <span class="o">-</span> <span class="mi">48</span><span class="p">)</span>
+    <span class="n">nm</span> <span class="o">=</span> <span class="n">DAYS_PER_MONTH</span>
+
+    <span class="n">Tmin</span> <span class="o">=</span> <span class="p">((</span><span class="n">dwelling</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">heat_calc_results</span><span class="p">[</span><span class="s">&#39;Tmean&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">Cmax</span> <span class="o">+</span> <span class="p">(</span>
+        <span class="mi">1000</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">hw_energy_content</span> <span class="o">/</span> <span class="p">(</span><span class="mi">24</span> <span class="o">*</span> <span class="n">nm</span><span class="p">))</span> <span class="o">-</span>
+            <span class="n">dwelling</span><span class="o">.</span><span class="n">heat_calc_results</span><span class="p">[</span><span class="s">&#39;useful_gain&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">h</span>
+
+    <span class="n">Text</span> <span class="o">=</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">Texternal_heating</span>
+    <span class="n">Eonpeak</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">Tmin</span> <span class="o">-</span> <span class="n">Text</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="mf">0.024</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="n">nm</span><span class="p">,</span>
+            <span class="p">(</span><span class="mf">0.024</span> <span class="o">*</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="n">nm</span> <span class="o">*</span> <span class="p">(</span><span class="n">Tmin</span> <span class="o">-</span> <span class="n">Text</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">Tmin</span> <span class="o">-</span> <span class="n">Text</span><span class="p">))))</span>
+
+    <span class="n">F</span> <span class="o">=</span> <span class="n">Eonpeak</span> <span class="o">/</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">hw_energy_content</span> <span class="o">+</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">Q_required</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">SUMMER_MONTHS</span><span class="p">:</span>
+        <span class="n">F</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">F</span>
+
+</div>
+<span class="k">def</span> <span class="nf">cpsu_store</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;measured_cylinder_loss&#39;</span><span class="p">):</span>
+        <span class="n">temperature_factor</span> <span class="o">=</span> <span class="o">.</span><span class="mi">89</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">temperature_factor</span> <span class="o">=</span> <span class="mf">1.08</span>
+
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;has_hw_time_control&#39;</span><span class="p">):</span>
+        <span class="n">temperature_factor</span> <span class="o">*=</span> <span class="mf">0.81</span>
+
+    <span class="c"># Check airing cupboard</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">water_sys</span><span class="p">,</span> <span class="s">&#39;cpsu_not_in_airing_cupboard&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="c"># !!! Actually this is if cpsu or thermal store not in airing cupboard</span>
+        <span class="n">temperature_factor</span> <span class="o">*=</span> <span class="mf">1.1</span>
+
+    <span class="k">return</span> <span class="n">temperature_factor</span>
+
+
+<span class="k">def</span> <span class="nf">elec_cpsu_store</span><span class="p">(</span><span class="n">dwelling</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dwelling</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;measured_cylinder_loss&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">1.09</span> <span class="o">+</span> <span class="mf">0.012</span> <span class="o">*</span> <span class="p">(</span><span class="n">dwelling</span><span class="o">.</span><span class="n">water_sys</span><span class="o">.</span><span class="n">cpsu_Tw</span> <span class="o">-</span> <span class="mi">85</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Jonathan Chambers, Andy Stone.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
