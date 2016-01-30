@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to SAPcalc’s documentation! &mdash; SAPcalc 0.1 documentation</title>
+    <title>Energy Perforamnce Certificate toolkit - EPCTK &mdash; SAPcalc 0.1 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -38,9 +38,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-sapcalc-s-documentation">
-<h1>Welcome to SAPcalc&#8217;s documentation!<a class="headerlink" href="#welcome-to-sapcalc-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
+  <div class="section" id="energy-perforamnce-certificate-toolkit-epctk">
+<h1>Energy Perforamnce Certificate toolkit - EPCTK<a class="headerlink" href="#energy-perforamnce-certificate-toolkit-epctk" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This project aims to be a free and open source implementation of
+the UK Energy Performance Certificate and underlying RdSAP and SAP
+models.</p>
+<p>It is written in Python (version 3.4 +) for easy integration with other
+data processing code, with the aim of enabling a variety of workflows.
+Particular attention will be given enabling highly automated workflows
+with large datasets. To acheive this goal a number of features are required
+(which are currently at various stages of completion)</p>
+<ul class="simple">
+<li>Implementation of SAP and RdSAP models</li>
+<li>Implementation of model-based EPC outputs</li>
+<li>Standardised data input with well defined input schema</li>
+<li>Adapter code for common data sources</li>
+<li>Reusable, documented and unit-tested code</li>
+</ul>
+</div>
+<div class="section" id="contents">
+<h2>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="part_2.html">SAP Section 2: Ventilation</a><ul>
@@ -49,54 +68,52 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tables.html">SAP Tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_a.html">Appendix A</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_a.html#appendix-a-main-and-secondary-heating-systems">Appendix A: Main and secondary heating systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_a.html#main-and-secondary-heating-systems">Main and secondary heating systems</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_b.html">Appendix B</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_b.html#appendix-b-gas-and-oil-boiler-systems-boilers-with-a-thermal-store-and-range-cooker-boilers">Appendix B: Gas and oil boiler systems, boilers with a thermal store, and range cooker boilers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_b.html#gas-and-oil-boiler-systems-boilers-with-a-thermal-store-and-range-cooker-boilers">Gas and oil boiler systems, boilers with a thermal store, and range cooker boilers</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_c.html">Appendix C</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_c.html#appendix-c-community-heating-including-schemes-with-combined-heat-and-power-chp-and-schemes-that-recover-heat-from-power-stations">Appendix C: Community heating, including schemes with Combined Heat and Power (CHP) and schemes that recover heat from power stations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_c.html#community-heating-including-schemes-with-combined-heat-and-power-chp-and-schemes-that-recover-heat-from-power-stations">Community heating, including schemes with Combined Heat and Power (CHP) and schemes that recover heat from power stations</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="appendix_d.html">Appendix D</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_d.html#id1">Appendix D</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="appendix_d.html">Appendix D</a></li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_e.html">Appendix E</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="appendix_e.html#id1">Appendix E</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_f.html">Appendix F</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_f.html#appendix-f-electric-cpsus">Appendix F: Electric CPSUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_f.html#electric-cpsus">Electric CPSUs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_g.html">Appendix G</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_g.html#appendix-g-flue-gas-heat-recovery-systems-and-waste-water-heat-recovery-systems">Appendix G: Flue gas heat recovery systems and Waste water heat recovery systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_g.html#flue-gas-heat-recovery-systems-and-waste-water-heat-recovery-systems">Flue gas heat recovery systems and Waste water heat recovery systems</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_h.html">Appendix H</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_h.html#appendix-h-solar-hot-water">Appendix H: Solar Hot Water</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_h.html#solar-hot-water">Solar Hot Water</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_j.html">Appendix J</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_j.html#appendix-j-seasonal-efficiency-for-solid-fuel-boilers-from-test-data">Appendix J: Seasonal efficiency for solid fuel boilers from test data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_j.html#seasonal-efficiency-for-solid-fuel-boilers-from-test-data">Seasonal efficiency for solid fuel boilers from test data</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_m.html">Appendix M</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_m.html#appendix-m-energy-from-photovoltaic-pv-technology-small-and-micro-wind-turbines-and-small-scale-hydro-electric-generators">Appendix M: Energy from Photovoltaic (PV) technology, small and micro wind turbines and small- scale hydro-electric generators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_m.html#energy-from-photovoltaic-pv-technology-small-and-micro-wind-turbines-and-small-scale-hydro-electric-generators">Energy from Photovoltaic (PV) technology, small and micro wind turbines and small- scale hydro-electric generators</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_n.html">Appendix N</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_n.html#appendix-n-heat-pumps-and-micro-chp">Appendix N: Heat Pumps and Micro CHP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_n.html#heat-pumps-and-micro-chp">Heat Pumps and Micro CHP</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="appendix_t.html">Appendix T</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="appendix_t.html#appendix-t-improvement-measures">Appendix T : Improvement measures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_t.html#improvement-measures">Improvement measures</a></li>
 </ul>
 </li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -116,7 +133,11 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to SAPcalc&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#">Energy Perforamnce Certificate toolkit - EPCTK</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#contents">Contents:</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 <div class="relations">
