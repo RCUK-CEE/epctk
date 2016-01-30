@@ -17,3 +17,11 @@ datasets. To acheive this goal a number of features are required
 - Standardised data input with well defined input schema
 - Adapter code for common data sources
 - Reusable, documented and unit-tested code
+
+
+License
+=======
+
+This code is published under the Educational Community License, Version 2.0.
+This is a modified version of the popular Apache Public License 2.0 with
+clauses related to educational institution-specific IP issues.
