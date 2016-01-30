@@ -59,4 +59,5 @@ docs/_build/
 target/
 
 # PyCharm
-.idea/
+.idea
+.idea/*
