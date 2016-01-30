@@ -2,5 +2,5 @@ Appendix J
 ~~~~~~~~~~
 
 
-.. automodule:: sap.appendix.appendix_j
+.. automodule:: epctk.appendix.appendix_j
    :members:

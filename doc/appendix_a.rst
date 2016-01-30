@@ -2,5 +2,5 @@ Appendix A
 ~~~~~~~~~~
 
 
-.. automodule:: sap.appendix.appendix_a
+.. automodule:: epctk.appendix.appendix_a
    :members:

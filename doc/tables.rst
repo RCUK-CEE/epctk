@@ -3,10 +3,10 @@ SAP Tables
 
 Functions and constants implementing various SAP tables
 
-.. automodule:: sap.tables
+.. automodule:: epctk.tables
    :members:
 
 
 
-.. automodule:: sap.tables.sap_tables
+.. automodule:: epctk.tables.tables_
    :members:

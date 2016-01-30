@@ -77,6 +77,21 @@ should contain "app" style code - scripts to be run from the command line
 for example.
 
 
+Building documentation pages
+----------------------------
+
+Currently, the documentation is built as a webpage and hosted using github-pages
+for simplicity, following the method described `here http://lucasbardella.com/blog/2010/02/hosting-your-sphinx-docs-in-github`_.
+In summary, you must checkout the gh-pages branch into a new folder separate
+from the folder you normally edit epctk in and set Sphinx to output the generated
+html pages into that folder by setting the ``BUILDDIR`` option. Generate the page
+and commit and push the result to gh-pages.
+
+Notes:
+
+- Do not delete the ``.nojekyll`` file.
+
+
 Contributors
 ============
 
