@@ -2,7 +2,7 @@ import collections
 import sys
 import logging
 import numpy
-import sap.tables
+import epctk.tables
 
 
 def constant(k):
@@ -90,7 +90,7 @@ def water_heater_type(dwelling):
 
     if hasattr(dwelling, 'instantaneous_pou_water_heating') and dwelling.instantaneous_pou_water_heating:
         return "electric pou instantaneous"
-    elif sap.tables.getTable3Row(dwelling) == 1:
+    elif epctk.tables.getTable3Row(dwelling) == 1:
         return "electric immersion"
     else:
         return "boiler/heat pump"
@@ -107,7 +107,7 @@ def space_heating_type(dwelling):
     # !!! Incomplete
 
     sys = dwelling.main_sys_1
-    TYPES = sap.tables.HeatingSystem.TYPES
+    TYPES = epctk.tables.HeatingSystem.TYPES
     if sys.system_type in [TYPES.combi, TYPES.cpsu, TYPES.electric_boiler, TYPES.boiler]:
         return "boiler"
     elif sys.system_type == TYPES.storage_heater:
@@ -146,25 +146,25 @@ def pressure_test_result(dwelling):
 # oil
 # biomass
 FUEL_MAPPING = {
-    sap.tables.MAINS_GAS: 'mains gas',
-    sap.tables.BULK_LPG: 'bulk lpg',
-    sap.tables.BOTTLED_LPG: 'bottled lpg',
-    sap.tables.LPG_COND18: 'bulk lpg',  # !!! Best I can do
-    sap.tables.HEATING_OIL: 'oil',
-    sap.tables.COAL: 'solid',
-    sap.tables.SMOKELESS_FUEL: 'solid',
-    sap.tables.ANTHRACITE: 'solid',
-    sap.tables.WOOD_LOGS: 'biomass',
-    sap.tables.WOOD_PELLETS_MAIN: 'biomass',
-    sap.tables.WOOD_PELLETS_SECONDARY: 'biomass',
-    sap.tables.WOOD_CHIPS: 'biomass',
-    sap.tables.DUAL_FUEL: 'solid',
-    sap.tables.B30K: 'oil',
-    sap.tables.BIODIESEL_UCO: 'oil',
-    sap.tables.ELECTRICITY_STANDARD: 'electricity',
-    sap.tables.ELECTRICITY_7HR: 'electricity',
-    sap.tables.ELECTRICITY_10HR: 'electricity',
-    sap.tables.ELECTRICITY_24HR: 'electricity',
+    epctk.tables.MAINS_GAS: 'mains gas',
+    epctk.tables.BULK_LPG: 'bulk lpg',
+    epctk.tables.BOTTLED_LPG: 'bottled lpg',
+    epctk.tables.LPG_COND18: 'bulk lpg',  # !!! Best I can do
+    epctk.tables.HEATING_OIL: 'oil',
+    epctk.tables.COAL: 'solid',
+    epctk.tables.SMOKELESS_FUEL: 'solid',
+    epctk.tables.ANTHRACITE: 'solid',
+    epctk.tables.WOOD_LOGS: 'biomass',
+    epctk.tables.WOOD_PELLETS_MAIN: 'biomass',
+    epctk.tables.WOOD_PELLETS_SECONDARY: 'biomass',
+    epctk.tables.WOOD_CHIPS: 'biomass',
+    epctk.tables.DUAL_FUEL: 'solid',
+    epctk.tables.B30K: 'oil',
+    epctk.tables.BIODIESEL_UCO: 'oil',
+    epctk.tables.ELECTRICITY_STANDARD: 'electricity',
+    epctk.tables.ELECTRICITY_7HR: 'electricity',
+    epctk.tables.ELECTRICITY_10HR: 'electricity',
+    epctk.tables.ELECTRICITY_24HR: 'electricity',
 
 }
 
@@ -180,10 +180,10 @@ ORIENTATIONS = {
 }
 
 VENTILATION_TYPES = {
-    sap.tables.VentilationTypes.NATURAL: 'natural ventilation',
-    sap.tables.VentilationTypes.MEV_CENTRALISED: 'mev',
-    sap.tables.VentilationTypes.MEV_DECENTRALISED: 'mev',
-    sap.tables.VentilationTypes.MVHR: 'balance whole house mv',
+    epctk.tables.VentilationTypes.NATURAL: 'natural ventilation',
+    epctk.tables.VentilationTypes.MEV_CENTRALISED: 'mev',
+    epctk.tables.VentilationTypes.MEV_DECENTRALISED: 'mev',
+    epctk.tables.VentilationTypes.MVHR: 'balance whole house mv',
 }
 
 ETI_MAPPING = [
@@ -401,7 +401,7 @@ def best_match_oil(winter_effy, summer_effy):
 def set_eti_boiler_type_and_effy(d):
     # Ignore second main system
     sys = d.main_sys_1
-    if sys.fuel.type() == sap.tables.FuelTypes.GAS and hasattr(sys, 'sap_appendixD_eqn'):
+    if sys.fuel.type() == epctk.tables.FuelTypes.GAS and hasattr(sys, 'sap_appendixD_eqn'):
         # A boiler from PCDF, which gives the appendix d equation directly
         appendix_d_type = appendix_d_mapping_gas[sys.sap_appendixD_eqn]
         d.eti_boiler_type = appendix_d_type[0]
@@ -409,7 +409,7 @@ def set_eti_boiler_type_and_effy(d):
     else:
         # A sap system, need to trick eti model into using correct
         # winter and summer effys
-        if sys.system_type == sap.tables.HeatingSystem.TYPES.cpsu:
+        if sys.system_type == epctk.tables.HeatingSystem.TYPES.cpsu:
             boiler_type = best_match_gas(sys.heating_effy_winter, sys.heating_effy_summer)
             d.eti_boiler_type = boiler_type[0]
             d.eti_effy = sys.heating_effy_winter - boiler_type[1]
@@ -515,8 +515,8 @@ if __name__ == '__main__':
         d.eti_haswarmairfan = d.main_sys_1.has_warm_air_fan or (
             hasattr(d, 'main_sys_2') and d.main_sys_2.has_warm_air_fan)
 
-        if not (d.main_sys_1.fuel.type() == sap.tables.FuelTypes.GAS or
-                        d.main_sys_1.fuel.type() == sap.tables.FuelTypes.OIL):
+        if not (d.main_sys_1.fuel.type() == epctk.tables.FuelTypes.GAS or
+                        d.main_sys_1.fuel.type() == epctk.tables.FuelTypes.OIL):
             # Needed to make sure interlock penalty isn't applied to
             # solid fuel boilers
             logging.info("Forcing interlock")

@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "SAP dwelling input",
+  "description": "inputs required to perform a SAP calculation",
+  "type": "object",
+
+
+  "definitions": {
+    "pressure_test": {
+      "type": "object",
+      "properties": {
+        "pressurisation_test_result_average": {"type": "float"},
+        "pressurisation_test_result": {"type": "float"},
+        "has_draught_lobby": {"type": "bool"},
+        "draught_stripping": {"type": "float"}
+      },
+        "oneOf": [
+          {"required": ["pressurisation_test_result_average"]},
+          {"required": ["pressurisation_test_result"]},
+          {"required": ["has_draught_lobby", "draught_stripping", "floor_type", "wall_type"]}
+        ]
+    },
+    "living_area": {
+      "type": "object",
+      "properties": {
+        "living_area_fraction": {"type": "float"},
+        "living_area": {"type": "float"}
+      },
+      "oneOf": [{"required": ["living_area"]},
+                 {"required":["living_area_fraction"]}]
+    },
+    "mean_heating": {
+      "type": "object",
+      "properties": {
+        "main_heating_type_code": {"type": "int"},
+        "main_heating_pcdf_id": {"type": "int"}
+      },
+      "oneOf": [{"required": ["main_heating_pcdf_id"]},
+        {"required": ["main_heating_type_code"]}]
+    }
+  },
+
+
+  "properties": {
+    //TODO: many INT properties are actually ENUMS
+    //TODO: might actually want to do Dict validation so we can reuse Enum definitions...
+    //required properties
+    "GFA": {"type": "float"},
+    "volume": {"type": "float"},
+    "Nstoreys": {"type": "int"},
+    "thermal_mass_parameter": {"type": "float"},
+    "Uthermalbridges": {"type": "float"},
+    "low_water_use": {"type": "bool"},
+    "Nflues": {"type": "int"},
+    "Nintermittentfans": {"type": "int"},
+    "Nchimneys": {"type": "int"},
+    "Npassivestacks": {"type": "int"},
+    "Nshelteredsides": {"type": "int"},
+
+    "water_heating_type_code":  {"type": "int"},
+
+    //enums
+    "sap_region": {"type": "int"},
+    "overshading": {"type": "int"},
+    "ventilation_type": {"type": "int"},
+    "control_type_code": {"type": "int"},
+
+
+
+    //optionals
+
+    "pressurisation_test_result_average": {"type": "float"},
+    "pressurisation_test_result": {"type": "float"},
+    "has_draught_lobby": {"type": "bool"},
+    "draught_stripping": {"type": "float"},
+    //enums
+    "floor_type": {"type": "int"},
+    "wall_type": {"type": "int"},
+
+    "living_area_fraction": {"type": "float"},
+    "living_area": {"type": "float"},
+
+    "main_heating_type_code": {"type": "int"},
+    "main_heating_pcdf_id": {"type": "int"},
+
+
+    // has if and only if constraint, might have to rethink or have extra validation step
+    "main_heating_oil_pump_inside_dwelling": {"type": "bool"},
+    "main_heating_fraction": {"type": "float"},
+
+    "use_immersion_heater_summer":  {"type": "bool"},
+    "immersion_type": {"type": "int"},
+
+
+    "measured_cylinder_loss": {"type": "float"},
+
+    "hw_cylinder_volume": {"type": "float"},
+    "hw_cylinder_insulation_type": {"type": "int"},
+    "hw_cylinder_insulation": {"type": "float"},
+
+    "PV_kWp": {"type": "float"},
+    "pv_overshading_category": {"type": "int"},
+
+    "hydro_electricity": {"type": "float"},
+
+    "wind_turbine_hub_height": {"type": "float"},
+    "N_wind_turbines": {"type": "int"},
+    "wind_turbine_rotor_diameter": {"type": "float"},
+    "terrain_type": {"type": "int"},
+
+    "cooled_area": {"type": "float"},
+    "fraction_cooled": {"type": "float"},
+    "cooling_compressor_control": {"type": "string"},
+    "cooling_packaged_system": {"type": "bool"},
+    "cooling_energy_label": {"type": "string"},
+  },
+
+  "required": [
+    "GFA",
+    "volume",
+    "Nstoreys",
+    "thermal_mass_parameter",
+    "Uthermalbridges",
+    "low_water_use",
+    "sap_region",
+    "overshading",
+    "ventilation_type",
+    "Nflues",
+    "Nintermittentfans",
+    "Nchimneys",
+    "Npassivestacks",
+    "Nshelteredsides",
+    "control_type_code",
+    "water_heating_type_code"
+  ],
+
+"allOf": [
+    { "$ref": "#/definitions/pressure_test" },
+    { "$ref": "#/definitions/living_area" },
+    { "$ref": "#/definitions/mean_heating" },
+    { "properties": {
+        "type": { "enum": [ "residential", "business" ] }
+      }
+    }
+  ],
+
+}

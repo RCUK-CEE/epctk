@@ -4,17 +4,17 @@ import pickle
 import sys
 import unittest
 
-from sap import runner
-from sap.dwelling import Dwelling, log_dwelling
-from sap.io import input_conversion_rules, yaml_io
-from sap.utils import SAPCalculationError, ALL_PARAMS
-import sap.appendix.appendix_t
+from epctk import runner
+from epctk.dwelling import Dwelling, log_dwelling
+from epctk.io import input_conversion_rules, yaml_io
+from epctk.utils import SAPCalculationError, ALL_PARAMS
+import epctk.appendix.appendix_t
 
 from tests import output_checker
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES, SKIP
 
-_FOLDER = os.path.dirname(__file__)
+_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', 'data_private', 'bre_test_cases')
 
 SAP_REGIONS = {
     '2.rtf': 11,
@@ -125,7 +125,7 @@ def run_dwelling(fname, dwelling):
     runner.run_sap(dwelling)
     runner.run_fee(dwelling)
     runner.run_der(dwelling)
-    sap.appendix.appendix_t.run_ter(dwelling)
+    epctk.appendix.appendix_t.run_ter(dwelling)
 
     # FIXME: ongoing problems in applying Appendix T improvements
     # sap.appendix.appendix_t.run_improvements(dwelling)

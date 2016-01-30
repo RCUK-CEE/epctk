@@ -1,6 +1,6 @@
 import logging
 
-from sap.utils import sum_summer, sum_winter, float_or_zero
+from epctk.utils import sum_summer, sum_winter, float_or_zero
 
 
 def check_result(calctype, actual, target, desc, max_err=0.1):

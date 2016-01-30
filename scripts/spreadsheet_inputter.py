@@ -2,15 +2,15 @@ import logging
 
 import win32com.client
 
-import sap.appendix.appendix_t
-import sap.elements.sap_types
-from sap import runner
-from sap.dwelling import Dwelling
-from sap.elements.sap_types import (GlazingTypes, VentilationTypes, HeatEmitters, ImmersionTypes,
-                                    CylinderInsulationTypes, DuctTypes, WallTypes, FloorTypes,
-                                    PVOvershading, SHWCollectorTypes, LoadCompensators, HeatingTypes,
-                                    TerrainTypes)
-from sap.io import input_conversion_rules
+import epctk.appendix.appendix_t
+import epctk.elements.sap_types
+from epctk import runner
+from epctk.dwelling import Dwelling
+from epctk.elements.sap_types import (GlazingTypes, VentilationTypes, HeatEmitters, ImmersionTypes,
+                                      CylinderInsulationTypes, DuctTypes, WallTypes, FloorTypes,
+                                      PVOvershading, SHWCollectorTypes, LoadCompensators, HeatingTypes,
+                                      TerrainTypes)
+from epctk.io import input_conversion_rules
 from tests import reference_case_parser
 from tests.output_checker import check_monthly_result, check_result, check_summer_monthly_result
 
@@ -70,11 +70,11 @@ GLAZING_TYPES = {
 }
 
 ELEMENT_TYPES = {
-    sap.elements.sap_types.HeatLossElementTypes.EXTERNAL_WALL: "External wall",
-    sap.elements.sap_types.HeatLossElementTypes.PARTY_WALL: "Party wall",
-    sap.elements.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR: "Ground floor",
-    sap.elements.sap_types.HeatLossElementTypes.EXTERNAL_ROOF: "Roof",
-    sap.elements.sap_types.HeatLossElementTypes.OPAQUE_DOOR: "Opaque door",
+    epctk.elements.sap_types.HeatLossElementTypes.EXTERNAL_WALL: "External wall",
+    epctk.elements.sap_types.HeatLossElementTypes.PARTY_WALL: "Party wall",
+    epctk.elements.sap_types.HeatLossElementTypes.EXTERNAL_FLOOR: "Ground floor",
+    epctk.elements.sap_types.HeatLossElementTypes.EXTERNAL_ROOF: "Roof",
+    epctk.elements.sap_types.HeatLossElementTypes.OPAQUE_DOOR: "Opaque door",
 }
 
 
@@ -286,7 +286,7 @@ def process_envelope_elements(xlbook, d):
 
 
 def process_solid_elements(xlbook, d):
-    doors = [el for el in d.heat_loss_elements if el.element_type == sap.elements.sap_types.HeatLossElementTypes.OPAQUE_DOOR]
+    doors = [el for el in d.heat_loss_elements if el.element_type == epctk.elements.sap_types.HeatLossElementTypes.OPAQUE_DOOR]
     assert len(doors) == 1
 
     xlbook.set_opaque_element(
@@ -297,8 +297,8 @@ def process_solid_elements(xlbook, d):
     idx = 1
 
     for el in [el for el in d.heat_loss_elements if not el.element_type in [
-        sap.elements.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
-        sap.elements.sap_types.HeatLossElementTypes.GLAZING,
+        epctk.elements.sap_types.HeatLossElementTypes.OPAQUE_DOOR,
+        epctk.elements.sap_types.HeatLossElementTypes.GLAZING,
     ]]:
         xlbook.set_opaque_element(
             idx,
@@ -354,7 +354,7 @@ def process_glazing_elements(xlbook, d):
             if not roof_windows[0].orientation_degrees == rw.orientation_degrees:
                 raise CannotDoInSpreadsheetError("More than one roof window orientation")
 
-        combined_window = sap.elements.sap_types.Opening(
+        combined_window = epctk.elements.sap_types.Opening(
             sum(rw.area for rw in roof_windows),
             roof_windows[0].orientation_degrees,
             rtype)
@@ -893,7 +893,7 @@ def run_dwelling(xlbook, d, can_run_fee, can_run_der, can_run_ter):
     write_to_excel(xlbook, d)
     runner.run_fee(d)
     runner.run_der(d)
-    sap.appendix.appendix_t.run_ter(d)
+    epctk.appendix.appendix_t.run_ter(d)
     runner.run_sap(d)
 
     if can_run_der:

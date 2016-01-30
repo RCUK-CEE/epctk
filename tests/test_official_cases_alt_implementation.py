@@ -6,11 +6,11 @@ import sys
 
 from tests import  output_checker
 
-import sap.appendix.appendix_t
-from sap import runner
-from sap.dwelling import log_dwelling_params, log_dwelling, ParamTrackerDwelling
-from sap.io import input_conversion_rules, yaml_io
-from sap.utils import SAPCalculationError, CALC_STAGE, ALL_PARAMS
+import epctk.appendix.appendix_t
+from epctk import runner
+from epctk.dwelling import log_dwelling_params, log_dwelling, ParamTrackerDwelling
+from epctk.io import input_conversion_rules, yaml_io
+from epctk.utils import SAPCalculationError, CALC_STAGE, ALL_PARAMS
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES, SKIP
 
@@ -112,10 +112,10 @@ def add_sap_region(dwelling, fname):
 
 def run_dwelling(dwelling):
     runner.run_sap(dwelling)
-    sap.appendix.appendix_t.run_improvements(dwelling)
+    epctk.appendix.appendix_t.run_improvements(dwelling)
     runner.run_fee(dwelling)
     runner.run_der(dwelling)
-    sap.appendix.appendix_t.run_ter(dwelling)
+    epctk.appendix.appendix_t.run_ter(dwelling)
 
 
 def get_dwelling(fname, force_reparse):
