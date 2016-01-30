@@ -1,5 +1,5 @@
-SAP Section 2: Ventilation
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+SAP Section 2
+~~~~~~~~~~~~~
 
 .. todo:
     Complete documentation on implementation of ventilation

@@ -1,6 +1,6 @@
 """
-SAP Section 2: Ventilation
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ventilation
+~~~~~~~~~~~
 
 Configure the ventilation according to section 2 of SAP
 

@@ -1,6 +1,6 @@
 """
-Appendix F: Electric CPSUs
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Electric CPSUs
+~~~~~~~~~~~~~~
 
 An electric CPSU is a central heating system providing space and domestic water heating.
 Primary water heated mainly during low-rate periods to up to 95°C in winter is stored

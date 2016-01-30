@@ -1,6 +1,6 @@
 """
-Appendix H: Solar Hot Water
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Solar Hot Water
+~~~~~~~~~~~~~~~
 
 """
 from ..tables import TABLE_H1, TABLE_H2, TABLE_H3, TABLE_H4

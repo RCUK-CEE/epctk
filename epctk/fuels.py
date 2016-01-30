@@ -156,8 +156,6 @@ class ElectricityTariff(Fuel):
     Assumes that on and off peak standing charge is same
     """
 
-    # TODO: Similar setup to Fuel, decide whether to just subclass...
-
     def __init__(self, on_peak_fuel_code, off_peak_fuel_code,
                  general_elec_on_peak_fraction, mech_vent_on_peak_fraction):
 

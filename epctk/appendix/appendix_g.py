@@ -1,6 +1,6 @@
 """
-Appendix G: Flue gas heat recovery systems and Waste water heat recovery systems
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Flue gas heat recovery systems and Waste water heat recovery systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 import math

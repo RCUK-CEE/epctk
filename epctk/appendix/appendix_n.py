@@ -1,6 +1,6 @@
 """
-Appendix N: Heat Pumps and Micro CHP
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Heat Pumps and Micro CHP
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Additional tables and functions implementing Appendix N of SAP
 which describes heat pumps and micro CHP units

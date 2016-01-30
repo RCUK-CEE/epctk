@@ -34,12 +34,12 @@ be accepted, to be later rejected if they do not pass internal testing.
 Coding guidelines
 -----------------
 
-Code should be formatted according to the `Python PEP8 https://www.python.org/dev/peps/pep-0008/`_
+Code should be formatted according to the `Python PEP8 <https://www.python.org/dev/peps/pep-0008/>`_
 guidelines, with the exception that lines should merely be of "reasonable" length (80 - 120 characters). 
 In general, readability trumps line length.
 
 Documentation is **not optional**! Please follow the 
-`Google python documentation http://google.github.io/styleguide/pyguide.html?showone=Comments#Comments`_
+`Google python documentation <http://google.github.io/styleguide/pyguide.html?showone=Comments#Comments>`_
 style for documentation comments in modules, functions, classes, and methods.
 In addition, project-wide documentation is created with Sphinx, using 
 "narrative" style documentation written in the ``.rst`` format files in the ``doc/`` folder.
@@ -56,7 +56,7 @@ Aim for descriptive variable names, intuitive logic flow, straightforward archit
 
 Package dependencies are defined in setup.py and requirements.txt. If you add a dependency,
 add it to both theses files - just be name in setup.py and with a recommended version
-in requirements.txt. See `here https://caremad.io/2013/07/setup-vs-requirement/`_ for
+in requirements.txt. See `here <https://caremad.io/2013/07/setup-vs-requirement/>`_ for
 more information on how to do this.
 
 
@@ -81,7 +81,7 @@ Building documentation pages
 ----------------------------
 
 Currently, the documentation is built as a webpage and hosted using github-pages
-for simplicity, following the method described `here http://lucasbardella.com/blog/2010/02/hosting-your-sphinx-docs-in-github`_.
+for simplicity, following the method described `here <http://lucasbardella.com/blog/2010/02/hosting-your-sphinx-docs-in-github>`_.
 In summary, you must checkout the gh-pages branch into a new folder separate
 from the folder you normally edit epctk in and set Sphinx to output the generated
 html pages into that folder by setting the ``BUILDDIR`` option. Generate the page

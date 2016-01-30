@@ -1,6 +1,6 @@
 """
-Appendix J: Seasonal efficiency for solid fuel boilers from test data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Seasonal efficiency for solid fuel boilers from test data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This appendix specifies how to obtain a seasonal efficiency from test data on a solid
 fuel boiler that is provided in the Product Characteristics Database. A database

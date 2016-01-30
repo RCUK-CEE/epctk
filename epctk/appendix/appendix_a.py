@@ -1,6 +1,6 @@
 """
-Appendix A: Main and secondary heating systems
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Main and secondary heating systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The main heating system is that which heats the largest proportion of dwelling.
 It is a heating system which is not usually based on individual room heaters
