@@ -12,8 +12,8 @@ Steps for contributing to epctk
 -------------------------------
 
 1. Choose a github issue to work on. If none exists which describes the changes 
-you want to make, please write one detailing the problem you aim to solve or 
-the feature you want to add.
+   you want to make, please write one detailing the problem you aim to solve or
+   the feature you want to add.
 2. Checkout the code from github
 3. Create a new branch to work on. This will help with organisation.
 4. Make your changes, following the coding guidelines for style and testing described below.
