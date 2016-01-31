@@ -36,14 +36,13 @@ def heat_loss(dwelling):
 
     h_vent = 0.33 * dwelling.infiltration_ach * dwelling.volume
 
-    dwelling.h = UA + h_bridging + h_vent
-    dwelling.hlp = dwelling.h / dwelling.GFA
-
-    dwelling.h_fabric = UA
-    dwelling.h_bridging = h_bridging
-    dwelling.h_vent = h_vent
-
-    dwelling.h_vent_annual = monthly_to_annual(h_vent)
+    return dict(
+    h = UA + h_bridging + h_vent,
+    hlp = dwelling.h / dwelling.GFA,
+    h_fabric = UA,
+    h_bridging = h_bridging,
+    h_vent = h_vent,
+    h_vent_annual = monthly_to_annual(h_vent))
 
 
 def water_heater_output(dwelling):
@@ -474,8 +473,10 @@ def perform_demand_calc(dwelling):
 
     # todo: convert the rest of these to use "update" semantics
     ventilation(dwelling)
-    heat_loss(dwelling)
-    hot_water_use(dwelling)
+
+    dwelling.update(heat_loss(dwelling))
+
+    dwelling.update(hot_water_use(dwelling))
 
     dwelling.update(lighting_consumption(dwelling))
 

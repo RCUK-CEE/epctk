@@ -25,9 +25,9 @@ def get_water_heater(dwelling):
     if code in TABLE_4A:
         water_system = get_4a_system(dwelling.electricity_tariff, code)
         water_sys = DedicatedWaterSystem(dwelling.water_sys_fuel,
-                                                  water_system['effy'],
-                                                  dwelling.use_immersion_heater_summer if dwelling.get(
-                                                          'use_immersion_heater_summer') else False)
+                                         water_system['effy'],
+                                         dwelling.use_immersion_heater_summer if dwelling.get(
+                                             'use_immersion_heater_summer') else False)
         water_sys.table2b_row = water_system['table2b_row']
 
     elif code == 901:  # from main
@@ -44,8 +44,8 @@ def get_water_heater(dwelling):
     elif code == 950:  # community dhw only
         # TODO Community hot water based on sap defaults not handled
         water_sys = appendix_c.CommunityHeating(
-                dwelling.community_heat_sources_dhw,
-                dwelling.get('sap_community_distribution_type_dhw'))
+            dwelling.community_heat_sources_dhw,
+            dwelling.get('sap_community_distribution_type_dhw'))
 
         if dwelling.get('community_dhw_flat_rate_charging'):
             water_sys.dhw_charging_factor = 1.05
@@ -117,41 +117,58 @@ def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
     return Qsolar
 
 
+def hot_water_from_solar(dwelling, hw_energy_content, savings_from_wwhrs, primary_circuit_loss_annual, primary_circuit_loss):
+    if dwelling.get('solar_collector_aperture') is not None:
+        input_from_solar = solar_system_output(dwelling,
+                                               hw_energy_content - savings_from_wwhrs,
+                                               dwelling.daily_hot_water_use)
+
+        if primary_circuit_loss_annual > 0 and dwelling.hw_cylinder_volume > 0 and dwelling.has_cylinderstat:
+            primary_circuit_loss *= TABLE_H5
+    else:
+        input_from_solar = 0
+    return input_from_solar
+
+
 def hot_water_use(dwelling):
     """
-    Calculate the dwelling hot water use, assign the result as
-    attribute on dwelling
+    Calculate hot water use variables.
 
-    :param dwelling:
-    :return:
+    .. todo::
+        break function into smaller chunks...
+
+    Args:
+        dwelling:
+
+    Returns:
+
     """
-    dwelling.hw_use_daily = dwelling.daily_hot_water_use * MONTHLY_HOT_WATER_FACTORS
+    hw_use_daily = dwelling.daily_hot_water_use * MONTHLY_HOT_WATER_FACTORS
 
-    dwelling.hw_energy_content = (4.19 / 3600.) * dwelling.hw_use_daily * \
-                                 DAYS_PER_MONTH * MONTHLY_HOT_WATER_TEMPERATURE_RISE
+    hw_energy_content = (4.19 / 3600.0) * hw_use_daily * DAYS_PER_MONTH * MONTHLY_HOT_WATER_TEMPERATURE_RISE
 
     if dwelling.get('instantaneous_pou_water_heating'):
-        dwelling.distribution_loss = 0
-        dwelling.storage_loss = 0
+        distribution_loss = 0
+        storage_loss = 0
 
     else:
-        dwelling.distribution_loss = 0.15 * dwelling.hw_energy_content
+        distribution_loss = 0.15 * hw_energy_content
 
         if dwelling.get('measured_cylinder_loss') is not None:
-            dwelling.storage_loss = dwelling.measured_cylinder_loss * \
-                                    dwelling.temperature_factor * DAYS_PER_MONTH
+            storage_loss = dwelling.measured_cylinder_loss * \
+                           dwelling.temperature_factor * DAYS_PER_MONTH
 
         elif dwelling.get('hw_cylinder_volume') is not None:
             cylinder_loss = dwelling.hw_cylinder_volume * dwelling.storage_loss_factor * \
                             dwelling.volume_factor * dwelling.temperature_factor
-            dwelling.storage_loss = cylinder_loss * DAYS_PER_MONTH
+            storage_loss = cylinder_loss * DAYS_PER_MONTH
 
         else:
-            dwelling.storage_loss = 0
+            storage_loss = 0
 
     if dwelling.get("solar_storage_combined_cylinder"):
-        dwelling.storage_loss *= (dwelling.hw_cylinder_volume -
-                                  dwelling.solar_dedicated_storage_volume) / dwelling.hw_cylinder_volume
+        storage_loss *= (dwelling.hw_cylinder_volume -
+                         dwelling.solar_dedicated_storage_volume) / dwelling.hw_cylinder_volume
 
     if dwelling.get('primary_loss_override') is not None:
         primary_circuit_loss_annual = dwelling.primary_loss_override
@@ -159,53 +176,62 @@ def hot_water_use(dwelling):
         primary_circuit_loss_annual = dwelling.primary_circuit_loss_annual
 
     # This will produce and array Array
-    dwelling.primary_circuit_loss = (primary_circuit_loss_annual / 365.0) * DAYS_PER_MONTH  # type: numpy.array
+    primary_circuit_loss = (primary_circuit_loss_annual / 365.0) * DAYS_PER_MONTH  # type: numpy.array
 
     if dwelling.get('combi_loss') is not None:
-        dwelling.combi_loss_monthly = dwelling.combi_loss(dwelling.hw_use_daily) * DAYS_PER_MONTH / 365
+        combi_loss_monthly = dwelling.combi_loss(hw_use_daily) * DAYS_PER_MONTH / 365
     else:
-        dwelling.combi_loss_monthly = 0
+        combi_loss_monthly = 0
 
     if dwelling.get('use_immersion_heater_summer', False):
         for i in SUMMER_MONTHS:
-            dwelling.primary_circuit_loss[i] = 0
+            primary_circuit_loss[i] = 0
 
     if dwelling.get('wwhr_systems') is not None:
-        dwelling.savings_from_wwhrs = appendix_g.wwhr_savings(dwelling)
+        savings_from_wwhrs = appendix_g.wwhr_savings(dwelling)
     else:
-        dwelling.savings_from_wwhrs = 0
+        savings_from_wwhrs = 0
 
-    if dwelling.get('solar_collector_aperture') is not None:
-        dwelling.input_from_solar = solar_system_output(dwelling,
-                                                        dwelling.hw_energy_content - dwelling.savings_from_wwhrs,
-                                                        dwelling.daily_hot_water_use)
-
-        if primary_circuit_loss_annual > 0 and dwelling.hw_cylinder_volume > 0 and dwelling.has_cylinderstat:
-            dwelling.primary_circuit_loss *= TABLE_H5
-    else:
-        dwelling.input_from_solar = 0
+    # Note: important that solar collector only done after wwhr savings included
+    input_from_solar = hot_water_from_solar(dwelling, hw_energy_content, savings_from_wwhrs,
+                                            primary_circuit_loss_annual, primary_circuit_loss)
 
     if dwelling.get('fghrs') is not None and dwelling.fghrs['has_pv_module']:
-        dwelling.fghrs_input_from_solar = fghrs_solar_input(dwelling,
-                                                            dwelling.fghrs,
-                                                            dwelling.hw_energy_content,
-                                                            dwelling.daily_hot_water_use)
+        fghrs_input_from_solar = fghrs_solar_input(dwelling,
+                                                   dwelling.fghrs,
+                                                   hw_energy_content,
+                                                   dwelling.daily_hot_water_use)
     else:
-        dwelling.fghrs_input_from_solar = 0
+        fghrs_input_from_solar = 0
 
-    dwelling.total_water_heating = 0.85 * dwelling.hw_energy_content + dwelling.distribution_loss + \
-                                   dwelling.storage_loss + dwelling.primary_circuit_loss + \
-                                   dwelling.combi_loss_monthly
+    total_water_heating = 0.85 * hw_energy_content + distribution_loss + \
+                          storage_loss + primary_circuit_loss + \
+                          combi_loss_monthly
 
     # Assumes the cylinder is in the heated space if input is missing
     # i.e default value is True if missing
     if dwelling.get('cylinder_in_heated_space', True):
-        dwelling.heat_gains_from_hw = 0.25 * (0.85 * dwelling.hw_energy_content + dwelling.combi_loss_monthly) + 0.8 * (
-            dwelling.distribution_loss + dwelling.primary_circuit_loss)
+        heat_gains_from_hw = 0.25 * (0.85 * hw_energy_content + combi_loss_monthly) + 0.8 * (
+            distribution_loss + primary_circuit_loss)
     else:
-        dwelling.heat_gains_from_hw = 0.25 * (0.85 * dwelling.hw_energy_content + dwelling.combi_loss_monthly) + 0.8 * (
-            dwelling.distribution_loss + dwelling.storage_loss + dwelling.primary_circuit_loss)
-    dwelling.heat_gains_from_hw = numpy.maximum(0, dwelling.heat_gains_from_hw)
+        heat_gains_from_hw = 0.25 * (0.85 * hw_energy_content + combi_loss_monthly) + 0.8 * (
+            distribution_loss + storage_loss + primary_circuit_loss)
+
+        heat_gains_from_hw = numpy.maximum(0, heat_gains_from_hw)
+
+    return dict(
+        hw_use_daily=hw_use_daily,
+        hw_energy_content=hw_energy_content,
+        total_water_heating=total_water_heating,
+        storage_loss=storage_loss,
+        distribution_loss=distribution_loss,
+        primary_circuit_loss=primary_circuit_loss,
+        combi_loss_monthly=combi_loss_monthly,
+        heat_gains_from_hw=heat_gains_from_hw,
+        input_from_solar=input_from_solar,
+        fghrs_input_from_solar=fghrs_input_from_solar,
+        savings_from_wwhrs=savings_from_wwhrs
+    )
 
 
 def fghrs_solar_input(dwelling, fghrs, hw_energy_content, daily_hot_water_use):
@@ -223,7 +249,7 @@ def fghrs_solar_input(dwelling, fghrs, hw_energy_content, daily_hot_water_use):
 
     volume_ratio = effective_solar_volume / daily_hot_water_use
     storage_volume_factor = numpy.minimum(
-            1., 1 + 0.2 * numpy.log(volume_ratio))
+        1., 1 + 0.2 * numpy.log(volume_ratio))
     Qsolar_annual = available_energy * utilisation * storage_volume_factor
     Qsolar = -Qsolar_annual * \
              dwelling.fghrs['monthly_solar_hw_factors'] * DAYS_PER_MONTH / 365
