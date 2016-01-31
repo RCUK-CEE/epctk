@@ -3,6 +3,8 @@
   "title": "SAP dwelling input",
   "description": "inputs required to perform a SAP calculation",
   "type": "object",
+  "additionalProperties": false,
+
   "definitions": {
     "pressure_test": {
       "properties": {
@@ -128,7 +130,7 @@
     },
     "pv": {
       //TODO need 'all or nothing' so i think you want oneOf with [{}, {...}]
-
+//      "oneOf": [{}, ]
       "properties": {
         "PV_kWp": {
           "type": "float"
