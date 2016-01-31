@@ -1,19 +1,19 @@
-from .heating_loaders import sedbuk_2005_heating_system, sedbuk_2009_heating_system, pcdf_heating_system
-
-from .elements import HeatingTypes
-from .ventilation import infiltration
+from epctk.cooling import configure_cooling_system
+from epctk.domestic_hot_water import hw_primary_circuit_loss
+from . import fuels
 from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
 from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
 from .domestic_hot_water import get_water_heater
+from .elements import HeatingTypes
 from .fuel_use import configure_fuel_costs
-from . import fuels
 from .fuels import ELECTRICITY_STANDARD
+from .heating_loaders import sedbuk_2005_heating_system, sedbuk_2009_heating_system, pcdf_heating_system
 from .solar import overshading_factors
-from .tables import (table_1b_occupancy, table_1b_daily_hot_water, TABLE_3, TABLE_10, TABLE_10C,
-                     table_2a_hot_water_vol_factor, table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,
+from .tables import (table_1b_occupancy, table_1b_daily_hot_water, TABLE_10, table_2a_hot_water_vol_factor, table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,
                      TABLE_4D, TABLE_4E, table_4f_fans_pumps_keep_hot, apply_table_4e,
                      table_5a_fans_and_pumps_gain)
 from .ventilation import configure_ventilation
+from .ventilation import infiltration
 
 
 def configure_responsiveness(dwelling):
@@ -307,114 +307,6 @@ def configure_fans_and_pumps(dwelling):
 
     configure_responsiveness(dwelling)
     configure_fuel_costs(dwelling)
-
-
-def configure_cooling_system(dwelling):
-    """
-    Part 10 SPACE COOLING REQUIREMENT
-
-    The space cooling requirement should always be calculated (section 8c of the worksheet).
-    It is included in the DER and ratings if the dwelling has a fixed air conditioning system.
-    This is based on standardised cooling patterns of 6 hours/day operation and cooling of part
-    of or all the dwelling to 24°C. Details are given in Tables 10, 10a and 10b and the associated equations.
-
-    Args:
-        dwelling:
-
-    Returns:
-
-    """
-    if dwelling.get('cooled_area') and dwelling.cooled_area > 0:
-        dwelling.fraction_cooled = dwelling.cooled_area / dwelling.GFA
-
-        if dwelling.get("cooling_tested_eer"):
-            cooling_eer = dwelling.cooling_tested_eer
-        elif dwelling.cooling_packaged_system:
-            cooling_eer = TABLE_10C[dwelling.cooling_energy_label]['packaged_sys_eer']
-        else:
-            cooling_eer = TABLE_10C[dwelling.cooling_energy_label]['split_sys_eer']
-
-        if dwelling.cooling_compressor_control == 'on/off':
-            dwelling.cooling_seer = 1.25 * cooling_eer
-        else:
-            dwelling.cooling_seer = 1.35 * cooling_eer
-    else:
-        dwelling.fraction_cooled = 0
-        dwelling.cooling_seer = 1  # Need a number, but doesn't matter what
-
-
-def get_table3_row(dwelling):
-    """
-    Get the row number from Table 3 for the given dwelling
-    by finding the row corresponding to the dwellings' combination of heating
-    type codes and thermal storage.
-
-    This implements the logic of section 4.2 Storage loss, and is used through the
-    hw_primary_circuit_loss function
-
-    Args:
-        dwelling (Dwelling):
-    
-    Returns:
-        Table 3 row corresponding to this dwelling properties
-    """
-    if dwelling.water_heating_type_code == 901:
-        # !!! Also need to do this for second main system?
-
-        # Water heating with main
-        if dwelling.main_sys_1.system_type == HeatingTypes.cpsu:
-            return 7
-        if (dwelling.get('main_heating_type_code') and
-                    dwelling.main_heating_type_code == 191):
-            return 1
-
-    if dwelling.water_sys.system_type in [HeatingTypes.combi,
-                                          HeatingTypes.storage_combi]:
-        return 6
-
-    elif dwelling.water_heating_type_code == 903:
-        # Immersion
-        return 1
-
-    elif dwelling.community_heating_dhw:
-        # Community heating
-        return 12
-
-    elif dwelling.get('cylinder_is_thermal_store'):
-        # !!! Need to check length of pipework here and insulation
-        return 10
-
-    elif (dwelling.water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
-                                             HeatingTypes.microchp]
-          and dwelling.water_sys.has_integral_store):
-        return 8
-
-    elif dwelling.has_hw_cylinder:
-        # Cylinder !!! Cylinderstat should be assumed to be present
-        # for CPSU, electric immersion, etc - see 9.3.7
-        if dwelling.has_cylinderstat and dwelling.primary_pipework_insulated:
-            return 5
-        elif dwelling.has_cylinderstat or dwelling.primary_pipework_insulated:
-            return 3  # row 4 is the same
-        else:
-            return 2
-
-    else:
-        # Must be combi?
-        raise Exception("Must be combi?")
-        # return 6
-
-
-def hw_primary_circuit_loss(dwelling):
-    """
-    Hot water primary circuit losses according to the logic described in
-    Section 4.2.
-
-    :param dwelling:
-    :return:
-    """
-    table3row = get_table3_row(dwelling)
-    return TABLE_3[table3row]
 
 
 def set_regional_properties(dwelling):

@@ -5,7 +5,8 @@ import numpy
 from .appendix import appendix_c, appendix_g
 from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
 from .elements import HeatingTypes, DedicatedWaterSystem
-from .tables import TABLE_4A, get_4a_system, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE, TABLE_H5
+from .tables import (TABLE_3, TABLE_4A, get_4a_system, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
+                     TABLE_H5)
 from .utils import SAPInputError
 
 
@@ -26,8 +27,7 @@ def get_water_heater(dwelling):
         water_system = get_4a_system(dwelling.electricity_tariff, code)
         water_sys = DedicatedWaterSystem(dwelling.water_sys_fuel,
                                          water_system['effy'],
-                                         dwelling.use_immersion_heater_summer if dwelling.get(
-                                             'use_immersion_heater_summer') else False)
+                                         dwelling.get('use_immersion_heater_summer', False))
         water_sys.table2b_row = water_system['table2b_row']
 
     elif code == 901:  # from main
@@ -117,36 +117,7 @@ def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
     return Qsolar
 
 
-def hot_water_from_solar(dwelling, hw_energy_content, savings_from_wwhrs, primary_circuit_loss_annual, primary_circuit_loss):
-    if dwelling.get('solar_collector_aperture') is not None:
-        input_from_solar = solar_system_output(dwelling,
-                                               hw_energy_content - savings_from_wwhrs,
-                                               dwelling.daily_hot_water_use)
-
-        if primary_circuit_loss_annual > 0 and dwelling.hw_cylinder_volume > 0 and dwelling.has_cylinderstat:
-            primary_circuit_loss *= TABLE_H5
-    else:
-        input_from_solar = 0
-    return input_from_solar
-
-
-def hot_water_use(dwelling):
-    """
-    Calculate hot water use variables.
-
-    .. todo::
-        break function into smaller chunks...
-
-    Args:
-        dwelling:
-
-    Returns:
-
-    """
-    hw_use_daily = dwelling.daily_hot_water_use * MONTHLY_HOT_WATER_FACTORS
-
-    hw_energy_content = (4.19 / 3600.0) * hw_use_daily * DAYS_PER_MONTH * MONTHLY_HOT_WATER_TEMPERATURE_RISE
-
+def distribution_storage_loss(dwelling, hw_energy_content):
     if dwelling.get('instantaneous_pou_water_heating'):
         distribution_loss = 0
         storage_loss = 0
@@ -166,6 +137,45 @@ def hot_water_use(dwelling):
         else:
             storage_loss = 0
 
+    return distribution_loss, storage_loss
+
+
+def hot_water_from_solar(dwelling, hw_energy_content, savings_from_wwhrs, primary_circuit_loss_annual,
+                         primary_circuit_loss):
+    if dwelling.get('solar_collector_aperture') is not None:
+        input_from_solar = solar_system_output(dwelling,
+                                               hw_energy_content - savings_from_wwhrs,
+                                               dwelling.daily_hot_water_use)
+
+        if primary_circuit_loss_annual > 0 and dwelling.hw_cylinder_volume > 0 and dwelling.has_cylinderstat:
+            primary_circuit_loss *= TABLE_H5
+    else:
+        input_from_solar = 0
+    return input_from_solar
+
+
+def hot_water_use(dwelling):
+    """
+    Calculate hot water use variables.
+
+    .. todo::
+        break function into smaller chunks. Could probably string together a series of .updates
+        for each sub-section.
+
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
+    hot_water_use_variables = {}
+
+    hw_use_daily = dwelling.daily_hot_water_use * MONTHLY_HOT_WATER_FACTORS
+
+    hw_energy_content = (4.19 / 3600.0) * hw_use_daily * DAYS_PER_MONTH * MONTHLY_HOT_WATER_TEMPERATURE_RISE
+
+    distribution_loss, storage_loss = distribution_storage_loss(dwelling, hw_energy_content)
+
     if dwelling.get("solar_storage_combined_cylinder"):
         storage_loss *= (dwelling.hw_cylinder_volume -
                          dwelling.solar_dedicated_storage_volume) / dwelling.hw_cylinder_volume
@@ -175,7 +185,7 @@ def hot_water_use(dwelling):
     else:
         primary_circuit_loss_annual = dwelling.primary_circuit_loss_annual
 
-    # This will produce and array Array
+    # This will produce an Array
     primary_circuit_loss = (primary_circuit_loss_annual / 365.0) * DAYS_PER_MONTH  # type: numpy.array
 
     if dwelling.get('combi_loss') is not None:
@@ -192,7 +202,6 @@ def hot_water_use(dwelling):
     else:
         savings_from_wwhrs = 0
 
-    # Note: important that solar collector only done after wwhr savings included
     input_from_solar = hot_water_from_solar(dwelling, hw_energy_content, savings_from_wwhrs,
                                             primary_circuit_loss_annual, primary_circuit_loss)
 
@@ -255,3 +264,77 @@ def fghrs_solar_input(dwelling, fghrs, hw_energy_content, daily_hot_water_use):
              dwelling.fghrs['monthly_solar_hw_factors'] * DAYS_PER_MONTH / 365
 
     return Qsolar
+
+
+def get_table3_row(dwelling):
+    """
+    Get the row number from Table 3 for the given dwelling
+    by finding the row corresponding to the dwellings' combination of heating
+    type codes and thermal storage.
+
+    This implements the logic of section 4.2 Storage loss, and is used through the
+    hw_primary_circuit_loss function
+
+    Args:
+        dwelling (Dwelling):
+
+    Returns:
+        Table 3 row corresponding to this dwelling properties
+    """
+    if dwelling.water_heating_type_code == 901:
+        # !!! Also need to do this for second main system?
+
+        # Water heating with main
+        if dwelling.main_sys_1.system_type == HeatingTypes.cpsu:
+            return 7
+        if (dwelling.get('main_heating_type_code') and
+                    dwelling.main_heating_type_code == 191):
+            return 1
+
+    if dwelling.water_sys.system_type in [HeatingTypes.combi,
+                                          HeatingTypes.storage_combi]:
+        return 6
+
+    elif dwelling.water_heating_type_code == 903:
+        # Immersion
+        return 1
+
+    elif dwelling.community_heating_dhw:
+        # Community heating
+        return 12
+
+    elif dwelling.get('cylinder_is_thermal_store'):
+        # !!! Need to check length of pipework here and insulation
+        return 10
+
+    elif (dwelling.water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
+                                             HeatingTypes.microchp]
+          and dwelling.water_sys.has_integral_store):
+        return 8
+
+    elif dwelling.has_hw_cylinder:
+        # Cylinder !!! Cylinderstat should be assumed to be present
+        # for CPSU, electric immersion, etc - see 9.3.7
+        if dwelling.has_cylinderstat and dwelling.primary_pipework_insulated:
+            return 5
+        elif dwelling.has_cylinderstat or dwelling.primary_pipework_insulated:
+            return 3  # row 4 is the same
+        else:
+            return 2
+
+    else:
+        # Must be combi?
+        raise Exception("Must be combi?")
+        # return 6
+
+
+def hw_primary_circuit_loss(dwelling):
+    """
+    Hot water primary circuit losses according to the logic described in
+    Section 4.2.
+
+    :param dwelling:
+    :return:
+    """
+    table3row = get_table3_row(dwelling)
+    return TABLE_3[table3row]

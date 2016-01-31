@@ -24,6 +24,7 @@ def print_results(casenum, res):
 
     for val in results:
         sys.stdout.write("%s," % (val,))
+
     sys.stdout.write("\n")
     sys.stdout.flush()
 
