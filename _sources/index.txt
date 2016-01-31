@@ -9,6 +9,9 @@ This project aims to be a free and open source implementation of
 the UK Energy Performance Certificate and underlying RdSAP and SAP
 models.
 
+The target spec implementation is currently SAP 2009, with the intention
+of adding newer versions in the future.
+
 It is written in Python (version 3.4 +) for easy integration with other
 data processing code, with the aim of enabling a variety of workflows.
 Particular attention will be given enabling highly automated workflows
@@ -63,3 +66,9 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+
+Links
+=====
+
+- `Package source on Github <https://github.com/RCUK-CEE/epctk>`_
+-
