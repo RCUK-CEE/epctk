@@ -2,15 +2,15 @@ import math
 
 import numpy
 
-# Try to keep imports matching order of SAP document
-from .lighting import lighting_consumption
+
+from .appendix import appendix_m, appendix_g, appendix_c
 from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
+from .domestic_hot_water import hot_water_use
+from .fuel_use import fuel_use
+from .lighting import lighting_consumption
+from .solar import solar
 from .utils import monthly_to_annual
 from .ventilation import ventilation
-from .domestic_hot_water import hot_water_use
-from .solar import solar
-from .fuel_use import fuel_use
-from .appendix import appendix_m, appendix_g
 
 
 def heat_loss(dwelling):
@@ -55,60 +55,79 @@ def water_heater_output(dwelling):
     dwelling.output_from_water_heater = numpy.maximum(0,
                                                       dwelling.total_water_heating +
                                                       dwelling.input_from_solar +
-                                                      dwelling.fghrs_input_from_solar  -
+                                                      dwelling.fghrs_input_from_solar -
                                                       dwelling.savings_from_wwhrs -
                                                       dwelling.savings_from_fghrs)
 
 
 def internal_heat_gain(dwelling):
-    dwelling.losses_gain = -40 * dwelling.Nocc
-    dwelling.water_heating_gains = (
-                                       1000. / 24.) * dwelling.heat_gains_from_hw / DAYS_PER_MONTH
+    """
+    Calculate internal heat games.
 
-    lighting_consumption(dwelling)
+    .. note::
+        must have calculated the lighting first so that it can be
+            included in the internal heat gains
+
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
+    losses_gain = -40 * dwelling.Nocc
+    water_heating_gains = (1000. / 24.) * dwelling.heat_gains_from_hw / DAYS_PER_MONTH
 
     mean_appliance_energy = 207.8 * (dwelling.GFA * dwelling.Nocc) ** 0.4714
     appliance_consumption_per_day = (mean_appliance_energy / 365.) * (
         1 + 0.157 * numpy.cos((2. * math.pi / 12.) * (numpy.arange(12) - .78)))
-    dwelling.appliance_consumption = appliance_consumption_per_day * \
-                                     DAYS_PER_MONTH
+
+    appliance_consumption = appliance_consumption_per_day * DAYS_PER_MONTH
 
     if dwelling.reduced_gains:
-        dwelling.met_gain = 50 * dwelling.Nocc
-        dwelling.cooking_gain = 23 + 5 * dwelling.Nocc
-        dwelling.appliance_gain = (
-                                      0.67 * 1000. / 24) * appliance_consumption_per_day
-        dwelling.light_gain = 0.4 * dwelling.full_light_gain
+        met_gain = 50 * dwelling.Nocc
+        cooking_gain = 23 + 5 * dwelling.Nocc
+        appliance_gain = (0.67 * 1000. / 24) * appliance_consumption_per_day
+        light_gain = 0.4 * dwelling.full_light_gain
     else:
-        dwelling.met_gain = 60 * dwelling.Nocc
-        dwelling.cooking_gain = 35 + 7 * dwelling.Nocc
-        dwelling.appliance_gain = (1000. / 24) * appliance_consumption_per_day
-        dwelling.light_gain = dwelling.full_light_gain
+        met_gain = 60 * dwelling.Nocc
+        cooking_gain = 35 + 7 * dwelling.Nocc
+        appliance_gain = (1000. / 24) * appliance_consumption_per_day
+        light_gain = dwelling.full_light_gain
 
-    dwelling.total_internal_gains = (dwelling.met_gain
-                                     + dwelling.water_heating_gains
-                                     + dwelling.light_gain
-                                     + dwelling.appliance_gain
-                                     + dwelling.cooking_gain
-                                     + dwelling.pump_gain
-                                     + dwelling.losses_gain)
+    total_internal_gains = (met_gain
+                            + light_gain
+                            + appliance_gain
+                            + cooking_gain
+                            + water_heating_gains
+                            + dwelling.pump_gain
+                            + losses_gain)
 
     if dwelling.reduced_gains:
         summer_met_gain = 60 * dwelling.Nocc
         summer_cooking_gain = 35 + 7 * dwelling.Nocc
         summer_appliance_gain = (1000. / 24) * appliance_consumption_per_day
         summer_light_gain = dwelling.full_light_gain
-        dwelling.total_internal_gains_summer = (summer_met_gain
-                                                + dwelling.water_heating_gains
-                                                + summer_light_gain
-                                                + summer_appliance_gain
-                                                + summer_cooking_gain
-                                                + dwelling.pump_gain
-                                                + dwelling.losses_gain
-                                                - dwelling.heating_system_pump_gain)
+        total_internal_gains_summer = (summer_met_gain +
+                                       water_heating_gains +
+                                       summer_light_gain +
+                                       summer_appliance_gain +
+                                       summer_cooking_gain +
+                                       dwelling.pump_gain +
+                                       losses_gain
+                                       - dwelling.heating_system_pump_gain)
     else:
-        dwelling.total_internal_gains_summer = dwelling.total_internal_gains - \
-                                               dwelling.heating_system_pump_gain
+        total_internal_gains_summer = total_internal_gains - dwelling.heating_system_pump_gain
+
+    # Apply results to dwelling
+    return dict(appliance_consumption=appliance_consumption,
+                met_gain=met_gain,
+                cooking_gain=cooking_gain,
+                appliance_gain=appliance_gain,
+                light_gain=light_gain,
+                water_heating_gains=water_heating_gains,
+                losses_gain=losses_gain,
+                total_internal_gains=total_internal_gains,
+                total_internal_gains_summer=total_internal_gains_summer)
 
 
 def heating_requirement(dwelling):
@@ -119,7 +138,7 @@ def heating_requirement(dwelling):
         dwelling.thermal_mass_parameter = ka / dwelling.GFA
 
     dwelling.heat_calc_results = calc_heat_required(
-            dwelling, dwelling.Texternal_heating, dwelling.winter_heat_gains)
+        dwelling, dwelling.Texternal_heating, dwelling.winter_heat_gains)
     Q_required = dwelling.heat_calc_results['heat_required']
     for i in SUMMER_MONTHS:
         Q_required[i] = 0
@@ -151,8 +170,8 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
                                           dwelling.h)
 
     Tmean_living_area = Tmean(
-            Texternal, dwelling.living_area_Theating, Tno_heat_living,
-            tau, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m, living_space=True)
+        Texternal, dwelling.living_area_Theating, Tno_heat_living,
+        tau, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m, living_space=True)
 
     if dwelling.main_heating_fraction < 1 and dwelling.get('heating_systems_heat_separate_areas'):
         if dwelling.main_heating_fraction > dwelling.living_area_fraction:
@@ -161,23 +180,23 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
                            (1 - dwelling.living_area_fraction)
 
             Tmean_other_1 = temperature_rest_of_dwelling(
-                    dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
-                    N16_9_m)
+                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
+                N16_9_m)
             Tmean_other_2 = temperature_rest_of_dwelling(
-                    dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
-                    N16_9_m)
+                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
+                N16_9_m)
 
             Tmean_other = Tmean_other_1 * \
                           weight_1 + Tmean_other_2 * (1 - weight_1)
         else:
             # only sys2 does rest of house
             Tmean_other = temperature_rest_of_dwelling(
-                    dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
-                    N16_9_m)
+                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys2, N24_16_m, N24_9_m,
+                N16_9_m)
     else:
         Tmean_other = temperature_rest_of_dwelling(
-                dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
-                N16_9_m)
+            dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
+            N16_9_m)
 
     if not dwelling.get('living_area_fraction'):
         dwelling.living_area_fraction = dwelling.living_area / dwelling.GFA
@@ -188,19 +207,19 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
     L = dwelling.h * (meanT - Texternal)
     utilisation = heat_utilisation_factor(a, heat_gains, L)
     return dict(
-            tau=tau,
-            alpha=a,
-            Texternal=Texternal,
-            Tmean_living_area=Tmean_living_area,
-            Tmean_other=Tmean_other,
-            util_living=util_living,
-            Tmean=meanT,
-            loss=L,
-            utilisation=utilisation,
-            useful_gain=utilisation * heat_gains,
-            heat_required=(range_cooker_factor(dwelling) *
-                           0.024 * (
-                               L - utilisation * heat_gains) * DAYS_PER_MONTH),
+        tau=tau,
+        alpha=a,
+        Texternal=Texternal,
+        Tmean_living_area=Tmean_living_area,
+        Tmean_other=Tmean_other,
+        util_living=util_living,
+        Tmean=meanT,
+        loss=L,
+        utilisation=utilisation,
+        useful_gain=utilisation * heat_gains,
+        heat_required=(range_cooker_factor(dwelling) *
+                       0.024 * (
+                           L - utilisation * heat_gains) * DAYS_PER_MONTH),
     )
 
 
@@ -211,7 +230,7 @@ def temperature_rest_of_dwelling(dwelling, Texternal, tau, a, L, heat_gains, con
                                          Theat_other,
                                          dwelling.heating_responsiveness,
                                          heat_utilisation_factor(
-                                                 a, heat_gains, L),
+                                             a, heat_gains, L),
                                          heat_gains,
                                          dwelling.h)
     return Tmean(Texternal, Theat_other, Tno_heat_other, tau, control_type, N24_16_m, N24_9_m, N16_9_m,
@@ -319,7 +338,7 @@ def cooling_requirement(dwelling):
 
     # No cooling in months where heating would be more than half of cooling
     heat_calc_results = calc_heat_required(
-            dwelling, Texternal_summer, G + dwelling.heating_system_pump_gain)
+        dwelling, Texternal_summer, G + dwelling.heating_system_pump_gain)
     Qheat_summer = heat_calc_results['heat_required']
     Qrequired = numpy.where(3 * Qheat_summer < Qrequired,
                             Qrequired,
@@ -388,39 +407,6 @@ def systems(dwelling):
     dwelling.Q_spacecooling = dwelling.Q_cooling_required / dwelling.cooling_seer
 
 
-def chp(dwelling):
-    if dwelling.get('chp_water_elec'):
-        e_summer = dwelling.chp_water_elec
-        e_space = dwelling.chp_space_elec
-
-        # !!! Can micro chp be a second main system??
-
-        # !!! Need water heating only option
-        if dwelling.water_sys is dwelling.main_sys_1:
-            if dwelling.get('use_immersion_heater_summer') and dwelling.use_immersion_heater_summer:
-                b64 = sum(x[0] for x in
-                          zip(dwelling.output_from_water_heater,
-                              dwelling.Q_required)
-                          if x[1] > 0)
-            else:
-                b64 = sum(dwelling.output_from_water_heater)
-        else:
-            b64 = 0
-            e_summer = 0
-
-        b98 = sum(dwelling.Q_required)
-        b204 = dwelling.fraction_of_heat_from_main * \
-               dwelling.main_heating_fraction
-
-        # !!! Need to check sign of result
-
-        dwelling.chp_electricity = -(b98 * b204 * e_space + b64 * e_summer)
-        dwelling.chp_electricity_onsite_fraction = 0.4
-    else:
-        dwelling.chp_electricity = 0
-        dwelling.chp_electricity_onsite_fraction = 0
-
-
 def sap(dwelling):
     sap_rating_energy_cost = dwelling.fuel_cost
     ecf = 0.47 * sap_rating_energy_cost / (dwelling.GFA + 45)
@@ -438,7 +424,7 @@ def fee(dwelling):
     r = dwelling.report
     r.start_section("", "FEE Calculation")
     r.add_single_result(
-            "Fabric energy efficiency (kWh/m2)", "109", dwelling.fee_rating)
+        "Fabric energy efficiency (kWh/m2)", "109", dwelling.fee_rating)
 
 
 def der(dwelling):
@@ -447,7 +433,7 @@ def der(dwelling):
     r = dwelling.report
     r.start_section("", "DER Calculation")
     r.add_single_result(
-            "Dwelling emissions (kg/yr)", "272", dwelling.emissions)
+        "Dwelling emissions (kg/yr)", "272", dwelling.emissions)
     r.add_single_result("DER rating (kg/m2/year)", "273", dwelling.der_rating)
 
 
@@ -470,9 +456,9 @@ def ter(dwelling, heating_fuel):
     r = dwelling.report
     r.start_section("", "TER Calculation")
     r.add_single_result(
-            "Emissions per m2 for space and water heating", "272a", C_h / dwelling.GFA)
+        "Emissions per m2 for space and water heating", "272a", C_h / dwelling.GFA)
     r.add_single_result(
-            "Emissions per m2 for lighting", "272b", C_l / dwelling.GFA)
+        "Emissions per m2 for lighting", "272b", C_l / dwelling.GFA)
     r.add_single_result("Heating fuel factor", None, FF)
     r.add_single_result("Heating fuel emission factor adjustment", None, EFA_h)
     r.add_single_result("Electricity emission factor adjustment", None, EFA_l)
@@ -485,10 +471,16 @@ def perform_demand_calc(dwelling):
     :param dwelling:
     :return:
     """
+
+    # todo: convert the rest of these to use "update" semantics
     ventilation(dwelling)
     heat_loss(dwelling)
     hot_water_use(dwelling)
-    internal_heat_gain(dwelling)
+
+    dwelling.update(lighting_consumption(dwelling))
+
+    dwelling.update(internal_heat_gain(dwelling))
+
     solar(dwelling)
     heating_requirement(dwelling)
     cooling_requirement(dwelling)
@@ -506,8 +498,10 @@ def perform_full_calc(dwelling):
     """
     perform_demand_calc(dwelling)
     systems(dwelling)
-    appendix_m.pv(dwelling)
-    appendix_m.wind_turbines(dwelling)
-    appendix_m.hydro(dwelling)
-    chp(dwelling)
+
+    dwelling.update(appendix_m.pv(dwelling))
+    dwelling.update(appendix_m.wind_turbines(dwelling))
+    dwelling.update(appendix_m.hydro(dwelling))
+    dwelling.update(appendix_c.chp(dwelling))
+
     fuel_use(dwelling)

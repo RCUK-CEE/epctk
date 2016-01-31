@@ -81,16 +81,18 @@ def m1_correction_factor(terrain_type, wind_speed):
 
 def pv(dwelling):
     if dwelling.get('photovoltaic_systems'):
-        dwelling.pv_electricity_onsite_fraction = 0.5
-        dwelling.pv_electricity = 0
+        onsite_fraction = 0.5
+        electricity = 0
         for pv_system in dwelling.photovoltaic_systems:
-            dwelling.pv_electricity += (0.8 * pv_system['kWp'] *
+            electricity += (0.8 * pv_system['kWp'] *
                                         pv_system['Igh'] *
                                         pv_system['overshading_factor'])
     else:
-        dwelling.pv_electricity = 0
-        dwelling.pv_electricity_onsite_fraction = 0.
+        electricity = 0
+        onsite_fraction = 0.
 
+    return dict(pv_electricity=electricity,
+                pv_electricity_onsite_fraction=onsite_fraction)
 
 def wind_turbines(dwelling):
     """
@@ -106,16 +108,23 @@ def wind_turbines(dwelling):
         A = .25 * math.pi * dwelling.wind_turbine_rotor_diameter ** 2
         p_wind = A * PA * CP_G_IE
 
-        dwelling.wind_electricity = dwelling.N_wind_turbines * p_wind * 1.9 * 8766 * 0.001
-        dwelling.wind_electricity_onsite_fraction = 0.7
+        electricity = dwelling.N_wind_turbines * p_wind * 1.9 * 8766 * 0.001
+        onsite_fraction = 0.7
     else:
-        dwelling.wind_electricity = 0
-        dwelling.wind_electricity_onsite_fraction = 0
+        electricity = 0
+        onsite_fraction = 0
+
+    return dict(wind_electricity=electricity,
+                wind_electricity_onsite_fraction=onsite_fraction)
 
 
 def hydro(dwelling):
-    if dwelling.get('hydro_electricity'):
-        dwelling.hydro_electricity_onsite_fraction = 0.4
+    electricity = dwelling.get('hydro_electricity')
+    if electricity:
+        onsite_fraction = 0.4
     else:
-        dwelling.hydro_electricity = 0
-        dwelling.hydro_electricity_onsite_fraction = 0.
+        electricity = 0
+        onsite_fraction = 0.0
+
+    return dict(hydro_electricity=electricity,
+                hydro_electricity_onsite_fraction=onsite_fraction)

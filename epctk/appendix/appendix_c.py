@@ -170,3 +170,39 @@ class CommunityHeating(HeatingSystem):
         chp_price = Fuel(48).unit_price()
         self.fuel_price_ = (self.chp_fraction * chp_price +
                             (1 - self.chp_fraction) * boiler_price)
+
+
+def chp(dwelling):
+    if dwelling.get('chp_water_elec'):
+        e_summer = dwelling.chp_water_elec
+        e_space = dwelling.chp_space_elec
+
+        # !!! Can micro chp be a second main system??
+
+        # !!! Need water heating only option
+        if dwelling.water_sys is dwelling.main_sys_1:
+            if dwelling.get('use_immersion_heater_summer') and dwelling.use_immersion_heater_summer:
+                b64 = sum(x[0] for x in
+                          zip(dwelling.output_from_water_heater,
+                              dwelling.Q_required)
+                          if x[1] > 0)
+            else:
+                b64 = sum(dwelling.output_from_water_heater)
+        else:
+            b64 = 0
+            e_summer = 0
+
+        b98 = sum(dwelling.Q_required)
+        b204 = dwelling.fraction_of_heat_from_main * \
+               dwelling.main_heating_fraction
+
+        # !!! Need to check sign of result
+
+        electricity = -(b98 * b204 * e_space + b64 * e_summer)
+        onsite_fraction = 0.4
+    else:
+        electricity = 0
+        onsite_fraction = 0
+
+    return dict(chp_electricity=electricity,
+                chp_electricity_onsite_fraction=onsite_fraction)
