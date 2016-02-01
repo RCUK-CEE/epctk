@@ -23,7 +23,7 @@ setup(name='epc_tk',
       license='MIT',
       packages=['sap'],
       install_requires=[
-          'yaml',
+          'pyyaml',
           'numpy',
           'pyparsing'
       ],
