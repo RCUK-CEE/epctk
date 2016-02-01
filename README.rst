@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/RCUK-CEE/epctk.svg?branch=master
+    :target: https://travis-ci.org/RCUK-CEE/epctk
+
 
 The UK EPC Toolkit: epctk
 =========================
