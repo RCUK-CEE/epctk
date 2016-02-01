@@ -1,11 +1,40 @@
-{
+sap_schema = {
   "$schema": "http://json-schema.org/schema#",
   "title": "SAP dwelling input",
   "description": "inputs required to perform a SAP calculation",
   "type": "object",
-  "additionalProperties": false,
+  "additionalProperties": False,
 
   "definitions": {
+    "opening_type": {
+        "properties": {
+            "glazing_type": {
+              "type": "int"
+            },
+            "gvalue": {
+              "type": "float"
+            },
+            "frame_factor": {
+              "type": "float"
+            },
+            "Uvalue": {
+              "type": "float"
+            },
+            "roof_window": {
+              "type": "bool"
+            },
+            "bfrc_data": {
+              "type": "bool"
+            }
+        },
+        "required": [
+            "glazing_type",
+            "gvalue",
+            "frame_factor",
+            "Uvalue",
+            "roof_window"
+        ]
+    },
     "pressure_test": {
       "properties": {
         "pressurisation_test_result_average": {
@@ -129,8 +158,8 @@
       ]
     },
     "pv": {
-      //TODO need 'all or nothing' so i think you want oneOf with [{}, {...}]?
-//      "oneOf": [{}, ]
+      #TODO need 'all or nothing' so i think you want oneOf with [{}, {...}]?
+      #      "oneOf": [{}, ]
       "properties": {
         "PV_kWp": {
           "type": "float"
@@ -195,9 +224,9 @@
     },
     {
       "properties": {
-        //TODO: many INT properties are actually ENUMS
-        //TODO: might actually want to do Dict validation so we can reuse Enum definitions...
-        //required properties
+        #TODO: many INT properties are actually ENUMS
+        #TODO: might actually want to do Dict validation so we can reuse Enum definitions...
+        #required properties
         "GFA": {
           "type": "float"
         },
@@ -234,7 +263,7 @@
         "water_heating_type_code": {
           "type": "int"
         },
-        //enums
+        #enums
         "sap_region": {
           "type": "int"
         },
@@ -247,14 +276,14 @@
         "control_type_code": {
           "type": "int"
         },
-        //enums
+        #enums
         "floor_type": {
           "type": "int"
         },
         "wall_type": {
           "type": "int"
         },
-        // has if and only if constraint, might have to rethink or have extra validation step
+        # has if and only if constraint, might have to rethink or have extra validation step
         "main_heating_oil_pump_inside_dwelling": {
           "type": "bool"
         },
@@ -286,9 +315,10 @@
         "control_type_code",
         "water_heating_type_code"
       ],
-      "anyOf": [
-        "hydro_electricity"
-      ]
     }
   ]
 }
+
+
+
+
