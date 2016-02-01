@@ -24,7 +24,8 @@ setup(name='epc_tk',
       packages=['sap'],
       install_requires=[
           'yaml',
-          'numpy', 'pyparsing'
+          'numpy',
+          'pyparsing'
       ],
       include_package_data=True,
       zip_safe=False)
