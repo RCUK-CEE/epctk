@@ -4,7 +4,7 @@ Tables in N section take up enough space to
 """
 import numpy
 
-from epctk.utils import SAPCalculationError
+from ..utils import SAPCalculationError
 
 
 def interpolate_psr_table(psr, table,

@@ -5,8 +5,7 @@ import numpy
 from .appendix import appendix_c, appendix_g
 from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
 from .elements import HeatingTypes, DedicatedWaterSystem
-from .tables import (TABLE_3, TABLE_4A, get_4a_system, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE,
-                     TABLE_H5)
+from .tables import (TABLE_3, TABLE_4A, get_4a_system, TABLE_H5, MONTHLY_HOT_WATER_FACTORS, MONTHLY_HOT_WATER_TEMPERATURE_RISE)
 from .utils import SAPInputError
 
 

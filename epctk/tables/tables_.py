@@ -3,8 +3,8 @@ import os.path
 
 import numpy
 
-from epctk.elements.sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, SHWCollectorTypes,
-                                      HeatingTypes, PVOvershading, VentilationTypes, BoilerTypes, FloorTypes)
+from ..elements.sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, HeatingTypes,
+                                  VentilationTypes, BoilerTypes, FloorTypes)
 from ..appendix.appendix_f import cpsu_store, elec_cpsu_store
 from ..utils import csv_to_dict
 
@@ -67,7 +67,7 @@ MONTHLY_HOT_WATER_FACTORS = numpy.array([1.1, 1.06, 1.02, 0.98, 0.94, 0.9, 0.9, 
 
 # Table 1d
 MONTHLY_HOT_WATER_TEMPERATURE_RISE = numpy.array(
-        [41.2, 41.4, 40.1, 37.6, 36.4, 33.9, 30.4, 33.4, 33.5, 36.3, 39.4, 39.9])
+    [41.2, 41.4, 40.1, 37.6, 36.4, 33.9, 30.4, 33.4, 33.5, 36.3, 39.4, 39.9])
 
 
 def table_2_hot_water_store_loss_factor(hw_cylinder_insulation_type, hw_cylinder_insulation):
@@ -140,15 +140,15 @@ def storage_combi_secondary(d):
 # Table 2b format:
 # Row number: (With Manufacturers data, Table 2 fallback)
 _TABLE_2b = {
-    1: (constant(0.6)          , constant(0.6)),
-    2: (cylinder_indirect      , cylinder_indirect),
-    3: (0                      , storage_combi_primary),
+    1: (constant(0.6), constant(0.6)),
+    2: (cylinder_indirect, cylinder_indirect),
+    3: (0, storage_combi_primary),
     4: (storage_combi_secondary, storage_combi_secondary),
-    5: (cylinder_indirect      , cylinder_indirect),  # same equations as indirect cylinder
-    6: (cpsu_store             , cpsu_store),
-    7: (cpsu_store             , cpsu_store),
-    8: (elec_cpsu_store        , elec_cpsu_store),
-    9: (constant(1)            , constant(1)),
+    5: (cylinder_indirect, cylinder_indirect),  # same equations as indirect cylinder
+    6: (cpsu_store, cpsu_store),
+    7: (cpsu_store, cpsu_store),
+    8: (elec_cpsu_store, elec_cpsu_store),
+    9: (constant(1), constant(1)),
 }
 
 
@@ -329,21 +329,21 @@ def table_5a_fans_and_pumps_gain(dwelling):
 # Table 6d
 TABLE_6D = {
     OvershadingTypes.HEAVY: dict(
-            solar_access_factor_winter=0.3,
-            solar_access_factor_summer=0.5,
-            light_access_factor=0.5),
+        solar_access_factor_winter=0.3,
+        solar_access_factor_summer=0.5,
+        light_access_factor=0.5),
     OvershadingTypes.MORE_THAN_AVERAGE: dict(
-            solar_access_factor_winter=0.54,
-            solar_access_factor_summer=0.7,
-            light_access_factor=0.67),
+        solar_access_factor_winter=0.54,
+        solar_access_factor_summer=0.7,
+        light_access_factor=0.67),
     OvershadingTypes.AVERAGE: dict(
-            solar_access_factor_winter=0.77,
-            solar_access_factor_summer=0.9,
-            light_access_factor=0.83),
+        solar_access_factor_winter=0.77,
+        solar_access_factor_summer=0.9,
+        light_access_factor=0.83),
     OvershadingTypes.VERY_LITTLE: dict(
-            solar_access_factor_winter=1,
-            solar_access_factor_summer=1,
-            light_access_factor=1),
+        solar_access_factor_winter=1,
+        solar_access_factor_summer=1,
+        light_access_factor=1),
 }
 
 
@@ -356,11 +356,11 @@ def summer_to_annual(summer_vals):
 
 def translate_10_row(regions, row):
     climate_data = dict(
-            code=int(row[0]),
-            name=row[1],
-            latitude=float(row[2]),
-            solar_radiation=summer_to_annual(row[3:6]),
-            external_temperature=summer_to_annual(row[6:9]))
+        code=int(row[0]),
+        name=row[1],
+        latitude=float(row[2]),
+        solar_radiation=summer_to_annual(row[3:6]),
+        external_temperature=summer_to_annual(row[6:9]))
 
     regions[climate_data['code']] = climate_data
 
@@ -371,9 +371,9 @@ TABLE_10 = csv_to_dict(os.path.join(_DATA_FOLDER, 'table_10.csv'), translate_10_
 # Table 10c
 def translate_10c_row(systems, row):
     system = dict(
-            energy_label=row[0],
-            split_sys_eer=float(row[1]),
-            packaged_sys_eer=float(row[2]))
+        energy_label=row[0],
+        split_sys_eer=float(row[1]),
+        packaged_sys_eer=float(row[2]))
     systems[system['energy_label']] = system
 
 
@@ -425,77 +425,6 @@ TABLE_D7 = {
     }
 }
 
-# Table H1
-TABLE_H1 = {
-    SHWCollectorTypes.EVACUATED_TUBE: [0.6, 3, .72],
-    SHWCollectorTypes.FLAT_PLATE_GLAZED: [0.75, 6, .9],
-    SHWCollectorTypes.UNGLAZED: [0.9, 20, 1],
-}
-
-# Table H2
-TABLE_H2 = {
-    # !!! Needs finishing
-    "Horizontal": 961,
-    30: {
-        0: 730,
-        45: 785,
-        90: 913,
-        135: 1027,
-        180: 1073,
-        225: 1027,
-        270: 913,
-        315: 785,
-    },
-    45: {
-        0: 640,
-        45: 686,
-        90: 854,
-        135: 997,
-        180: 1054,
-        225: 997,
-        270: 854,
-        315: 686,
-    },
-    60: {
-        0: 500,
-        45: 597,
-        90: 776,
-        135: 927,
-        180: 989,
-        225: 927,
-        270: 776,
-        315: 597,
-    },
-    "Vertical": {
-        0: 371,
-        45: 440,
-        90: 582,
-        135: 705,
-        180: 746,
-        225: 705,
-        270: 582,
-        315: 440,
-    },
-}
-
-TABLE_H3 = {
-    "Horizontal": numpy.array([0.24, 0.50, 0.86, 1.37, 1.74, 1.84, 1.78, 1.50, 1.06, 0.63, 0.31, 0.19]),
-    30: numpy.array([0.35, 0.63, 0.92, 1.30, 1.58, 1.68, 1.62, 1.39, 1.08, 0.74, 0.43, 0.29]),
-    45: numpy.array([0.39, 0.69, 0.95, 1.27, 1.52, 1.61, 1.55, 1.34, 1.08, 0.79, 0.48, 0.33]),
-    60: numpy.array([0.44, 0.74, 0.97, 1.24, 1.45, 1.54, 1.48, 1.30, 1.09, 0.84, 0.53, 0.37]),
-    "Vertical": numpy.array([0.58, 0.92, 1.05, 1.15, 1.25, 1.33, 1.28, 1.15, 1.10, 0.99, 0.69, 0.50]),
-}
-
-# Table H4
-TABLE_H4 = {
-    PVOvershading.HEAVY: .5,
-    PVOvershading.SIGNIFICANT: .65,
-    PVOvershading.MODEST: .8,
-    PVOvershading.NONE_OR_VERY_LITTLE: 1,
-}
-
-TABLE_H5 = [1.0, 1.0, 0.94, 0.70, 0.45, 0.44, 0.44, 0.48, 0.76, 0.94, 1.0, 1.0]
-
 TABLE_M1 = {
     TerrainTypes.DENSE_URBAN: {
         10: .56,
@@ -516,7 +445,6 @@ TABLE_M1 = {
         0: .82,
     },
 }
-
 
 
 # !!! Needs completing
