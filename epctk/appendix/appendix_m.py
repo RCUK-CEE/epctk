@@ -5,7 +5,7 @@ Energy from Photovoltaic (PV) technology, small and micro wind turbines and smal
 """
 import math
 
-from ..tables import TABLE_H2, TABLE_H4, TABLE_M1
+from ..tables import TABLE_M1,  TABLE_H2, TABLE_H4
 
 
 def pv_Igh(pitch, orientation=None):

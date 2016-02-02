@@ -2,7 +2,6 @@ import math
 
 import numpy
 
-
 from .appendix import appendix_m, appendix_g, appendix_c
 from .constants import DAYS_PER_MONTH, SUMMER_MONTHS
 from .domestic_hot_water import hot_water_use
@@ -15,16 +14,19 @@ from .ventilation import ventilation
 
 def heat_loss(dwelling):
     """
-    Set the attributes `h`, `hlp`, `h_fabric`, `h_bridging`, `h_vent`, `h_vent_annual`
+    Return the attributes `h`, `hlp`, `h_fabric`, `h_bridging`, `h_vent`, `h_vent_annual`
     on the given dwelling object
 
     Args:
         dwelling:
+
+    Returns:
+        dict of heat loss attributes, to be added to dwelling using `update()`
     """
+    # TODO: what is "h"?
     if dwelling.get('hlp') is not None:
-        # TODO: what is "h"?
-        dwelling.h = dwelling.hlp * dwelling.GFA
-        return
+
+        return dict(h=dwelling.hlp * dwelling.GFA)
 
     UA = sum(e.Uvalue * e.area for e in dwelling.heat_loss_elements)
     A_bridging = sum(e.area for e in dwelling.heat_loss_elements if e.is_external)
@@ -36,13 +38,14 @@ def heat_loss(dwelling):
 
     h_vent = 0.33 * dwelling.infiltration_ach * dwelling.volume
 
+    h = UA + h_bridging + h_vent
     return dict(
-    h = UA + h_bridging + h_vent,
-    hlp = dwelling.h / dwelling.GFA,
-    h_fabric = UA,
-    h_bridging = h_bridging,
-    h_vent = h_vent,
-    h_vent_annual = monthly_to_annual(h_vent))
+        h=h,
+        hlp=h / dwelling.GFA,
+        h_fabric=UA,
+        h_bridging=h_bridging,
+        h_vent=h_vent,
+        h_vent_annual=monthly_to_annual(h_vent))
 
 
 def water_heater_output(dwelling):

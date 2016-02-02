@@ -11,8 +11,7 @@ from ..elements import HeatingTypes
 from . import appendix_m
 from ..constants import DAYS_PER_MONTH
 from ..io.pcdf import get_wwhr_system, get_fghr_system
-from ..tables import (MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, TABLE_H3,
-                      combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
+from ..tables import (TABLE_H3, MONTHLY_HOT_WATER_TEMPERATURE_RISE, MONTHLY_HOT_WATER_FACTORS, combi_loss_table_3a, combi_loss_table_3b, combi_loss_table_3c)
 
 
 def configure_wwhr(dwelling):
