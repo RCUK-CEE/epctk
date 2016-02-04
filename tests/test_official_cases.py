@@ -7,9 +7,8 @@ import unittest
 from epctk import runner
 from epctk.dwelling import Dwelling
 from epctk.io import input_conversion_rules, yaml_io
+from epctk.runner import run_dwelling
 from epctk.utils import SAPCalculationError
-import epctk.appendix.appendix_t
-
 from tests import output_checker
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES, SKIP
@@ -95,48 +94,6 @@ def load_reference_case(case_path, parser, force_reparse):
     return case
 
 
-def run_dwelling(fname, dwelling):
-    """
-    Run dwelling that was loaded from fname
-
-    :param fname: file name needed to lookup SAP region
-    :param dwelling: dwelling definition loaded from file
-    :return:
-    """
-
-    # FIXME !!! Bit of a hack here because our tests case files don't include sap region
-    if fname in SAP_REGIONS:
-        dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
-    elif not dwelling.get("sap_region"):
-        dwelling['sap_region'] = 11
-
-    runner.run_sap(dwelling)
-    runner.run_fee(dwelling)
-    runner.run_der(dwelling)
-    epctk.appendix.appendix_t.run_ter(dwelling)
-
-    # FIXME: ongoing problems in applying Appendix T improvements
-    # sap.appendix.appendix_t.run_improvements(dwelling)
-
-
-def run_sap_only(fname, dwelling):
-    """
-    Run dwelling that was loaded from fname
-
-    :param fname: file name needed to lookup SAP region
-    :param dwelling: dwelling definition loaded from file
-    :return:
-    """
-
-    # FIXME !!! Bit of a hack here because our tests case files don't include sap region
-    if fname in SAP_REGIONS:
-        dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
-    elif not dwelling.get("sap_region"):
-        dwelling['sap_region'] = 11
-
-    runner.run_sap(dwelling)
-
-
 def run_case(fname, reparse):
     logging.warning("RUNNING %s" % (fname,))
 
@@ -150,13 +107,19 @@ def run_case(fname, reparse):
             with open(yaml_file, 'w') as f:
                 yaml_io.to_yaml(dwelling, f)
             output_checker.check_results(dwelling, parsed_ref_case)
-        run_dwelling(fname, dwelling)
+
+
+        # FIXME !!! Bit of a hack here because our tests case files don't include sap region
+        if fname in SAP_REGIONS:
+            dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
+        elif not dwelling.get("sap_region"):
+            dwelling['sap_region'] = 11
+
+        run_dwelling(dwelling)
 
     except SAPCalculationError:
-        # if output_checker.is_err_calc(parsed_ref_case):
-        #     return
-        # else:
         raise
+
     logging.info("DONE")
 
 

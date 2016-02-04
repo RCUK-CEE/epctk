@@ -81,12 +81,15 @@ def solar_system_output(dwelling, hw_energy_content, daily_hot_water_use):
     Returns:
 
     """
-    performance_ratio = dwelling.collector_heat_loss_coeff / dwelling.collector_zero_loss_effy
+    collector_zero_loss_effy = dwelling.collector_zero_loss_effy
+
+    performance_ratio = dwelling.collector_heat_loss_coeff / collector_zero_loss_effy
 
     annual_radiation = dwelling.collector_Igh
 
     overshading_factor = dwelling.collector_overshading_factor
-    available_energy = dwelling.solar_collector_aperture * dwelling.collector_zero_loss_effy
+
+    available_energy = dwelling.solar_collector_aperture * collector_zero_loss_effy
     available_energy *= annual_radiation * overshading_factor
 
     solar_to_load = available_energy / sum(hw_energy_content)
@@ -167,8 +170,6 @@ def hot_water_use(dwelling):
     Returns:
 
     """
-    hot_water_use_variables = {}
-
     hw_use_daily = dwelling.daily_hot_water_use * MONTHLY_HOT_WATER_FACTORS
 
     hw_energy_content = (4.19 / 3600.0) * hw_use_daily * DAYS_PER_MONTH * MONTHLY_HOT_WATER_TEMPERATURE_RISE
@@ -205,10 +206,7 @@ def hot_water_use(dwelling):
                                             primary_circuit_loss_annual, primary_circuit_loss)
 
     if dwelling.get('fghrs') is not None and dwelling.fghrs['has_pv_module']:
-        fghrs_input_from_solar = fghrs_solar_input(dwelling,
-                                                   dwelling.fghrs,
-                                                   hw_energy_content,
-                                                   dwelling.daily_hot_water_use)
+        fghrs_input_from_solar = fghrs_solar_input(dwelling.fghrs, hw_energy_content, dwelling.daily_hot_water_use)
     else:
         fghrs_input_from_solar = 0
 
@@ -242,8 +240,8 @@ def hot_water_use(dwelling):
     )
 
 
-def fghrs_solar_input(dwelling, fghrs, hw_energy_content, daily_hot_water_use):
-    available_energy = (.84 *
+def fghrs_solar_input(fghrs, hw_energy_content, daily_hot_water_use):
+    available_energy = (0.84 *
                         fghrs['PV_kWp'] *
                         fghrs['Igh'] *
                         fghrs['overshading_factor'] *
@@ -259,8 +257,7 @@ def fghrs_solar_input(dwelling, fghrs, hw_energy_content, daily_hot_water_use):
     storage_volume_factor = numpy.minimum(
         1., 1 + 0.2 * numpy.log(volume_ratio))
     Qsolar_annual = available_energy * utilisation * storage_volume_factor
-    Qsolar = -Qsolar_annual * \
-             dwelling.fghrs['monthly_solar_hw_factors'] * DAYS_PER_MONTH / 365
+    Qsolar = -Qsolar_annual * fghrs['monthly_solar_hw_factors'] * DAYS_PER_MONTH / 365
 
     return Qsolar
 
@@ -323,7 +320,7 @@ def get_table3_row(dwelling):
 
     else:
         # Must be combi?
-        raise Exception("Must be combi?")
+        raise SAPInputError("Must be combi")
         # return 6
 
 

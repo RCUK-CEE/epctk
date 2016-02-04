@@ -3,8 +3,28 @@ import sys
 import logging
 import numpy
 
+from ..domestic_hot_water import get_table3_row
+from ..runner import run_dwelling
 from ..elements import HeatingSystem, VentilationTypes
 from .. import tables
+
+""" Useful SQL
+DELETE FROM ETI.dbo.SAPTestCases;
+
+BULK
+ INSERT ETI.dbo.SAPTestCases
+ FROM 'C:\\UCL\SAP\test_cases\eti.txt'
+ WITH
+ (
+ FIELDTERMINATOR = ',',
+ ROWTERMINATOR = '\n'
+ );
+
+DROP TABLE ETI.dbo.inputs;
+
+SELECT * INTO ETI.dbo.inputs from ETI.dbo.SAPTestCases
+
+"""
 
 
 def constant(k):
@@ -92,7 +112,7 @@ def water_heater_type(dwelling):
 
     if hasattr(dwelling, 'instantaneous_pou_water_heating') and dwelling.instantaneous_pou_water_heating:
         return "electric pou instantaneous"
-    elif tables.getTable3Row(dwelling) == 1:
+    elif get_table3_row(dwelling) == 1:
         return "electric immersion"
     else:
         return "boiler/heat pump"
@@ -503,11 +523,11 @@ if __name__ == '__main__':
             logging.error("Can't run this one")
             continue
         if casenum in casenums_immersion_summer:
-            logging.warn("Uses immersion heater in summer")
+            logging.warning("Uses immersion heater in summer")
         if casenum in casenums_more_than_1_orientation:
-            logging.warn("More than one window orientation")
+            logging.warning("More than one window orientation")
 
-        res, d = v0.run_dwelling(casenum)
+        res, d = run_dwelling(casenum)
         d.casenum = casenum
         set_eti_boiler_type_and_effy(d)
         calc_average_window(d)
@@ -531,20 +551,4 @@ if __name__ == '__main__':
 
         print_eti_inputs(eti_in)
 
-""" Useful SQL
-DELETE FROM ETI.dbo.SAPTestCases;
 
-BULK
- INSERT ETI.dbo.SAPTestCases
- FROM 'C:\\UCL\SAP\test_cases\eti.txt'
- WITH
- (
- FIELDTERMINATOR = ',',
- ROWTERMINATOR = '\n'
- );
-
-DROP TABLE ETI.dbo.inputs;
-
-SELECT * INTO ETI.dbo.inputs from ETI.dbo.SAPTestCases
-
-"""

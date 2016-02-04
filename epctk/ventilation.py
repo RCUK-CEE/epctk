@@ -183,7 +183,9 @@ def ventilation(dwelling):
 
     """
     if dwelling.get('hlp') is not None:
-        return
+        # Heat loss parameter already defined so don't need to
+        # calculate the ventilation separately
+        return {}
 
     if not dwelling.get('Nfansandpassivevents'):
         dwelling.Nfansandpassivevents = dwelling.Nintermittentfans + \

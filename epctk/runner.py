@@ -4,7 +4,7 @@ from .dwelling import DwellingResults
 from .elements import (OvershadingTypes,
                        HeatEmitters, VentilationTypes)
 from .fuels import fuel_from_code
-
+from .appendix import appendix_t
 
 def run_sap(input_dwelling):
     """
@@ -85,7 +85,7 @@ def run_fee(input_dwelling):
     dwelling.pump_gain = 0
     dwelling.heating_system_pump_gain = 0
 
-    worksheet.perform_demand_calc(dwelling)
+    dwelling = worksheet.perform_demand_calc(dwelling)
     dwelling.fee_rating = worksheet.fee(dwelling.GFA, dwelling.Q_required, dwelling.Q_cooling_required)
 
 
@@ -132,3 +132,19 @@ def run_der(input_dwelling):
         input_dwelling.ter_fuel = dwelling.main_sys_2_fuel
 
 
+def run_dwelling(dwelling):
+    """
+    Run dwelling that was loaded from fname
+
+    :param fname: file name needed to lookup SAP region
+    :param dwelling: dwelling definition loaded from file
+    :return:
+    """
+
+    run_sap(dwelling)
+    run_fee(dwelling)
+    run_der(dwelling)
+    appendix_t.run_ter(dwelling)
+
+    # FIXME: ongoing problems in applying Appendix T improvements
+    # sap.appendix.appendix_t.run_improvements(dwelling)

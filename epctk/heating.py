@@ -26,23 +26,21 @@ def heat_utilisation_factor(a, heat_gains, heat_loss):
     else:
         return (1 - gamma ** a) / (1 - gamma ** (a + 1))
 
+
 def heating_requirement(dwelling):
-    if not dwelling.get('thermal_mass_parameter'):
-        ka = 0
-        for t in dwelling.thermal_mass_elements:
-            ka += t.area * t.kvalue
-        dwelling.thermal_mass_parameter = ka / dwelling.GFA
 
     dwelling.heat_calc_results = calc_heat_required(
         dwelling, dwelling.Texternal_heating, dwelling.winter_heat_gains)
-    Q_required = dwelling.heat_calc_results['heat_required']
+
+    q_required = dwelling.heat_calc_results['heat_required']
+
     for i in SUMMER_MONTHS:
-        Q_required[i] = 0
+        q_required[i] = 0
         dwelling.heat_calc_results['loss'][i] = 0
         dwelling.heat_calc_results['utilisation'][i] = 0
         dwelling.heat_calc_results['useful_gain'][i] = 0
 
-    dwelling.Q_required = Q_required
+    return q_required
 
 
 def calc_heat_required(dwelling, Texternal, heat_gains):
@@ -108,6 +106,7 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
     utilisation = heat_utilisation_factor(a, heat_gains, L)
 
     heat_req = (appendix_b.range_cooker_factor(dwelling) * 0.024 * (L - utilisation * heat_gains) * DAYS_PER_MONTH)
+
     return dict(
         tau=tau,
         alpha=a,

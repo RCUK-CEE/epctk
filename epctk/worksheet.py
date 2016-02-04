@@ -57,12 +57,12 @@ def water_heater_output(dwelling):
     else:
         dwelling.savings_from_fghrs = 0
 
-    dwelling.output_from_water_heater = numpy.maximum(0,
-                                                      dwelling.total_water_heating +
-                                                      dwelling.input_from_solar +
-                                                      dwelling.fghrs_input_from_solar -
-                                                      dwelling.savings_from_wwhrs -
-                                                      dwelling.savings_from_fghrs)
+    return numpy.maximum(0,
+                         dwelling.total_water_heating +
+                         dwelling.input_from_solar +
+                         dwelling.fghrs_input_from_solar -
+                         dwelling.savings_from_wwhrs -
+                         dwelling.savings_from_fghrs)
 
 
 def internal_heat_gain(dwelling):
@@ -136,44 +136,55 @@ def internal_heat_gain(dwelling):
 
 
 def heating_systems_energy(dwelling):
-    dwelling.Q_main_1 = dwelling.fraction_of_heat_from_main * dwelling.main_heating_fraction * dwelling.Q_required
+    Q_main_1 = dwelling.fraction_of_heat_from_main * dwelling.main_heating_fraction * dwelling.Q_required
 
-    dwelling.sys1_space_effy = dwelling.main_sys_1.space_heat_effy(dwelling.Q_main_1)
+    sys1_space_effy = dwelling.main_sys_1.space_heat_effy(Q_main_1)
 
-    dwelling.Q_spaceheat_main = 100 * dwelling.Q_main_1 / dwelling.sys1_space_effy
+    Q_spaceheat_main = 100 * Q_main_1 / sys1_space_effy
 
     if dwelling.get('main_sys_2'):
-        dwelling.Q_main_2 = dwelling.fraction_of_heat_from_main * \
-                            dwelling.main_heating_2_fraction * dwelling.Q_required
+        Q_main_2 = dwelling.fraction_of_heat_from_main * \
+                   dwelling.main_heating_2_fraction * dwelling.Q_required
 
-        dwelling.sys2_space_effy = dwelling.main_sys_2.space_heat_effy(dwelling.Q_main_2)
+        sys2_space_effy = dwelling.main_sys_2.space_heat_effy(Q_main_2)
 
-        dwelling.Q_spaceheat_main_2 = 100 * dwelling.Q_main_2 / dwelling.sys2_space_effy
+        Q_spaceheat_main_2 = 100 * Q_main_2 / sys2_space_effy
 
     else:
-        dwelling.Q_spaceheat_main_2 = numpy.zeros(12)
-        dwelling.Q_main_2 = [0, ]
+        Q_spaceheat_main_2 = numpy.zeros(12)
+        Q_main_2 = [0, ]
+        sys2_space_effy = None
 
     if dwelling.fraction_of_heat_from_main < 1:
-        Q_secondary = (1 - dwelling.fraction_of_heat_from_main) * dwelling.Q_required
+        q_secondary = (1 - dwelling.fraction_of_heat_from_main) * dwelling.Q_required
 
-        dwelling.secondary_space_effy = dwelling.secondary_sys.space_heat_effy(Q_secondary)
-        dwelling.Q_spaceheat_secondary = 100 * Q_secondary / dwelling.secondary_space_effy
+        secondary_space_effy = dwelling.secondary_sys.space_heat_effy(q_secondary)
+        q_spaceheat_secondary = 100 * q_secondary / secondary_space_effy
 
     else:
-        dwelling.Q_spaceheat_secondary = numpy.zeros(12)
+        q_spaceheat_secondary = numpy.zeros(12)
+        secondary_space_effy = None
 
     water_effy = dwelling.water_sys.water_heat_effy(dwelling.output_from_water_heater)
 
     if hasattr(dwelling.water_sys, "keep_hot_elec_consumption"):
         Q_waterheat = 100 * (
-            dwelling.output_from_water_heater - dwelling.combi_loss_monthly) / dwelling.water_effy
+            dwelling.output_from_water_heater - dwelling.combi_loss_monthly) / water_effy
     else:
-        Q_waterheat = 100 * dwelling.output_from_water_heater / dwelling.water_effy
+        Q_waterheat = 100 * dwelling.output_from_water_heater / water_effy
 
-    dwelling.water_effy = water_effy
-    dwelling.Q_waterheat = Q_waterheat
-    dwelling.Q_spacecooling = dwelling.Q_cooling_required / dwelling.cooling_seer
+    return dict(
+        Q_main_1=Q_main_1,
+        sys1_space_effy=sys1_space_effy,
+        Q_spaceheat_main=Q_spaceheat_main,
+        Q_main_2=Q_main_2,
+        Q_spaceheat_main_2=Q_spaceheat_main_2,
+        sys2_space_effy=sys2_space_effy,
+        secondary_space_effy=secondary_space_effy,
+        Q_spaceheat_secondary=q_spaceheat_secondary,
+        water_effy=water_effy,
+        Q_waterheat=Q_waterheat,
+        Q_spacecooling=dwelling.Q_cooling_required / dwelling.cooling_seer)
 
 
 def sap(ground_floor_area, fuel_cost):
@@ -241,10 +252,11 @@ def perform_demand_calc(dwelling):
     Calculate the SAP energy demand for a dwelling
 
     Args:
-        dwelling:
+        dwelling (Dwelling):
 
     """
 
+    # TODO: modify functions to take only the arguments they need instead of the whole dwelling data.
     dwelling.update(ventilation(dwelling))
 
     dwelling.update(heat_loss(dwelling))
@@ -255,12 +267,15 @@ def perform_demand_calc(dwelling):
 
     dwelling.update(internal_heat_gain(dwelling))
 
-    # todo: convert the rest of these to use "update" semantics
+    dwelling.update(solar(dwelling))
 
-    solar(dwelling)
-    heating_requirement(dwelling)
+    dwelling.Q_required = heating_requirement(dwelling)
+
     dwelling.Q_cooling_required = cooling_requirement(dwelling)
-    water_heater_output(dwelling)
+
+    dwelling.output_from_water_heater = water_heater_output(dwelling)
+
+    return dwelling
 
 
 def perform_full_calc(dwelling):
@@ -274,9 +289,8 @@ def perform_full_calc(dwelling):
 
 
     """
-    perform_demand_calc(dwelling)
-    heating_systems_energy(dwelling)
-
+    dwelling = perform_demand_calc(dwelling)
+    dwelling.update(heating_systems_energy(dwelling))
     dwelling.update(appendix_m.pv(dwelling))
     dwelling.update(appendix_m.wind_turbines(dwelling))
     dwelling.update(appendix_m.hydro(dwelling))

@@ -18,9 +18,10 @@ def overshading_factors(dwelling_overshading):
 
     """
     overshading_factors = TABLE_6D[dwelling_overshading]
-    return { key: overshading_factors[key] for key in ['light_access_factor',
-                                                        'solar_access_factor_winter',
-                                                        'solar_access_factor_summer']}
+    return {key: overshading_factors[key] for key in ['light_access_factor',
+                                                      'solar_access_factor_winter',
+                                                      'solar_access_factor_summer']}
+
 
 def incident_solar(Igh, details, orientation, is_roof_window):
     if not is_roof_window:
@@ -50,33 +51,22 @@ def solar_access_factor_summer(dwelling, opening):
 
 
 def solar(dwelling):
-    dwelling.solar_gain_winter = sum(
-            0.9 * solar_access_factor_winter(dwelling,
-                                             o) * o.opening_type.gvalue * o.opening_type.frame_factor * o.area *
-            incident_solar(dwelling.Igh_heating,
-                           SOLAR_HEATING,
-                           o.orientation_degrees * math.pi / 180,
-                           o.opening_type.roof_window)
-            for o in dwelling.openings)
+    solar_gain_winter = sum(
+        0.9 * solar_access_factor_winter(dwelling,
+                                         o) * o.opening_type.gvalue * o.opening_type.frame_factor * o.area *
+        incident_solar(dwelling.Igh_heating,
+                       SOLAR_HEATING,
+                       o.orientation_degrees * math.pi / 180,
+                       o.opening_type.roof_window)
+        for o in dwelling.openings)
 
-    # for o in dwelling.openings:
-    #     flux=incident_solar(dwelling.Igh_heating,
-    #                    solar_constants_heating,
-    #                    o.orientation_degrees*math.pi/180,
-    #                    o.opening_type.roof_window)
-    #
-    #     print(o.area,o.orientation_degrees,flux,o.type.gvalue,o.type.frame_factor,solar_access_factor_winter(dwelling,o))
-
-    dwelling.winter_heat_gains = dwelling.total_internal_gains + \
-                                 dwelling.solar_gain_winter
-
-    # !!! Really only want to do this if we have cooling
+    # TODO Really only want to do this if we have cooling
     sol_gain = 0
     for o in dwelling.openings:
         sol_inc = incident_solar(dwelling.Igh_summer,
-                       SolarConstants(dwelling.latitude),
-                       o.orientation_degrees * math.pi / 180,
-                       o.opening_type.roof_window)
+                                 SolarConstants(dwelling.latitude),
+                                 o.orientation_degrees * math.pi / 180,
+                                 o.opening_type.roof_window)
         sol_access = solar_access_factor_summer(dwelling, o)
         o_type = o.opening_type
 
@@ -84,5 +74,13 @@ def solar(dwelling):
 
     dwelling.solar_gain_summer = sol_gain
 
-    dwelling.summer_heat_gains = dwelling.total_internal_gains_summer + dwelling.solar_gain_summer
+    dwelling.summer_heat_gains = dwelling.total_internal_gains_summer + sol_gain
 
+    dwelling.solar_gain_winter = solar_gain_winter
+
+    dwelling.winter_heat_gains = dwelling.total_internal_gains + solar_gain_winter
+
+    return dict(solar_gain_summer=sol_gain,
+                summer_heat_gains=dwelling.total_internal_gains_summer + sol_gain,
+                solar_gain_winter=solar_gain_winter,
+                winter_heat_gains = dwelling.total_internal_gains + solar_gain_winter)
