@@ -366,6 +366,3 @@ def lookup_sap_tables(dwelling):
         # FIXME @Andy: Basically, I have no idea what happens here
         assert False
 
-    if dwelling.get('next_stage'):
-        print('warning, calc stage thing enabled no idea what it does')
-        dwelling.next_stage()

@@ -5,9 +5,9 @@ import sys
 import unittest
 
 from epctk import runner
-from epctk.dwelling import Dwelling, log_dwelling
+from epctk.dwelling import Dwelling
 from epctk.io import input_conversion_rules, yaml_io
-from epctk.utils import SAPCalculationError, ALL_PARAMS
+from epctk.utils import SAPCalculationError
 import epctk.appendix.appendix_t
 
 from tests import output_checker
@@ -42,31 +42,19 @@ class SingleLevelFilter(logging.Filter):
             return record.levelno == self.passlevel
 
 
-def dump_param_list():
-    for i in range(len(ALL_PARAMS)):
-        for k in ALL_PARAMS[i]:
-            print((i, k))
-
-    print(("Dumped inputs: ", len(ALL_PARAMS[1])))
-
-
 def create_sap_dwelling(inputs):
     """
     Create a SAP dwelling object from parsed SAP input file
     :param inputs:
     :return:
     """
-    # dwelling = ParamTrackerDwelling()
-
     dwelling = Dwelling()
     input_conversion_rules.process_inputs(dwelling, inputs)
 
     # if not sap_dwelling_validator.validate(dwelling):
     # logging.error("Bad inputs")
     # exit(0)
-    log_dwelling(dwelling)
 
-    # dwelling.next_stage()
     return dwelling
 
 
@@ -288,3 +276,6 @@ if __name__ == '__main__':
     # run_sample_cases(options.reparse)
 
     # dump_param_list()
+
+if __name__ == "__main__":
+    unittest.main()

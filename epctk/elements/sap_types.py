@@ -1,6 +1,13 @@
 from enum import Enum, IntEnum
 
 
+class Country(IntEnum):
+    England = 1
+    Wales = 2
+    Scotland = 3
+    NortherIreland = 4
+
+
 class WallTypes(IntEnum):
     MASONRY = 1
     OTHER = 2

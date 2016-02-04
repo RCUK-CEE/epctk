@@ -6,9 +6,12 @@ Tables for RdSAP
 """
 
 import math
+from enum import IntEnum
+
+from ..elements import Country
 
 
-class AgeBands:
+class AgeBands(IntEnum):
     A = 1
     B = 2
     C = 3
@@ -22,11 +25,80 @@ class AgeBands:
     K = 11
 
 
+# Age band 	England & Wales 	Scotland 	Northern Ireland
+# A 	before 1900 	before 1919 	before 1919
+# B 	1900-1929 	1919-1929 	1919-1929
+# C 	1930-1949 	1930-1949 	1930-1949
+# D 	1950-1966 	1950-1964 	1950-1973
+# E 	1967-1975 	1965-1975 	1974-1977
+# F 	1976-1982 	1976-1983 	1978-1985
+# G 	1983-1990 	1984-1991 	1986-1991
+# H 	1991-1995 	1992-1998 	1992-1999
+# I 	1996-2002 	1999-2002 	2000-2006
+# J 	2003-2006 	2003-2007 	(not applicable)
+# K 	2007 onwards 	2008 onwards 	2007 onwards
+
+# map ageband to year of construction:
+TABLE_S1 = {
+    Country.Scotland: {AgeBands.A: (None, 1919),
+                       AgeBands.B: (1919, 1929),
+                       AgeBands.C: (1930, 1949),
+                       AgeBands.D: (1950, 1964),
+                       AgeBands.E: (1965, 1975),
+                       AgeBands.F: (1976, 1983),
+                       AgeBands.G: (1984, 1991),
+                       AgeBands.H: (1992, 1998),
+                       AgeBands.I: (1999, 2002),
+                       AgeBands.J: (2003, 2007),
+                       AgeBands.K: (2008, None)},
+    Country.NortherIreland: {AgeBands.A: (None, 1919),
+                             AgeBands.B: (1919, 1929),
+                             AgeBands.C: (1930, 1949),
+                             AgeBands.D: (1950, 1973),
+                             AgeBands.E: (1974, 1977),
+                             AgeBands.F: (1978, 1985),
+                             AgeBands.G: (1986, 1991),
+                             AgeBands.H: (1992, 1999),
+                             AgeBands.I: (2000, 2006),
+                             AgeBands.J: None,
+                             AgeBands.K: (2007, None)},
+    Country.England: {AgeBands.A: (0, 1900),
+                      AgeBands.B: (1900, 1929),
+                      AgeBands.C: (1930, 1949),
+                      AgeBands.D: (1950, 1966),
+                      AgeBands.E: (1967, 1975),
+                      AgeBands.F: (1976, 1982),
+                      AgeBands.G: (1983, 1990),
+                      AgeBands.H: (1991, 1995),
+                      AgeBands.I: (1996, 2002),
+                      AgeBands.J: (2003, 2006),
+                      AgeBands.K: (2007, None)},
+    Country.Wales: {AgeBands.A: (None, 1900), AgeBands.B: (1900, 1929), AgeBands.C: (1930, 1949),
+                    AgeBands.D: (1950, 1966), AgeBands.E: (1967, 1975), AgeBands.F: (1976, 1982),
+                    AgeBands.G: (1983, 1990), AgeBands.H: (1991, 1995), AgeBands.I: (1996, 2002),
+                    AgeBands.J: (2003, 2006), AgeBands.K: (2007, None)}
+}
+
+
+def table_s1_age_band(building_age, country=Country.England):
+    country_table = TABLE_S1[country]
+
+    for band, yr_range in country_table.items():
+        if yr_range is None:
+            continue
+        start, end = yr_range
+        start = start if start is not None else -9999
+        end = end if end is not None else 9999
+
+        if start < building_age <= end:
+            return band
+
+
 def floor_infiltration(age_band):
     return 0.2 if age_band <= AgeBands.E else 0.1
 
 
-def Nfans_and_vents(age_band, Nrooms):
+def n_fans_and_vents(age_band, Nrooms):
     if age_band <= AgeBands.E:
         return 0
     elif age_band <= AgeBands.G:
@@ -41,16 +113,17 @@ def Nfans_and_vents(age_band, Nrooms):
         else:
             return 4
 
+
 LIVING_AREA_FRACTION = [
     0.75, 0.5, 0.3, 0.25, 0.21, 0.18, 0.16, 0.14, 0.13, 0.12, 0.11, 0.1, 0.1, 0.09, 0.09
 ]
 
 
-def living_area_fraction(nrooms):
-    return LIVING_AREA_FRACTION[int(nrooms) - 1]
+def living_area_fraction(n_rooms):
+    return LIVING_AREA_FRACTION[int(n_rooms) - 1]
 
 
-def Uroof(loft_ins_thickness_mm):
+def u_roof(loft_ins_thickness_mm):
     return 1 / (1 / 2.3 + 0.021 * loft_ins_thickness_mm)
 
 
@@ -119,7 +192,6 @@ CONCRETE_WALL_U_VALUES = {  # System build as built
     AgeBands.G: 0.6,
     AgeBands.H: 0.6,
 }
-
 
 CAVITY_WALL_THICKNESS = {
     AgeBands.A: .25,
@@ -222,17 +294,31 @@ class Glazing:
         for k, v in list(self.properties.items()):
             setattr(target, k, v)
 
+
 GLAZING_TYPES = dict(
     SINGLE=Glazing(0.9, 0.85, 1 / (0.04 + 1 / 4.8), False),
     ### Should vary with age
     DOUBLE=Glazing(0.8, 0.76, 1 / (0.04 + 1 / 3.1), True),
 )
+
+
 # also need secondary and triple glazing
 
 
-class DwellingType:
+class DwellingType(IntEnum):
     HOUSE = 1
     FLAT = 2
+    BUNGALOW = 3
+    MAISONETTE = 4
+
+
+class DwellingSubType(IntEnum):
+    DETACHED = 1
+    SEMI_DETACHED = 2
+    MID_TERRACE = 3
+    END_TERRACE = 4
+    ENCLOSED_MID_TERRACE = 5
+    ENCLOSED_END_TERRACE = 6
 
 
 def has_draught_lobby(dwelling_type):

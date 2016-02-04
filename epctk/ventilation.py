@@ -14,7 +14,6 @@ from .tables import (mech_vent_default_in_use_factor, mech_vent_default_hr_effy_
 from .utils import monthly_to_annual
 
 
-
 def configure_ventilation(dwelling):
     """
 
@@ -66,7 +65,6 @@ def configure_ventilation(dwelling):
 
     elif ventilation_type == VentilationTypes.MV:
         set_mv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type)
-
 
 
 # TODO: change these to output the relevant data so we don't have to pass in dwelling
@@ -163,11 +161,10 @@ def set_mv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_t
 
 
 def set_piv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
-
     if dwelling.get('piv_sfp'):
-            piv_sfp = dwelling.piv_sfp
-            in_use_factor = mech_vent_in_use_factor(dwelling.ventilation_type, mv_ducttype,
-                                                    mv_approved)
+        piv_sfp = dwelling.piv_sfp
+        in_use_factor = mech_vent_in_use_factor(dwelling.ventilation_type, mv_ducttype,
+                                                mv_approved)
     else:
         piv_sfp = 0.8  # Table 4g
         in_use_factor = mech_vent_default_in_use_factor()
@@ -194,25 +191,22 @@ def ventilation(dwelling):
 
     inf_chimneys_ach = (dwelling.Nchimneys * 40 + dwelling.Nflues * 20 +
                         dwelling.Nfansandpassivevents * 10 + dwelling.Nfluelessgasfires * 40) / dwelling.volume
-    dwelling.inf_chimneys_ach = inf_chimneys_ach
 
     if dwelling.get('pressurisation_test_result') is not None:
         base_infiltration_rate = dwelling.pressurisation_test_result / 20 + inf_chimneys_ach
     elif dwelling.get('pressurisation_test_result_average') is not None:
-        base_infiltration_rate = (
-                                     dwelling.pressurisation_test_result_average + 2) / 20. + inf_chimneys_ach
+        base_infiltration_rate = (dwelling.pressurisation_test_result_average + 2) / 20. + inf_chimneys_ach
     else:
         additional_infiltration = (dwelling.Nstoreys - 1) * 0.1
         draught_infiltration = 0.05 if not dwelling.has_draught_lobby else 0
-        dwelling.window_infiltration = 0.25 - 0.2 * dwelling.draught_stripping
+        window_infiltration = 0.25 - 0.2 * dwelling.draught_stripping
 
         base_infiltration_rate = (additional_infiltration
                                   + dwelling.structural_infiltration
                                   + dwelling.floor_infiltration
                                   + draught_infiltration
-                                  + dwelling.window_infiltration
+                                  + window_infiltration
                                   + inf_chimneys_ach)
-    dwelling.base_infiltration_rate = base_infiltration_rate
 
     shelter_factor = 1 - 0.075 * dwelling.Nshelteredsides
     adjusted_infiltration_rate = shelter_factor * base_infiltration_rate
@@ -220,37 +214,43 @@ def ventilation(dwelling):
     effective_inf_rate = adjusted_infiltration_rate * dwelling.wind_speed / 4.
 
     if dwelling.ventilation_type == VentilationTypes.NATURAL:
-        dwelling.infiltration_ach = numpy.where(
-                effective_inf_rate < 1.,
-                0.5 + (effective_inf_rate ** 2) * 0.5,
-                effective_inf_rate)
+        infiltration_ach = numpy.where(
+            effective_inf_rate < 1.,
+            0.5 + (effective_inf_rate ** 2) * 0.5,
+            effective_inf_rate)
 
     elif dwelling.ventilation_type == VentilationTypes.MV:
         system_ach = 0.5
-        dwelling.infiltration_ach = effective_inf_rate + system_ach
+        infiltration_ach = effective_inf_rate + system_ach
 
     elif dwelling.ventilation_type in [VentilationTypes.MEV_CENTRALISED,
                                        VentilationTypes.MEV_DECENTRALISED,
                                        VentilationTypes.PIV_FROM_OUTSIDE]:
         system_ach = 0.5
-        dwelling.infiltration_ach = numpy.where(
-                effective_inf_rate < 0.5 * system_ach,
-                system_ach,
-                effective_inf_rate + 0.5 * system_ach)
+        infiltration_ach = numpy.where(
+            effective_inf_rate < 0.5 * system_ach,
+            system_ach,
+            effective_inf_rate + 0.5 * system_ach)
     elif dwelling.ventilation_type == VentilationTypes.MVHR:
         system_ach = 0.5
-        dwelling.infiltration_ach = (
+        infiltration_ach = (
             effective_inf_rate + system_ach * (1 - dwelling.mvhr_effy / 100)
         )
+    else:
+        # TODO: should this be allowed?
+        infiltration_ach = None
 
     if dwelling.get('appendix_q_systems') is not None:
         for appendix_q_system in dwelling.appendix_q_systems:
             if 'ach_rates' in appendix_q_system:
                 # TODO: Should really check that we don't get two sets of ach rates
-                dwelling.infiltration_ach = numpy.array(appendix_q_system['ach_rates'])
+                infiltration_ach = numpy.array(appendix_q_system['ach_rates'])
 
-    dwelling.infiltration_ach_annual = monthly_to_annual(
-            dwelling.infiltration_ach)
+    return dict(
+        base_infiltration_rate=base_infiltration_rate,
+        infiltration_ach=infiltration_ach,
+        inf_chimneys_ach=inf_chimneys_ach,
+        infiltration_ach_annual=monthly_to_annual(infiltration_ach))
 
 
 def infiltration(wall_type=None, floor_type=None):
