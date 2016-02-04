@@ -77,9 +77,10 @@ def set_mev_centralised_properties(dwelling, mv_ducttype, mv_approved, ventilati
         sfp = 0.8  # Table 4g
         in_use_factor = mech_vent_default_in_use_factor()
 
-    dwelling.adjusted_fan_sfp = sfp * in_use_factor
     if mv_approved:
         assert False
+
+    dwelling.adjusted_fan_sfp = sfp * in_use_factor
 
 
 def set_mev_decentralised_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
@@ -98,8 +99,9 @@ def set_mev_decentralised_properties(dwelling, mv_ducttype, mv_approved, ventila
         for fantype in ['kitchen', 'other']:
             configuration = location + '_' + fantype
             countattr = 'mev_fan_' + configuration + '_count'
-            if dwelling.get(countattr):
-                count = getattr(dwelling, countattr)
+
+            count = dwelling.get(countattr)
+            if count:
                 sfp = get_sfp(configuration)
                 in_use_factor = mech_vent_in_use_factor(ventilation_type,
                                                         this_duct_type,
@@ -109,12 +111,14 @@ def set_mev_decentralised_properties(dwelling, mv_ducttype, mv_approved, ventila
                 total_flow += flowrate * count
 
     if total_flow > 0:
-        dwelling.adjusted_fan_sfp = sfp_sum / total_flow
+        adjusted_fan_sfp = sfp_sum / total_flow
 
     else:
         in_use_factor = mech_vent_default_in_use_factor()
         sfp = 0.8  # Table 4g
-        dwelling.adjusted_fan_sfp = sfp * in_use_factor
+        adjusted_fan_sfp = sfp * in_use_factor
+
+    dwelling.adjusted_fan_sfp = adjusted_fan_sfp
 
 
 def set_mvhr_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
@@ -157,6 +161,7 @@ def set_mv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_t
     else:
         mv_sfp = 2  # Table 4g
         in_use_factor = mech_vent_default_in_use_factor()
+
     dwelling.adjusted_fan_sfp = mv_sfp * in_use_factor
 
 
@@ -168,7 +173,18 @@ def set_piv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_
     else:
         piv_sfp = 0.8  # Table 4g
         in_use_factor = mech_vent_default_in_use_factor()
+
     dwelling.adjusted_fan_sfp = piv_sfp * in_use_factor
+
+
+def infiltration(wall_type=None, floor_type=None):
+    out = {}
+    if wall_type:
+        out['structural_infiltration'] = 0.35 if wall_type == WallTypes.MASONRY else 0.25
+
+    if floor_type:
+        out['floor_infiltration'] = FLOOR_INFILTRATION[floor_type]
+    return out
 
 
 def ventilation(dwelling):
@@ -255,11 +271,3 @@ def ventilation(dwelling):
         infiltration_ach_annual=monthly_to_annual(infiltration_ach))
 
 
-def infiltration(wall_type=None, floor_type=None):
-    out = {}
-    if wall_type:
-        out['structural_infiltration'] = 0.35 if wall_type == WallTypes.MASONRY else 0.25
-
-    if floor_type:
-        out['floor_infiltration'] = FLOOR_INFILTRATION[floor_type]
-    return out

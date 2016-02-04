@@ -4,7 +4,6 @@ import pickle
 import sys
 import unittest
 
-from epctk import runner
 from epctk.dwelling import Dwelling
 from epctk.io import input_conversion_rules, yaml_io
 from epctk.runner import run_dwelling
@@ -27,6 +26,11 @@ SAP_REGIONS = {
     '10.rtf': 11,
 }
 
+@unittest.skip("Fast test by skipping official test cases")
+class TestOfficialCases(unittest.TestCase):
+    def test_run_all_known_working_noparse(self):
+        run_official_cases(
+            OFFICIAL_CASES, reparse=False)
 
 class SingleLevelFilter(logging.Filter):
     def __init__(self, passlevel, reject):
@@ -169,14 +173,6 @@ def run_official_cases(cases, maxruns=None, reparse=False):
     print(("Ran: ", count))
 
 
-class TestOfficialCases(unittest.TestCase):
-    def test_run_all_known_working_noparse(self):
-        run_official_cases(
-            OFFICIAL_CASES, reparse=False)
-    #
-    # def test_run_all_known_working_parse(self):
-    #     run_official_cases(
-    #         OFFICIAL_CASES_THAT_WORK, reparse=True)
 
 
 if __name__ == '__main__':

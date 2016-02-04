@@ -1,20 +1,20 @@
-from epctk.cooling import configure_cooling_system
-from epctk.domestic_hot_water import hw_primary_circuit_loss
+from .cooling import configure_cooling_system
+from .domestic_hot_water import hw_primary_circuit_loss
+from .utils import SAPInputError
 from . import fuels
-from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
+from .fuels import ELECTRICITY_STANDARD
 from .constants import USE_TABLE_4D_FOR_RESPONSIVENESS
 from .domestic_hot_water import get_water_heater
 from .elements import HeatingTypes
 from .fuel_use import configure_fuel_costs
-from .fuels import ELECTRICITY_STANDARD
 from .heating_loaders import sedbuk_2005_heating_system, sedbuk_2009_heating_system, pcdf_heating_system
 from .solar import overshading_factors
 from .tables import (table_1b_occupancy, table_1b_daily_hot_water, TABLE_10, table_2a_hot_water_vol_factor,
                      table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,
                      TABLE_4D, TABLE_4E, table_4f_fans_pumps_keep_hot, apply_table_4e,
                      table_5a_fans_and_pumps_gain)
-from .ventilation import configure_ventilation
-from .ventilation import infiltration
+from .ventilation import configure_ventilation, infiltration
+from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
 
 
 def lookup_sap_tables(dwelling):
@@ -60,10 +60,12 @@ def lookup_sap_tables(dwelling):
     # Add infiltration factors
     dwelling.update(infiltration(wall_type=dwelling.get("wall_type"),
                                  floor_type=dwelling.get("floor_type")))
+
+    configure_ventilation(dwelling)
+
     # Add overshading factors
     dwelling.update(overshading_factors(dwelling.overshading))
 
-    configure_ventilation(dwelling)
     configure_systems(dwelling)
     configure_cooling_system(dwelling)
 
@@ -76,7 +78,7 @@ def lookup_sap_tables(dwelling):
     # Bit of a special case here!
     if dwelling.get('reassign_systems_for_test_case_30'):
         # FIXME @Andy: Basically, I have no idea what happens here
-        assert False
+        raise SAPInputError("reassign_systems_for_test_case_30  was set but no idea why it should do!")
 
     dwelling.update(fix_misc_configuration(dwelling))
 

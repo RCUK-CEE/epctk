@@ -1,11 +1,34 @@
-from enum import Enum, IntEnum
+from enum import IntEnum
+
+from ..utils import SAPInputError
 
 
-class Country(IntEnum):
-    England = 1
-    Wales = 2
-    Scotland = 3
-    NortherIreland = 4
+class DwellingType(IntEnum):
+    HOUSE = 1
+    FLAT = 2
+    BUNGALOW = 3
+    MAISONETTE = 4
+
+    @classmethod
+    def from_string(cls, dwelling_type_name: str):
+        try:
+            return getattr(cls, dwelling_type_name.upper())
+        except AttributeError:
+            raise SAPInputError("{} is not a valid dwelling type".format(dwelling_type_name))
+
+class DwellingSubType(IntEnum):
+    DETACHED = 1
+    SEMI_DETACHED = 2
+    MID_TERRACE = 3
+    END_TERRACE = 4
+    ENCLOSED_MID_TERRACE = 5
+    ENCLOSED_END_TERRACE = 6
+
+
+class TerrainTypes(IntEnum):
+    DENSE_URBAN = 1
+    SUBURBAN = 2
+    RURAL = 3
 
 
 class WallTypes(IntEnum):
@@ -23,12 +46,6 @@ class FloorTypes(IntEnum):
 class ImmersionTypes(IntEnum):
     SINGLE = 1
     DUAL = 2
-
-
-class TerrainTypes(IntEnum):
-    DENSE_URBAN = 1
-    SUBURBAN = 2
-    RURAL = 3
 
 
 class FuelTypes(IntEnum):
@@ -58,7 +75,6 @@ _light_transmittance = {
     GlazingTypes.TRIPLE: 0.7,
     GlazingTypes.SECONDARY: 0.8
 }
-
 
 
 class ThermalStoreTypes(IntEnum):
@@ -201,3 +217,4 @@ class Opening:
         self.orientation_degrees = orientation_degrees
         self.opening_type = opening_type
         self.name = name
+

@@ -1,5 +1,5 @@
 SAP Tables
-~~~~~~~~~~
+----------
 
 Functions and constants implementing various SAP tables
 
@@ -10,3 +10,9 @@ Functions and constants implementing various SAP tables
 
 .. automodule:: epctk.tables.tables_
    :members:
+
+
+
+.. automodule:: epctk.tables.tables_appendix_s
+   :members:
+

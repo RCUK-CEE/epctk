@@ -5,13 +5,14 @@ Tables for RdSAP
 
 """
 
-import math
 from enum import IntEnum
 
-from ..elements import Country
+from ..elements import GlazingTypes
+from epctk.elements import DwellingType
+from ..elements.geographic import Country
 
 
-class AgeBands(IntEnum):
+class AgeBand(IntEnum):
     A = 1
     B = 2
     C = 3
@@ -40,47 +41,43 @@ class AgeBands(IntEnum):
 
 # map ageband to year of construction:
 TABLE_S1 = {
-    Country.Scotland: {AgeBands.A: (None, 1919),
-                       AgeBands.B: (1919, 1929),
-                       AgeBands.C: (1930, 1949),
-                       AgeBands.D: (1950, 1964),
-                       AgeBands.E: (1965, 1975),
-                       AgeBands.F: (1976, 1983),
-                       AgeBands.G: (1984, 1991),
-                       AgeBands.H: (1992, 1998),
-                       AgeBands.I: (1999, 2002),
-                       AgeBands.J: (2003, 2007),
-                       AgeBands.K: (2008, None)},
-    Country.NortherIreland: {AgeBands.A: (None, 1919),
-                             AgeBands.B: (1919, 1929),
-                             AgeBands.C: (1930, 1949),
-                             AgeBands.D: (1950, 1973),
-                             AgeBands.E: (1974, 1977),
-                             AgeBands.F: (1978, 1985),
-                             AgeBands.G: (1986, 1991),
-                             AgeBands.H: (1992, 1999),
-                             AgeBands.I: (2000, 2006),
-                             AgeBands.J: None,
-                             AgeBands.K: (2007, None)},
-    Country.England: {AgeBands.A: (0, 1900),
-                      AgeBands.B: (1900, 1929),
-                      AgeBands.C: (1930, 1949),
-                      AgeBands.D: (1950, 1966),
-                      AgeBands.E: (1967, 1975),
-                      AgeBands.F: (1976, 1982),
-                      AgeBands.G: (1983, 1990),
-                      AgeBands.H: (1991, 1995),
-                      AgeBands.I: (1996, 2002),
-                      AgeBands.J: (2003, 2006),
-                      AgeBands.K: (2007, None)},
-    Country.Wales: {AgeBands.A: (None, 1900), AgeBands.B: (1900, 1929), AgeBands.C: (1930, 1949),
-                    AgeBands.D: (1950, 1966), AgeBands.E: (1967, 1975), AgeBands.F: (1976, 1982),
-                    AgeBands.G: (1983, 1990), AgeBands.H: (1991, 1995), AgeBands.I: (1996, 2002),
-                    AgeBands.J: (2003, 2006), AgeBands.K: (2007, None)}
+    Country.Scotland: {AgeBand.A: (None, 1919),
+                       AgeBand.B: (1919, 1929),
+                       AgeBand.C: (1930, 1949),
+                       AgeBand.D: (1950, 1964),
+                       AgeBand.E: (1965, 1975),
+                       AgeBand.F: (1976, 1983),
+                       AgeBand.G: (1984, 1991),
+                       AgeBand.H: (1992, 1998),
+                       AgeBand.I: (1999, 2002),
+                       AgeBand.J: (2003, 2007),
+                       AgeBand.K: (2008, None)},
+    Country.NorthernIreland: {AgeBand.A: (None, 1919),
+                              AgeBand.B: (1919, 1929),
+                              AgeBand.C: (1930, 1949),
+                              AgeBand.D: (1950, 1973),
+                              AgeBand.E: (1974, 1977),
+                              AgeBand.F: (1978, 1985),
+                              AgeBand.G: (1986, 1991),
+                              AgeBand.H: (1992, 1999),
+                              AgeBand.I: (2000, 2006),
+                              AgeBand.J: None,
+                              AgeBand.K: (2007, None)},
+    Country.England: {AgeBand.A: (0, 1900),
+                      AgeBand.B: (1900, 1929),
+                      AgeBand.C: (1930, 1949),
+                      AgeBand.D: (1950, 1966),
+                      AgeBand.E: (1967, 1975),
+                      AgeBand.F: (1976, 1982),
+                      AgeBand.G: (1983, 1990),
+                      AgeBand.H: (1991, 1995),
+                      AgeBand.I: (1996, 2002),
+                      AgeBand.J: (2003, 2006),
+                      AgeBand.K: (2007, None)}
 }
 
 
-def table_s1_age_band(building_age, country=Country.England):
+def table_s1_age_band(building_age, country):
     country_table = TABLE_S1[country]
 
     for band, yr_range in country_table.items():
@@ -93,25 +90,6 @@ def table_s1_age_band(building_age, country=Country.England):
         if start < building_age <= end:
             return band
 
-
-def floor_infiltration(age_band):
-    return 0.2 if age_band <= AgeBands.E else 0.1
-
-
-def n_fans_and_vents(age_band, Nrooms):
-    if age_band <= AgeBands.E:
-        return 0
-    elif age_band <= AgeBands.G:
-        return 1
-    else:
-        if Nrooms <= 2:
-            return 1
-        elif Nrooms <= 5:
-            return 2
-        elif Nrooms <= 8:
-            return 3
-        else:
-            return 4
 
 
 LIVING_AREA_FRACTION = [
@@ -128,36 +106,36 @@ def u_roof(loft_ins_thickness_mm):
 
 
 CAVITY_WALL_U_VALUES = {  # Masonry cavity as built
-    AgeBands.A: 2.1,
-    AgeBands.B: 1.6,
-    AgeBands.C: 1.6,
-    AgeBands.D: 1.6,
-    AgeBands.E: 1.6,
-    AgeBands.F: 1.0,
-    AgeBands.G: 0.6,
-    AgeBands.H: 0.6,
+    AgeBand.A: 2.1,
+    AgeBand.B: 1.6,
+    AgeBand.C: 1.6,
+    AgeBand.D: 1.6,
+    AgeBand.E: 1.6,
+    AgeBand.F: 1.0,
+    AgeBand.G: 0.6,
+    AgeBand.H: 0.6,
 }
 
 FILLED_CAVITY_WALL_U_VALUES = {  # Masonry cavity filled
-    AgeBands.A: 0.5,
-    AgeBands.B: 0.5,
-    AgeBands.C: 0.5,
-    AgeBands.D: 0.5,
-    AgeBands.E: 0.5,
-    AgeBands.F: 0.4,
-    AgeBands.G: 0.35,
-    AgeBands.H: 0.35,
+    AgeBand.A: 0.5,
+    AgeBand.B: 0.5,
+    AgeBand.C: 0.5,
+    AgeBand.D: 0.5,
+    AgeBand.E: 0.5,
+    AgeBand.F: 0.4,
+    AgeBand.G: 0.35,
+    AgeBand.H: 0.35,
 }
 
 SOLID_BRICK_U_VALUES = {  # Solid brick as built
-    AgeBands.A: 2.1,
-    AgeBands.B: 2.1,
-    AgeBands.C: 2.1,
-    AgeBands.D: 2.1,
-    AgeBands.E: 1.7,
-    AgeBands.F: 1.0,
-    AgeBands.G: .6,
-    AgeBands.H: .6,
+    AgeBand.A: 2.1,
+    AgeBand.B: 2.1,
+    AgeBand.C: 2.1,
+    AgeBand.D: 2.1,
+    AgeBand.E: 1.7,
+    AgeBand.F: 1.0,
+    AgeBand.G: .6,
+    AgeBand.H: .6,
 }
 
 """
@@ -172,113 +150,162 @@ SOLID_BRICK_U_VALUES= { ### Solid brick as built
     AgeBands.H:.6, 
 }"""
 TIMBER_WALL_U_VALUES = {  # Timber frame
-    AgeBands.A: 2.5,
-    AgeBands.B: 1.9,
-    AgeBands.C: 1.9,
-    AgeBands.D: 1.0,
-    AgeBands.E: 0.8,
-    AgeBands.F: 0.45,
-    AgeBands.G: 0.4,
-    AgeBands.H: 0.4,
+    AgeBand.A: 2.5,
+    AgeBand.B: 1.9,
+    AgeBand.C: 1.9,
+    AgeBand.D: 1.0,
+    AgeBand.E: 0.8,
+    AgeBand.F: 0.45,
+    AgeBand.G: 0.4,
+    AgeBand.H: 0.4,
 }
 
 CONCRETE_WALL_U_VALUES = {  # System build as built
-    AgeBands.A: 2.0,
-    AgeBands.B: 2.0,
-    AgeBands.C: 2.0,
-    AgeBands.D: 2.0,
-    AgeBands.E: 1.7,
-    AgeBands.F: 1.0,
-    AgeBands.G: 0.6,
-    AgeBands.H: 0.6,
+    AgeBand.A: 2.0,
+    AgeBand.B: 2.0,
+    AgeBand.C: 2.0,
+    AgeBand.D: 2.0,
+    AgeBand.E: 1.7,
+    AgeBand.F: 1.0,
+    AgeBand.G: 0.6,
+    AgeBand.H: 0.6,
 }
 
 CAVITY_WALL_THICKNESS = {
-    AgeBands.A: .25,
-    AgeBands.B: .25,
-    AgeBands.C: .25,
-    AgeBands.D: .25,
-    AgeBands.E: .25,
-    AgeBands.F: .26,
-    AgeBands.G: .27,
-    AgeBands.H: .27,
+    AgeBand.A: .25,
+    AgeBand.B: .25,
+    AgeBand.C: .25,
+    AgeBand.D: .25,
+    AgeBand.E: .25,
+    AgeBand.F: .26,
+    AgeBand.G: .27,
+    AgeBand.H: .27,
 }
 
 SOLID_WALL_THICKNESS = {
-    AgeBands.A: .22,
-    AgeBands.B: .22,
-    AgeBands.C: .22,
-    AgeBands.D: .22,
-    AgeBands.E: .24,
-    AgeBands.F: .25,
-    AgeBands.G: .27,
-    AgeBands.H: .27,
+    AgeBand.A: .22,
+    AgeBand.B: .22,
+    AgeBand.C: .22,
+    AgeBand.D: .22,
+    AgeBand.E: .24,
+    AgeBand.F: .25,
+    AgeBand.G: .27,
+    AgeBand.H: .27,
 }
 
 TIMBER_WALL_THICKNESS = {
-    AgeBands.A: .15,
-    AgeBands.B: .15,
-    AgeBands.C: .15,
-    AgeBands.D: .25,
-    AgeBands.E: .27,
-    AgeBands.F: .27,
-    AgeBands.G: .27,
-    AgeBands.H: .27,
+    AgeBand.A: .15,
+    AgeBand.B: .15,
+    AgeBand.C: .15,
+    AgeBand.D: .25,
+    AgeBand.E: .27,
+    AgeBand.F: .27,
+    AgeBand.G: .27,
+    AgeBand.H: .27,
 }
 
 CONCRETE_WALL_THICKNESS = {
-    AgeBands.A: .25,
-    AgeBands.B: .25,
-    AgeBands.C: .25,
-    AgeBands.D: .25,
-    AgeBands.E: .25,
-    AgeBands.F: .30,
-    AgeBands.G: .30,
-    AgeBands.H: .30,
+    AgeBand.A: .25,
+    AgeBand.B: .25,
+    AgeBand.C: .25,
+    AgeBand.D: .25,
+    AgeBand.E: .25,
+    AgeBand.F: .30,
+    AgeBand.G: .30,
+    AgeBand.H: .30,
 }
 
 
-def floor_insulation_thickness(age_band):
-    if age_band <= AgeBands.H:
+#Table S5 (contains miscellaneous substitutions)
+
+
+def n_fans_and_vents(age_band, n_rooms):
+    if age_band <= AgeBand.E:
         return 0
-    elif age_band == AgeBands.I:
-        return 25
-    elif age_band == AgeBands.J:
-        return 75
-    elif age_band == AgeBands.K:
-        return 100
-
-
-def Ugnd(age_band, exposed_perimeter, wall_thickness, Agndfloor):
-    if Agndfloor == 0:
-        return 0
-
-    lamda_g = 1.5
-    Rsi = .17
-    Rse = 0.04
-    Rf = 0.001 * floor_insulation_thickness(age_band) / 0.035
-
-    if age_band <= AgeBands.B:
-        # suspended timber floor
-        dg = wall_thickness + lamda_g * (Rsi + Rse)
-        B = 2 * Agndfloor / exposed_perimeter
-        Ug = 2 * lamda_g * math.log(math.pi * B / dg + 1) / (math.pi * B + dg)
-        h = 0.3
-        v = 5
-        fw = 0.05
-        eps = 0.003
-        Uw = 1.5
-        Ux = 2 * h * Uw / B + 1450 * eps * v * fw / B
-        return 1 / (2 * Rsi + Rf + 0.2 + 1 / (Ug + Ux))
+    elif age_band <= AgeBand.G:
+        return 1
     else:
-        # solid floor
-        dt = wall_thickness + lamda_g * (Rsi + Rf + Rse)
-        B = 2 * Agndfloor / exposed_perimeter
-        if dt < B:
-            return 2 * lamda_g * math.log(math.pi * B / dt + 1) / (math.pi * B + dt)
+        if n_rooms <= 2:
+            return 1
+        elif n_rooms <= 5:
+            return 2
+        elif n_rooms <= 8:
+            return 3
         else:
-            return lamda_g / (0.457 * B + dt)
+            return 4
 
+
+def floor_infiltration(age_band):
+    return 0.2 if age_band <= AgeBand.E else 0.1
+
+
+def has_draught_lobby(dwelling_type):
+    """
+    House or bungalow: no
+    Flat or maisonette: yes if heated or unheated corridor
+
+    Args:
+        dwelling_type:
+
+    Returns:
+
+    """
+    return dwelling_type == DwellingType.FLAT
+
+
+def percent_draught_stripping(openings):
+    """
+    *Table S5*
+
+    Windows draughtstripped equal to percentage of triple, double or secondary glazing
+    (glazing in a non-separated conservatory is included in the calculation of the percentage).
+
+    Doors not draughtstripped
+
+    Args:
+        dwelling:
+
+    Returns:
+        float percentage draft stripped
+    """
+    count_openings = 0
+    count_non_single = 0
+    for opening in openings:
+        count_openings += 1
+        if opening.get('glazing_type') in [GlazingTypes.DOUBLE, GlazingTypes.TRIPLE, GlazingTypes.SECONDARY]:
+            count_non_single += 1
+
+    return 100 * count_non_single / count_openings
+
+
+def num_sheltered_sides(dwelling_type, n_floors):
+    """
+    4 for flat/maisonette up to third storey above ground level 2 in other cases
+    Args:
+        dwelling_type:
+        n_floors:
+
+    Returns:
+        int number of sheltered sides
+    """
+
+    if dwelling_type in [DwellingType.FLAT, DwellingType.MAISONETTE] and n_floors < 3:
+        return 4
+    else:
+        return 2
+
+### END table s5 ###
+
+
+def primary_pipework_insulated():
+    return False
+
+
+def has_hw_time_control(age_band):
+    if age_band <= AgeBand.I:
+        return False
+    else:
+        return True
 
 class Glazing:
     def __init__(self, light_transmittance, gvalue, Uvalue, draught_proof):
@@ -295,42 +322,14 @@ class Glazing:
             setattr(target, k, v)
 
 
-GLAZING_TYPES = dict(
-    SINGLE=Glazing(0.9, 0.85, 1 / (0.04 + 1 / 4.8), False),
+GLAZING_TYPES = {
+    GlazingTypes.SINGLE: Glazing(0.9, 0.85, 1 / (0.04 + 1 / 4.8), False),
     ### Should vary with age
-    DOUBLE=Glazing(0.8, 0.76, 1 / (0.04 + 1 / 3.1), True),
-)
-
+    GlazingTypes.DOUBLE: Glazing(0.8, 0.76, 1 / (0.04 + 1 / 3.1), True)
 
 # also need secondary and triple glazing
+}
 
 
-class DwellingType(IntEnum):
-    HOUSE = 1
-    FLAT = 2
-    BUNGALOW = 3
-    MAISONETTE = 4
 
 
-class DwellingSubType(IntEnum):
-    DETACHED = 1
-    SEMI_DETACHED = 2
-    MID_TERRACE = 3
-    END_TERRACE = 4
-    ENCLOSED_MID_TERRACE = 5
-    ENCLOSED_END_TERRACE = 6
-
-
-def has_draught_lobby(dwelling_type):
-    return dwelling_type == DwellingType.FLAT
-
-
-def primary_pipework_insulated():
-    return False
-
-
-def has_hw_time_control(age_band):
-    if age_band <= AgeBands.I:
-        return False
-    else:
-        return True
