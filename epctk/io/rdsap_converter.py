@@ -9,7 +9,8 @@ import math
 from ..elements import DwellingType
 from ..elements.geographic import Country, country_from_region
 
-from ..tables.tables_appendix_s import AgeBand, table_s1_age_band, num_sheltered_sides
+from ..tables.tables_appendix_s import AgeBand, table_s1_age_band, num_sheltered_sides, lookup_wall_u_values, \
+    lookup_wall_thickness
 
 from ..utils import SAPInputError
 
@@ -84,15 +85,25 @@ def configure_rdsap(dwelling):
     dwelling['age_band'] = age_band
 
 
+    wall_u = dwelling.get("wall_u_value")
+
+    if not wall_u:
+        # From validation, if wall u isn't defined you must define material and insulation type
+        wall_material = dwelling['wall_material']
+        wall_insulation = dwelling['wall_insulation']
+
+        lookup_wall_u_values(country, age_band, wall_material, wall_insulation)
+
+        # not strictly needed
+        wall_t = dwelling.get("wall_thickness")
+        if wall_t is None:
+            wall_t = lookup_wall_thickness(age_band, wall_material, wall_insulation)
+            dwelling["wall_thickness"] = wall_t
 
 
-def configure_u_values(dwelling):
-    wall_u = lookup_wall_u()
 
 
-def lookup_wall_u(country, age_band, wall_type):
-    # TODO: lookup based on tables s6 s7 s8. Need to complete tables too
-    pass
+
 
 def floor_insulation_thickness(age_band):
     if age_band <= AgeBand.H:

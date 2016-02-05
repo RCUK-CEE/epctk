@@ -28,7 +28,6 @@ class Country(IntEnum):
         except KeyError:
             raise SAPInputError("No country in the UK matching code: {}".format(iso_country_code))
 
-
 COUNTRY_CODES = {
     "GB-EAW": Country.England,
     "GB-ENG": Country.England,
