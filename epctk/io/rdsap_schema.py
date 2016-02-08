@@ -94,7 +94,8 @@ sap_schema = {
                 },
                 {
                     "required": [
-                        "has_draught_lobby",
+                        # This is not required for rdSAP
+                        # "has_draught_lobby",
                         "draught_stripping",
                         "floor_type",
                         "wall_type"
@@ -261,7 +262,8 @@ sap_schema = {
                 # TODO: many INT properties are actually ENUMS
                 # TODO: might actually want to do Dict validation so we can reuse Enum definitions...
                 "sap_region": {
-                    "type": "int"
+                    "type": "int",
+                    "enum": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
                 },
                 "country_code": {
                     "type": "string",
@@ -272,6 +274,10 @@ sap_schema = {
                     "type": "string",
                     "enum": ["house", "flat", "bungalow", "maisonette"]
                 },
+                "n_rooms": {
+                    "type": "int"
+                },
+
 
                 "GFA": {
                     "type": "float"

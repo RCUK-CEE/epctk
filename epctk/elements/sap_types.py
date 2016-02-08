@@ -1,20 +1,14 @@
-from enum import IntEnum
+from enum import Enum, IntEnum
 
 from ..utils import SAPInputError
 
 
-class DwellingType(IntEnum):
-    HOUSE = 1
-    FLAT = 2
-    BUNGALOW = 3
-    MAISONETTE = 4
+class DwellingType(Enum):
+    HOUSE = 'house'
+    FLAT = 'flat'
+    BUNGALOW = 'bungalow'
+    MAISONETTE = 'maisonette'
 
-    @classmethod
-    def from_string(cls, dwelling_type_name: str):
-        try:
-            return getattr(cls, dwelling_type_name.upper())
-        except AttributeError:
-            raise SAPInputError("{} is not a valid dwelling type".format(dwelling_type_name))
 
 class DwellingSubType(IntEnum):
     DETACHED = 1
@@ -184,17 +178,40 @@ class CommunityDistributionTypes(IntEnum):
     MODERN_LOW_TEMP = 4
 
 
-class OpeningType:
+class OpeningType(dict):
+    """
+    Contains opening type properties
+
+    This is a thin wrapper for a dict, so that we can treat everything as
+    semi-structured data, easily convertible to JSON or similar format.
+    To maintain compatiblity with original code, add getattr override
+    as for dwelling object
+    """
     def __init__(self, glazing_type, gvalue, frame_factor, Uvalue, roof_window, bfrc_data=False):
-        self.gvalue = gvalue
-        self.light_transmittance = _light_transmittance[glazing_type] # will raise KeyError if wrong glazing type
-        self.frame_factor = frame_factor
-        self.Uvalue = Uvalue
-        self.roof_window = roof_window
-        self.bfrc_data = bfrc_data
-        self.glazing_type = glazing_type
+        super().__init__(glazing_type=glazing_type, gvalue=gvalue,
+                         light_transmittance=_light_transmittance[glazing_type], frame_factor=frame_factor,
+                         Uvalue=Uvalue, roof_window=roof_window, bfrc_data=bfrc_data)
+        self.gvalue = self['gvalue']
+        self.light_transmittance = self['light_transmittance']
+        self.frame_factor = self['frame_factor']
+        self.Uvalue = self['Uvalue']
+        self.roof_window = self['roof_window']
+        self.bfrc_data = self['bfrc_data']
+        self.glazing_type = self['glazing_type']
 
-
+    # def __getattr__(self, item):
+    #     """
+    #     Make dict keys accessible as attributes. If an item is not in the
+    #     dict, return it from the object `__dict__`
+    #
+    #     """
+    #     try:
+    #         return self[item]
+    #     except KeyError:
+    #         try:
+    #             return self.__dict__[item]
+    #         except KeyError:
+    #             raise AttributeError(item)
 class HeatLossElement:
     def __init__(self, area, Uvalue, is_external, element_type, name=""):
         self.area = area
@@ -217,4 +234,3 @@ class Opening:
         self.orientation_degrees = orientation_degrees
         self.opening_type = opening_type
         self.name = name
-

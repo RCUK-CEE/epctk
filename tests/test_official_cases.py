@@ -26,7 +26,7 @@ SAP_REGIONS = {
     '10.rtf': 11,
 }
 
-@unittest.skip("Fast test by skipping official test cases")
+# @unittest.skip("Fast test by skipping official test cases")
 class TestOfficialCases(unittest.TestCase):
     def test_run_all_known_working_noparse(self):
         run_official_cases(

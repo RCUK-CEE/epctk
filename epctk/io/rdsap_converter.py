@@ -10,7 +10,7 @@ from ..elements import DwellingType
 from ..elements.geographic import Country, country_from_region
 
 from ..tables.tables_appendix_s import AgeBand, table_s1_age_band, num_sheltered_sides, lookup_wall_u_values, \
-    lookup_wall_thickness
+    table_s3_wall_thickness, n_fans_and_vents, correct_floor_type, has_draught_lobby
 
 from ..utils import SAPInputError
 
@@ -47,17 +47,16 @@ def get_country(dwelling):
 
 
 
-
 def configure_rdsap(dwelling):
     """
 
     Args:
-        dwelling: dwelling input dict
+        dwelling (dict): rdsap inputs
 
     Returns:
 
     """
-
+    # TODO: split this up later...
     # perform lookup for missing data
     # Problem: how to know what data is missing??
 
@@ -73,35 +72,70 @@ def configure_rdsap(dwelling):
     else:
         age_band = AgeBand(age_band)
 
+    n_rooms = dwelling['n_rooms']
 
+    # Apply Table S5 for misc corrections
+    n_fans_vents = dwelling.get('Nfansandpassivevents')
+    if not n_fans_vents:
+        n_fans_vents = n_fans_and_vents(age_band, n_rooms)
+
+
+    if "pressurisation_test_result_average" not in dwelling and "pressurisation_test_result" not in dwelling:
+        # Floor type only required if there is no pressure test
+        floor_type = dwelling.get('floor_type')
+        floor_type = correct_floor_type(age_band, floor_type)
+
+    else:
+        floor_type = None
+
+    draught_lobby = dwelling.get('has_draught_lobby')
+    if draught_lobby is None:
+        draught_lobby = has_draught_lobby(dwelling_type)
 
     n_sheltered_sides = dwelling.get("Nshelteredsides")
-
     if n_sheltered_sides is None:
-        num_sheltered_sides(dwelling_type, dwelling.get("n_floors", 1))
+        n_sheltered_sides = num_sheltered_sides(dwelling_type, dwelling.get("n_floors", 1))
 
-    dwelling['country'] = country
 
-    dwelling['age_band'] = age_band
-
+    # End Table S5
 
     wall_u = dwelling.get("wall_u_value")
 
     if not wall_u:
         # From validation, if wall u isn't defined you must define material and insulation type
-        wall_material = dwelling['wall_material']
-        wall_insulation = dwelling['wall_insulation']
+        try:
+            wall_material = dwelling['wall_material']
+            wall_insulation = dwelling['wall_insulation']
+        except KeyError as e:
+            raise SAPInputError("If wall u isn't defined, wall material and insulation type "
+                                "must be supplied. {} was missing".format(e.args[0]))
 
-        lookup_wall_u_values(country, age_band, wall_material, wall_insulation)
+        # apply tables s6/s7/s8 depending on country
+        wall_u = lookup_wall_u_values(country, age_band, wall_material, wall_insulation)
 
-        # not strictly needed
+        # only needed to convert from externally measured dimensions to internal ones
         wall_t = dwelling.get("wall_thickness")
         if wall_t is None:
-            wall_t = lookup_wall_thickness(age_band, wall_material, wall_insulation)
+            wall_t = table_s3_wall_thickness(age_band, wall_material, wall_insulation)
             dwelling["wall_thickness"] = wall_t
 
 
+    # Section S5.8
+    thermal_mass_parameter = dwelling.get('thermal_mass_parameter')
+    if not thermal_mass_parameter:
+        thermal_mass_parameter = 250.0
 
+    # assign the values to the dwelling object
+    dwelling['country'] = country
+    dwelling['age_band'] = age_band
+
+    dwelling['Nfansandpassivevents'] = n_fans_vents
+    dwelling['floor_type'] = floor_type
+    dwelling['has_draught_lobby'] = draught_lobby
+    dwelling["Nshelteredsides"] = n_sheltered_sides
+
+    dwelling["wall_u_value"] = wall_u
+    dwelling['thermal_mass_parameter'] = thermal_mass_parameter
 
 
 
