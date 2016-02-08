@@ -24,14 +24,15 @@ def lookup_sap_tables(dwelling):
     .. note::
         This modifies the input dwelling! The dwelling is returned anyway
         In the future, shift to "immutable" style where the copies are always
-        returned without modifying input data.
+        returned without modifying input data, enabling a "pipeling" style
+        workflow and easier testing of partially configured dwellings
 
     Args:
         dwelling input dwelling data
 
     Returns:
         dwelling where input data has been converted to configured
-        dwelling elements, values convered, sap table lookups performed, etc
+        dwelling elements, values converted, sap table lookups performed, etc
 
         NOTE that this also MODIFIES the inputs.
     """
@@ -66,7 +67,8 @@ def lookup_sap_tables(dwelling):
     # Add overshading factors
     dwelling.update(overshading_factors(dwelling.overshading))
 
-    configure_systems(dwelling)
+    # TODO: change the following to return dicts of properties to extend the dwelling definition
+    configure_heat_systems(dwelling)
     configure_cooling_system(dwelling)
 
     appendix_m.configure_wind_turbines(dwelling)
@@ -96,7 +98,11 @@ def fix_misc_configuration(dwelling):
     else:
         thermal_mass_parameter = dwelling['thermal_mass_parameter']
 
-    return dict(thermal_mass_parameter=thermal_mass_parameter)
+    living_area_fraction =dwelling.get('living_area_fraction')
+    if not living_area_fraction:
+        living_area_fraction = dwelling.living_area / dwelling.GFA
+
+    return dict(thermal_mass_parameter=thermal_mass_parameter, living_area_fraction=living_area_fraction)
 
 
 def configure_responsiveness(dwelling):
@@ -158,7 +164,7 @@ def configure_control_system(dwelling, system_num):
         system.water_mult = 0.7
 
 
-def configure_main_system(dwelling):
+def configure_main_system_1(dwelling):
     """
     Configure the main heating system.
 
@@ -344,7 +350,7 @@ def configure_water(dwelling):
     configure_water_storage(dwelling)
 
 
-def configure_systems(dwelling):
+def configure_heat_systems(dwelling):
     """
     Configure space and water heating systems
 
@@ -363,7 +369,7 @@ def configure_systems(dwelling):
     if dwelling.get('secondary_heating_type_code') and dwelling.secondary_heating_type_code == 613:
         dwelling.Nfluelessgasfires += 1
 
-    configure_main_system(dwelling)
+    configure_main_system_1(dwelling)
     configure_main_system_2(dwelling)
 
     # !!! fraction of heat from main 2 not specified, assume 0%

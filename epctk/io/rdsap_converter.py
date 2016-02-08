@@ -10,7 +10,9 @@ from ..elements import DwellingType
 from ..elements.geographic import Country, country_from_region
 
 from ..tables.tables_appendix_s import AgeBand, table_s1_age_band, num_sheltered_sides, lookup_wall_u_values, \
-    table_s3_wall_thickness, n_fans_and_vents, correct_floor_type, has_draught_lobby
+    table_s3_wall_thickness, n_fans_and_vents, correct_floor_type, has_draught_lobby, percent_draught_stripping, \
+    table_s16_living_area_fraction, has_hw_time_control, table_s17_water_cylinder, primary_pipework_insulated, \
+    cylinder_insulation_properties
 
 from ..utils import SAPInputError
 
@@ -80,13 +82,20 @@ def configure_rdsap(dwelling):
         n_fans_vents = n_fans_and_vents(age_band, n_rooms)
 
 
+    ventilation_props = {}
+
     if "pressurisation_test_result_average" not in dwelling and "pressurisation_test_result" not in dwelling:
-        # Floor type only required if there is no pressure test
+        # if no pressure test, need to configure infiltration rates etc
+
         floor_type = dwelling.get('floor_type')
         floor_type = correct_floor_type(age_band, floor_type)
 
-    else:
-        floor_type = None
+        draught_stripping = dwelling.get('draught_stripping')
+        if draught_stripping is None:
+            draught_stripping = percent_draught_stripping(dwelling['openings'])
+
+        ventilation_props['draught_stripping'] = draught_stripping
+        ventilation_props['floor_type'] = floor_type
 
     draught_lobby = dwelling.get('has_draught_lobby')
     if draught_lobby is None:
@@ -95,6 +104,9 @@ def configure_rdsap(dwelling):
     n_sheltered_sides = dwelling.get("Nshelteredsides")
     if n_sheltered_sides is None:
         n_sheltered_sides = num_sheltered_sides(dwelling_type, dwelling.get("n_floors", 1))
+
+    # for ventilation properties, most are not needed if pressure test is present.
+    ventilation_props['has_draught_lobby'] = draught_lobby
 
 
     # End Table S5
@@ -125,18 +137,57 @@ def configure_rdsap(dwelling):
     if not thermal_mass_parameter:
         thermal_mass_parameter = 250.0
 
+    # S9 living area fraction
+    living_a_fraction = table_s16_living_area_fraction(n_rooms)
+
+    # S10 water heating
+    # Define flexible water properties dict, because some parameters such as cylinder
+    # volumes only apply/should only be set under certain conditions.
+    water_props = {}
+
+    # cylinder volume
+    has_hw_cylinder = dwelling.get('has_hw_cylinder')
+    if has_hw_cylinder == True and not dwelling.get('measured_cylinder_loss'):
+        hw_cylinder_volume = dwelling.get('hw_cylinder_volume')
+        if hw_cylinder_volume is None:
+            desc = dwelling.get("hw_cylinder_descriptor")
+            hw_cylinder_volume = table_s17_water_cylinder(desc)
+
+        cylinder_insulation = dwelling.get('hw_cylinder_insulation')
+        cylinder_insulation_type = dwelling.get('hw_cylinder_insulation_type')
+        if cylinder_insulation is None or cylinder_insulation_type is None:
+            cylinder_insulation, cylinder_insulation_type = cylinder_insulation_properties(age_band)
+
+        water_props['hw_cylinder_volume'] = hw_cylinder_volume
+        water_props['hw_cylinder_insulation'] = cylinder_insulation
+        water_props['hw_cylinder_insulation_type'] = cylinder_insulation_type
+
+
+    # pipework
+    pipework_insulated = dwelling.get('primary_pipework_insulated')
+    if pipework_insulated is None:
+        pipework_insulated = primary_pipework_insulated(age_band)
+
+    hw_time_control = has_hw_time_control(age_band)
+
+    water_props['pipework_insulated'] = pipework_insulated
+
+
+
     # assign the values to the dwelling object
+    # TODO: return this for update instead...
     dwelling['country'] = country
     dwelling['age_band'] = age_band
 
     dwelling['Nfansandpassivevents'] = n_fans_vents
-    dwelling['floor_type'] = floor_type
-    dwelling['has_draught_lobby'] = draught_lobby
+
     dwelling["Nshelteredsides"] = n_sheltered_sides
 
     dwelling["wall_u_value"] = wall_u
     dwelling['thermal_mass_parameter'] = thermal_mass_parameter
+    dwelling['living_area_fraction'] = living_a_fraction
 
+    dwelling['has_hw_time_control'] = hw_time_control
 
 
 def floor_insulation_thickness(age_band):

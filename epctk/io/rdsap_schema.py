@@ -1,3 +1,13 @@
+
+{
+'main': [
+    {'fuel_type': 'asd',
+     'hetas_approved': False},
+    {'fuel_type': 'csd'}
+]
+}
+
+
 sap_schema = {
     "$schema": "http://json-schema.org/schema#",
     "title": "SAP dwelling input",
@@ -6,6 +16,18 @@ sap_schema = {
     "additionalProperties": False,
 
     "definitions": {
+        "water_system_definition": {
+            "properties": {
+                "water_system":{
+                    "type": "object",
+                    "properties": {
+                        "has_interlock": {
+                            "type": "bool"
+                        }
+                    }
+                }
+            }
+        },
         "wall_definition": {
             "properties": {
                 "wall_material": {
@@ -94,9 +116,10 @@ sap_schema = {
                 },
                 {
                     "required": [
-                        # This is not required for rdSAP
+                        # Lobby inferred from building type for RdSAP
                         # "has_draught_lobby",
-                        "draught_stripping",
+                        # stripping inferred from opening types for RdSAP
+                        # "draught_stripping",
                         "floor_type",
                         "wall_type"
                     ]

@@ -54,24 +54,26 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
     else:
         N24_16_m, N24_9_m, N16_9_m = (None, None, None)
 
-    L = dwelling.h * (dwelling.living_area_Theating - Texternal)
+    living_area_Theating = dwelling.living_area_Theating
+    living_area_fraction = dwelling.living_area_fraction
+
+    L = dwelling.h * (living_area_Theating - Texternal)
     util_living = heat_utilisation_factor(a, heat_gains, L)
     Tno_heat_living = temperature_no_heat(Texternal,
-                                          dwelling.living_area_Theating,
+                                          living_area_Theating,
                                           dwelling.heating_responsiveness,
                                           util_living,
                                           heat_gains,
                                           dwelling.h)
 
     Tmean_living_area = Tmean(
-        Texternal, dwelling.living_area_Theating, Tno_heat_living,
+        Texternal, living_area_Theating, Tno_heat_living,
         tau, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m, living_space=True)
 
     if dwelling.main_heating_fraction < 1 and dwelling.get('heating_systems_heat_separate_areas'):
-        if dwelling.main_heating_fraction > dwelling.living_area_fraction:
+        if dwelling.main_heating_fraction > living_area_fraction:
             # both systems contribute to rest of house
-            weight_1 = 1 - dwelling.main_heating_2_fraction / \
-                           (1 - dwelling.living_area_fraction)
+            weight_1 = 1 - dwelling.main_heating_2_fraction / (1 - living_area_fraction)
 
             Tmean_other_1 = temperature_rest_of_dwelling(
                 dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
@@ -92,17 +94,17 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
             dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
             N16_9_m)
 
-    if not dwelling.get('living_area_fraction'):
-        # TODO: this should probably be verified right at the start!
-        living_area_fraction = dwelling.living_area / dwelling.GFA
+    # if not dwelling.get('living_area_fraction'):
+    #     # TODO: this should probably be verified right at the start!
+    #     living_area_fraction = dwelling.living_area / dwelling.GFA
+    #
+    #     dwelling.living_area_fraction = living_area_fraction
+    # else:
+    #     living_area_fraction = dwelling.living_area_fraction
 
-        dwelling.living_area_fraction = living_area_fraction
-    else:
-        living_area_fraction = dwelling.living_area_fraction
-
-    meanT = living_area_fraction * Tmean_living_area + (1 - living_area_fraction) * \
+    mean_T = living_area_fraction * Tmean_living_area + (1 - living_area_fraction) * \
                                                        Tmean_other + dwelling.temperature_adjustment
-    L = dwelling.h * (meanT - Texternal)
+    L = dwelling.h * (mean_T - Texternal)
     utilisation = heat_utilisation_factor(a, heat_gains, L)
 
     heat_req = (appendix_b.range_cooker_factor(dwelling) * 0.024 * (L - utilisation * heat_gains) * DAYS_PER_MONTH)
@@ -114,7 +116,7 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
         Tmean_living_area=Tmean_living_area,
         Tmean_other=Tmean_other,
         util_living=util_living,
-        Tmean=meanT,
+        Tmean=mean_T,
         loss=L,
         utilisation=utilisation,
         useful_gain=utilisation * heat_gains,
@@ -136,9 +138,26 @@ def temperature_rest_of_dwelling(dwelling, Texternal, tau, a, L, heat_gains, con
                  living_space=False)
 
 
-def Tmean(Texternal, Theat, Tno_heat, tau, control_type, N24_16_m, N24_9_m, N16_9_m, living_space):
+def Tmean(Texternal, T_heat, T_no_heat, tau, control_type, N24_16_m, N24_9_m, N16_9_m, living_space):
+    """
+
+    Args:
+        Texternal:
+        T_heat:
+        T_no_heat:
+        tau:
+        control_type:
+        N24_16_m:
+        N24_9_m:
+        N16_9_m:
+        living_space:
+
+    Returns:
+
+    """
+    # FIXME: why is Texternal supplied but not used?
     tc = 4 + 0.25 * tau
-    dT = Theat - Tno_heat
+    dT = T_heat - T_no_heat
 
     if control_type == 1 or control_type == 2 or living_space:
         # toff1=7
@@ -148,12 +167,12 @@ def Tmean(Texternal, Theat, Tno_heat, tau, control_type, N24_16_m, N24_9_m, N16_
         # weekday
         u1 = temperature_reduction(dT, tc, 7)
         u2 = temperature_reduction(dT, tc, 8)
-        Tweekday = Theat - (u1 + u2)
+        Tweekday = T_heat - (u1 + u2)
 
         # weekend
         u3 = 0  # (since Toff3=0)
         u4 = u2  # (since Toff4=Toff2)
-        Tweekend = Theat - (u3 + u4)
+        Tweekend = T_heat - (u3 + u4)
     else:
         # toff1=9
         # toff2=8
@@ -161,7 +180,7 @@ def Tmean(Texternal, Theat, Tno_heat, tau, control_type, N24_16_m, N24_9_m, N16_
         # toff4=8
         u1 = temperature_reduction(dT, tc, 9)
         u2 = temperature_reduction(dT, tc, 8)
-        Tweekday = Theat - (u1 + u2)
+        Tweekday = T_heat - (u1 + u2)
         Tweekend = Tweekday
 
     if N24_16_m is None:
@@ -169,7 +188,7 @@ def Tmean(Texternal, Theat, Tno_heat, tau, control_type, N24_16_m, N24_9_m, N16_
     else:
         WEm = numpy.array([9, 8, 9, 8, 9, 9, 9, 9, 8, 9, 8, 9])
         WDm = numpy.array([22, 20, 22, 22, 22, 21, 22, 22, 22, 22, 22, 22])
-        return ((N24_16_m + N24_9_m) * Theat + (WEm - N24_16_m + N16_9_m) * Tweekend + (
+        return ((N24_16_m + N24_9_m) * T_heat + (WEm - N24_16_m + N16_9_m) * Tweekend + (
             WDm - N16_9_m - N24_9_m) * Tweekday) / (WEm + WDm)
 
 

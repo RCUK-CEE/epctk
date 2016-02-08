@@ -47,6 +47,9 @@ class subtoken_mapping:
         val = self.converter(tokens[self.tokenId])
         d[self.attr] = val
 
+def enum_mapping(attr, enum_):
+    return LambdaMapping(attr, lambda x: enum_(x.vals[0].value))
+
 
 # Mapping functions for primary inputs
 def simple_mapping(attr):

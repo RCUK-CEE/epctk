@@ -21,7 +21,7 @@ class SAPCalculationError(RuntimeError):
     pass
 
 
-class SAPInputError(RuntimeError):
+class SAPInputError(ValueError):
     pass
 
 

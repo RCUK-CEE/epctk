@@ -4,12 +4,13 @@ Tables for RdSAP
 
 
 """
+import logging
 import os.path
 from enum import Enum, IntEnum
 import csv
 
 from ..utils import SAPInputError
-from ..elements import GlazingTypes, DwellingType, OpeningType, FloorTypes
+from ..elements import GlazingTypes, DwellingType, OpeningType, FloorTypes, FuelTypes, CylinderInsulationTypes
 from ..elements.geographic import Country
 
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'data')
@@ -52,6 +53,13 @@ class WallInsulation(Enum):
     EXTERNAL = 'external'
     FILL = 'fill'
     NONE = 'none'
+
+
+class CylinderDescriptor(Enum):
+    INACCESSIBLE = 'inaccessible'
+    NORMAL = 'normal'
+    MEDIUM = 'medium'
+    LARGE = 'large'
 
 
 # map ageband to year of construction:
@@ -438,7 +446,8 @@ def table_s14_window_properties(glazing_type, is_roof_window=False):
 
 def table_s16_living_area_fraction(n_rooms):
     """
-    Living area according to table s16
+    Living area fraction according to table s16
+
     Args:
         n_rooms:
 
@@ -452,11 +461,98 @@ def table_s16_living_area_fraction(n_rooms):
     return living_area_fraction[int(n_rooms) - 1]
 
 
-def primary_pipework_insulated():
-    return False
+def table_s17_water_cylinder(descriptor, fuel_type=None):
+    """
+    if descriptor is "inaccessible:
+        if off-peak electric dual immersion: 210 litres
+        if from solid fuel boiler: 160 litres
+        otherwise: 110 litre
+    Args:
+        descriptor: cylinder access descriptor
+        fuel_type:
+
+    Returns:
+        estimated cylinder volume from description, in litres
+
+    """
+    descriptor = CylinderDescriptor(descriptor)
+
+    sizes = {
+        CylinderDescriptor.NORMAL: 110,
+        CylinderDescriptor.MEDIUM: 160,
+        CylinderDescriptor.LARGE: 210
+    }
+
+    if descriptor == CylinderDescriptor.INACCESSIBLE:
+        if fuel_type == FuelTypes.SOLID:
+            return sizes[CylinderDescriptor.MEDIUM]
+        elif fuel_type == FuelTypes.ELECTRIC:
+            logging.warning("INCOMPLETE: assuming that inaccessible electric cylinder is off-peak dual immersion")
+            return sizes[CylinderDescriptor.LARGE]
+        else:
+            return sizes[CylinderDescriptor.NORMAL]
+
+    return sizes[descriptor]
+
+# Table S18 is a collection of misc corrections/assumptions
+
+
+def cylinder_insulation_properties(age_band):
+    """
+    *Table S18, row 1*
+
+    Age band of main property A to F: 12 mm loose jacket
+    Age band of main property G, H: 25 mm foam
+    Age band of main property I to K: 38 mm foam
+    Args:
+        age_band:
+
+    Returns:
+
+    """
+    if AgeBand.A <= age_band <= AgeBand.F:
+        return 12.0, CylinderInsulationTypes.JACKET
+    elif AgeBand.G <= age_band <= AgeBand.H:
+        return 25.0, CylinderInsulationTypes.FOAM
+    elif age_band >= AgeBand.I:
+        return 38.0, CylinderInsulationTypes.FOAM
+    else:
+        raise SAPInputError("Invalid Age Band {}".format(age_band), age_band)
+
+
+def primary_pipework_insulated(age_band):
+    """
+    *Table S18, row 3*
+
+    Args:
+        age_band:
+
+    Returns:
+
+    """
+    if age_band >= AgeBand.K:
+        return True
+    else:
+        return False
+
+def boiler_hetas_approved(boiler_fuel):
+    if boiler_fuel == FuelTypes.SOLID:
+        return False
+    # TODO what about other types?
 
 
 def has_hw_time_control(age_band):
+    """
+    *Table S18, row 13*
+
+    Does the dwelling have a hot water timer control
+
+    Args:
+        age_band:
+
+    Returns:
+
+    """
     if age_band <= AgeBand.I:
         return False
     else:

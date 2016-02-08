@@ -17,6 +17,9 @@ from .utils import monthly_to_annual, SAPInputError
 def ventilation_properties(dwelling):
     """
 
+    Calculate the adjusted Specific Fan Power (SFP) as a function of the ventilation
+    system configuration
+
     Mechanical ventilation:
 
     (a) Positive input ventilation (PIV)
@@ -28,7 +31,8 @@ def ventilation_properties(dwelling):
         (The energy used by the fan is taken as counterbalancing the effect of
         using slightly warmer air from the loft space compared with outside).
         Some positive input ventilation systems supply the air directly from
-        the outside and the procedure for these systems is the same as for mechanical extract ventilation.
+        the outside and the procedure for these systems is the same as for
+        mechanical extract ventilation.
 
     (b) Mechanical extract ventilation (MEV)
         MEV is a fan driven ventilation system, which only extracts air from
@@ -36,8 +40,19 @@ def ventilation_properties(dwelling):
         changes per hour through the mechanical system, plus infiltration.
         MEV can be either:
 
-            - centralised: air is extracted from wet rooms via ducting and expelled by means of a central fan., or
-            - decentralised: air is extracted by continuously-running fans in each wet room.
+            - Centralised: air is extracted from wet rooms via ducting and expelled by
+              means of a central fan., or
+            - Decentralised: air is extracted by continuously-running fans in each wet room.
+
+    (c) Balanced whole house mechanical ventilation
+        Balanced ventilation provides fresh air to habitable rooms in the
+        dwelling and extracts exhaust air from wet rooms.
+        A balanced system without heat recovery extracts from wet rooms via
+        ducting and expelled by a central fan. Air is also supplied to habitable
+        rooms, either via ducting and a central fan or by individual supply air
+        fans in each habitable room.
+        In a balanced system with heat recovery (MVHR) both the extract and supply
+        air are provided via ducting, with a heat exchanger between the outgoing and incoming air.
 
     Args:
         dwelling:
@@ -61,7 +76,7 @@ def ventilation_properties(dwelling):
                                                dwelling.get('mev_sfp'))
 
     elif ventilation_type == VentilationTypes.MEV_DECENTRALISED:
-        adjusted_fan_sfp = mev_decentralised_sfp(dwelling, mv_ducttype, mv_approved, ventilation_type)
+        adjusted_fan_sfp = mev_decentralised_sfp(dwelling, mv_ducttype, mv_approved, ventilation_type, dwelling.get('mev_sys_pcdf_id'))
 
     elif ventilation_type == VentilationTypes.MVHR:
         adjusted_fan_sfp = mvhr_sfp(mv_ducttype, mv_approved, ventilation_type, dwelling.get('mvhr_sfp'))
@@ -95,9 +110,26 @@ def mev_centralised_sfp(mv_ducttype, mv_approved, ventilation_type, mev_sfp=None
     return sfp * in_use_factor
 
 
-def mev_decentralised_sfp(dwelling, mv_ducttype, mv_approved, ventilation_type):
-    if dwelling.get('mev_sys_pcdf_id'):
-        sys = get_mev_system(dwelling.mev_sys_pcdf_id)
+def mev_decentralised_sfp(dwelling, mv_ducttype, mv_approved, ventilation_type, mev_sys_pcdf_id=None):
+    """
+    Specific fan power for decentralised MEV.
+
+    Args:
+        dwelling: dwelling is (unfortunately) required to lookup each MEV config.
+          .. todo::
+           if decentralised MEV was just stored as array could just pass in the array,
+           making things clearere and more testable. Need to find where this is set and correct throughout
+           code base.
+        mv_ducttype:
+        mv_approved:
+        ventilation_type:
+        mev_sys_pcdf_id:
+
+    Returns:
+
+    """
+    if mev_sys_pcdf_id:
+        sys = get_mev_system(mev_sys_pcdf_id)
         get_sfp = lambda conf: sys['configs'][conf]['sfp']
     else:
         get_sfp = lambda conf: dwelling["mev_fan_" + conf + "_sfp"]
@@ -208,8 +240,9 @@ def infiltration(wall_type=None, floor_type=None):
 
 def ventilation(dwelling):
     """
-    Ventilation part of the worksheet calculation. This
-    is run after the dwelling has been suitably configured
+    Ventilation part of the worksheet.
+
+    This is run after the dwelling has been suitably configured
 
     Args:
         dwelling:
