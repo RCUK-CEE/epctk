@@ -13,7 +13,7 @@ from .tables import (table_1b_occupancy, table_1b_daily_hot_water, TABLE_10, tab
                      table_2_hot_water_store_loss_factor, table_2b_hot_water_temp_factor,
                      TABLE_4D, TABLE_4E, table_4f_fans_pumps_keep_hot, apply_table_4e,
                      table_5a_fans_and_pumps_gain)
-from .ventilation import configure_ventilation, infiltration
+from .ventilation import ventilation_properties, infiltration
 from .appendix import appendix_a, appendix_c, appendix_g, appendix_h, appendix_m
 
 
@@ -61,7 +61,7 @@ def lookup_sap_tables(dwelling):
     dwelling.update(infiltration(wall_type=dwelling.get("wall_type"),
                                  floor_type=dwelling.get("floor_type")))
 
-    configure_ventilation(dwelling)
+    dwelling.update(ventilation_properties(dwelling))
 
     # Add overshading factors
     dwelling.update(overshading_factors(dwelling.overshading))

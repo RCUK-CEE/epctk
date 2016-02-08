@@ -11,10 +11,10 @@ from .elements import VentilationTypes, DuctTypes, WallTypes
 from .io.pcdf import get_mev_system
 from .tables import (mech_vent_default_in_use_factor, mech_vent_default_hr_effy_factor,
                      mech_vent_in_use_factor, mech_vent_in_use_factor_hr, FLOOR_INFILTRATION)
-from .utils import monthly_to_annual
+from .utils import monthly_to_annual, SAPInputError
 
 
-def configure_ventilation(dwelling):
+def ventilation_properties(dwelling):
     """
 
     Mechanical ventilation:
@@ -51,27 +51,39 @@ def configure_ventilation(dwelling):
     # Assume NONE duct type if there is none set for this dwelling.
     mv_ducttype = dwelling.get('mv_ducttype')
 
+    extra_props = {}
+
     if ventilation_type == VentilationTypes.PIV_FROM_OUTSIDE:
-        set_piv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type)
+        adjusted_fan_sfp = piv_sfp(mv_ducttype, mv_approved, ventilation_type, dwelling.get('piv_sfp'))
 
     elif ventilation_type == VentilationTypes.MEV_CENTRALISED:
-        set_mev_centralised_properties(dwelling, mv_ducttype, mv_approved, ventilation_type)
+        adjusted_fan_sfp = mev_centralised_sfp(mv_ducttype, mv_approved, ventilation_type,
+                                               dwelling.get('mev_sfp'))
 
     elif ventilation_type == VentilationTypes.MEV_DECENTRALISED:
-        set_mev_decentralised_properties(dwelling, mv_ducttype, mv_approved, ventilation_type)
+        adjusted_fan_sfp = mev_decentralised_sfp(dwelling, mv_ducttype, mv_approved, ventilation_type)
 
     elif ventilation_type == VentilationTypes.MVHR:
-        set_mvhr_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type)
+        adjusted_fan_sfp = mvhr_sfp(mv_ducttype, mv_approved, ventilation_type, dwelling.get('mvhr_sfp'))
+
+        # Special case for MVHR where we need to set additional properties
+        extra_props = mvhr_additional_properties(mv_ducttype, mv_approved, ventilation_type, dwelling.get('mvhr_effy'), dwelling.get('mvhr_sfp'))
 
     elif ventilation_type == VentilationTypes.MV:
-        set_mv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type)
+        adjusted_fan_sfp = set_mv_dwelling_properties(mv_ducttype, mv_approved, ventilation_type, dwelling.get('mv_sfp'))
+
+    elif ventilation_type == VentilationTypes.NATURAL:
+        # TODO: should we just not set this, or set it to None?
+        adjusted_fan_sfp = 0
+    else:
+        raise SAPInputError(ventilation_type)
+
+    return dict(adjusted_fan_sfp=adjusted_fan_sfp, **extra_props)
 
 
-# TODO: change these to output the relevant data so we don't have to pass in dwelling
-# -- Probably want to return a dict and use dict-style dwelling.update
-def set_mev_centralised_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
-    if dwelling.get('mev_sfp'):
-        sfp = dwelling.mev_sfp
+def mev_centralised_sfp(mv_ducttype, mv_approved, ventilation_type, mev_sfp=None):
+    if mev_sfp:
+        sfp = mev_sfp
         in_use_factor = mech_vent_in_use_factor(ventilation_type, mv_ducttype, mv_approved)
     else:
         sfp = 0.8  # Table 4g
@@ -80,15 +92,15 @@ def set_mev_centralised_properties(dwelling, mv_ducttype, mv_approved, ventilati
     if mv_approved:
         assert False
 
-    dwelling.adjusted_fan_sfp = sfp * in_use_factor
+    return sfp * in_use_factor
 
 
-def set_mev_decentralised_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
+def mev_decentralised_sfp(dwelling, mv_ducttype, mv_approved, ventilation_type):
     if dwelling.get('mev_sys_pcdf_id'):
         sys = get_mev_system(dwelling.mev_sys_pcdf_id)
-        get_sfp = lambda configuration: sys['configs'][configuration]['sfp']
+        get_sfp = lambda conf: sys['configs'][conf]['sfp']
     else:
-        get_sfp = lambda configuration: dwelling["mev_fan_" + configuration + "_sfp"]
+        get_sfp = lambda conf: dwelling["mev_fan_" + conf + "_sfp"]
 
     total_flow = 0
     sfp_sum = 0
@@ -118,10 +130,10 @@ def set_mev_decentralised_properties(dwelling, mv_ducttype, mv_approved, ventila
         sfp = 0.8  # Table 4g
         adjusted_fan_sfp = sfp * in_use_factor
 
-    dwelling.adjusted_fan_sfp = adjusted_fan_sfp
+    return adjusted_fan_sfp
 
 
-def set_mvhr_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
+def mvhr_sfp(mv_ducttype, mv_approved, ventilation_type, mvhr_sfp=None):
     """
     Set the properties for the MVHR unit based on tables 4g and 4h
 
@@ -131,50 +143,57 @@ def set_mvhr_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation
     :param ventilation_type:
     :return:
     """
-    if dwelling.get('mvhr_sfp'):
+    if mvhr_sfp:
         in_use_factor = mech_vent_in_use_factor(ventilation_type,
                                                 mv_ducttype,
                                                 mv_approved)
+    else:
+        if mv_approved:
+            raise SAPInputError("Cannot be mv_approved without mvhr_sfp being set")
 
+        mvhr_sfp = 2  # Table 4g
+
+        in_use_factor = mech_vent_default_in_use_factor()
+
+    # FIXME: Don't think you actually need to set mvhr sfp if youget it from table 4g
+    # dwelling.mvhr_sfp = mvhr_sfp
+    return mvhr_sfp * in_use_factor
+
+
+def mvhr_additional_properties(mv_ducttype, mv_approved, ventilation_type, mvhr_effy=None, mvhr_sfp=None):
+    if mvhr_sfp:
         in_use_factor_hr = mech_vent_in_use_factor_hr(ventilation_type,
                                                       mv_ducttype,
                                                       mv_approved)
     else:
-        dwelling.mvhr_sfp = 2  # Table 4g
-        dwelling.mvhr_effy = 66  # Table 4g
+        mvhr_sfp = 2  # Table 4g
+        mvhr_effy = 66  # Table 4g
 
-        in_use_factor = mech_vent_default_in_use_factor()
         in_use_factor_hr = mech_vent_default_hr_effy_factor()
 
-        if mv_approved:
-            assert False
-
-    dwelling.adjusted_fan_sfp = dwelling.mvhr_sfp * in_use_factor
-    dwelling.mvhr_effy = dwelling.mvhr_effy * in_use_factor_hr
+    return dict(mvhr_sfp=mvhr_sfp,
+                mvhr_effy=mvhr_effy * in_use_factor_hr)
 
 
-def set_mv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
-    if dwelling.get('mv_sfp'):
-        mv_sfp = dwelling.mv_sfp
-        in_use_factor = mech_vent_in_use_factor(dwelling.ventilation_type, mv_ducttype,
-                                                mv_approved)
+def set_mv_dwelling_properties(mv_ducttype, mv_approved, ventilation_type, mv_sfp=None):
+    if mv_sfp:
+        in_use_factor = mech_vent_in_use_factor(ventilation_type, mv_ducttype, mv_approved)
     else:
         mv_sfp = 2  # Table 4g
         in_use_factor = mech_vent_default_in_use_factor()
 
-    dwelling.adjusted_fan_sfp = mv_sfp * in_use_factor
+    return mv_sfp * in_use_factor
 
 
-def set_piv_dwelling_properties(dwelling, mv_ducttype, mv_approved, ventilation_type):
-    if dwelling.get('piv_sfp'):
-        piv_sfp = dwelling.piv_sfp
-        in_use_factor = mech_vent_in_use_factor(dwelling.ventilation_type, mv_ducttype,
-                                                mv_approved)
+def piv_sfp(mv_ducttype, mv_approved, ventilation_type, piv_sfp=None):
+    if piv_sfp:
+        piv_sfp = piv_sfp
+        in_use_factor = mech_vent_in_use_factor(ventilation_type, mv_ducttype, mv_approved)
     else:
         piv_sfp = 0.8  # Table 4g
         in_use_factor = mech_vent_default_in_use_factor()
 
-    dwelling.adjusted_fan_sfp = piv_sfp * in_use_factor
+    return piv_sfp * in_use_factor
 
 
 def infiltration(wall_type=None, floor_type=None):
@@ -269,5 +288,3 @@ def ventilation(dwelling):
         infiltration_ach=infiltration_ach,
         inf_chimneys_ach=inf_chimneys_ach,
         infiltration_ach_annual=monthly_to_annual(infiltration_ach))
-
-
