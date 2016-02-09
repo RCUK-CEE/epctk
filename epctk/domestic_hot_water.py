@@ -35,6 +35,8 @@ def get_water_heater(dwelling):
         water_sys = dwelling.main_sys_1
 
     elif code == 914:  # from second main
+        if dwelling.main_sys_2 is None:
+            raise RuntimeError("Main system 2 must not be None")
         water_sys = dwelling.main_sys_2
 
     elif code == 902:  # from secondary

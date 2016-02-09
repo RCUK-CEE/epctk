@@ -522,7 +522,7 @@ def cylinder_insulation_properties(age_band):
 
 def primary_pipework_insulated(age_band):
     """
-    *Table S18, row 3*
+    *Table S18, row 4*
 
     Args:
         age_band:
@@ -534,6 +534,33 @@ def primary_pipework_insulated(age_band):
         return True
     else:
         return False
+
+
+def pump_in_heated_space():
+    """
+    *Table S18, row 5*
+    Space heating circulation pump for wet systems is in heated space
+
+    Returns:
+
+    """
+    return True
+
+
+def fan_assist(boiler_data):
+    """
+    *Table S18, row 7,8*
+
+    Gas boilers pre 1998, balanced or open flue - not fan assisted
+    Oil boilers from SAP table - not fan assisted
+
+    Args:
+        boiler_data:
+
+    Returns:
+
+    """
+    raise NotImplementedError("Fan assist logic not implemented")
 
 def boiler_hetas_approved(boiler_fuel):
     if boiler_fuel == FuelTypes.SOLID:

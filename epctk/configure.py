@@ -43,6 +43,9 @@ def lookup_sap_tables(dwelling):
     else:
         fuels.PREFER_PCDF_FUEL_PRICES = False
 
+    if dwelling.get('hw_cylinder_volume', 0) > 0:
+        dwelling.has_cylinderstat = True
+
     # Fix up fuel types
     if dwelling.get('water_sys_fuel') == ELECTRICITY_STANDARD:
         dwelling.water_sys_fuel = dwelling.electricity_tariff
@@ -98,7 +101,7 @@ def fix_misc_configuration(dwelling):
     else:
         thermal_mass_parameter = dwelling['thermal_mass_parameter']
 
-    living_area_fraction =dwelling.get('living_area_fraction')
+    living_area_fraction = dwelling.get('living_area_fraction')
     if not living_area_fraction:
         living_area_fraction = dwelling.living_area / dwelling.GFA
 
@@ -175,50 +178,58 @@ def configure_main_system_1(dwelling):
     Returns:
 
     """
-    if dwelling.get('main_heating_pcdf_id') is not None:
+
+    use_immersion_heater_summer = dwelling.get('use_immersion_heater_summer', False)
+    heating_type_code = dwelling.get('main_heating_type_code')
+
+    fuel = dwelling.get('main_sys_fuel')
+
+    pcdf_id = dwelling.get('main_heating_pcdf_id')
+
+    sedbuk_range_case_loss = dwelling.get('sys1_sedbuk_range_case_loss_at_full_output')
+    sedbuk_range = dwelling.get('sys1_sedbuk_range_full_output')
+    sedbuk_type = dwelling.get('sys1_sedbuk_type')
+
+    sedbuk_2005_effy = dwelling.get('sys1_sedbuk_2005_effy')
+    sedbuk_2009_effy = dwelling.get('sys1_sedbuk_2009_effy')
+    sedbuk_fan_assisted = dwelling.get('sys1_sedbuk_fan_assisted')
+
+    hw_cylinder_volume = dwelling.get('hw_cylinder_volume', 0)
+    cpsu_not_in_airing_cupboard = dwelling.get('cpsu_not_in_airing_cupboard', False)
+
+    if pcdf_id is not None:
         main_sys = pcdf_heating_system(dwelling,
-                                       dwelling.main_heating_pcdf_id,
-                                       dwelling.main_sys_fuel,
-                                       dwelling.get('use_immersion_heater_summer', False))
+                                       pcdf_id,
+                                       fuel,
+                                       use_immersion_heater_summer)
     # !!! Might need to enforce a secondary system?
-    elif dwelling.get('sys1_sedbuk_2005_effy') is not None:
-        main_sys = sedbuk_2005_heating_system(
-                dwelling,
-                dwelling.main_sys_fuel,
-                dwelling.sys1_sedbuk_2005_effy,
-                dwelling.get('sys1_sedbuk_range_case_loss_at_full_output'),
-                dwelling.get('sys1_sedbuk_range_full_output'),
-                dwelling.sys1_sedbuk_type,
-                dwelling.sys1_sedbuk_fan_assisted,
-                dwelling.get('use_immersion_heater_summer', False))
+    elif sedbuk_2005_effy is not None:
+        main_sys = sedbuk_2005_heating_system(fuel, sedbuk_2005_effy, sedbuk_range_case_loss, sedbuk_range, sedbuk_type,
+                                              sedbuk_fan_assisted, use_immersion_heater_summer,
+                                              hw_cylinder_volume,
+                                              cpsu_not_in_airing_cupboard)
 
-    elif dwelling.get('sys1_sedbuk_2009_effy') is not None:
-        main_sys = sedbuk_2009_heating_system(
-                dwelling,
-                dwelling.main_sys_fuel,
-                dwelling.sys1_sedbuk_2009_effy,
-                dwelling.get('sys1_sedbuk_range_case_loss_at_full_output'),
-                dwelling.get('sys1_sedbuk_range_full_output'),
-                dwelling.sys1_sedbuk_type,
-                True,  # !!! Assumes condensing
-                dwelling.sys1_sedbuk_fan_assisted,
-                dwelling.get('use_immersion_heater_summer', False))
+    elif sedbuk_2009_effy is not None:
+        main_sys = sedbuk_2009_heating_system(fuel, sedbuk_2009_effy, sedbuk_range_case_loss, sedbuk_range, sedbuk_type,
+                                              True, sedbuk_fan_assisted, use_immersion_heater_summer,
+                                              hw_cylinder_volume,
+                                              cpsu_not_in_airing_cupboard)
 
-    elif dwelling.get('main_heating_type_code') == "community":
+    elif heating_type_code == "community":
         # TODO: Can Community can be second main system too?
         main_sys = appendix_c.CommunityHeating(
-                dwelling.community_heat_sources,
-                dwelling.get('sap_community_distribution_type'))
+            dwelling.community_heat_sources,
+            dwelling.get('sap_community_distribution_type'))
 
         dwelling.main_sys_fuel = main_sys.fuel
 
     else:
         main_sys = appendix_a.sap_table_heating_system(
-                dwelling,
-                dwelling.main_heating_type_code,
-                dwelling.main_sys_fuel,
-                dwelling.use_immersion_heater_summer if dwelling.get('use_immersion_heater_summer') else False,
-                dwelling.sys1_hetas_approved if dwelling.get('sys1_hetas_approved') else False)
+            dwelling,
+            heating_type_code,
+            fuel,
+            use_immersion_heater_summer,
+            dwelling.get('sys1_hetas_approved', False))
 
     # TODO Should check here for no main system specified, and use a default if that's the case
     if main_sys is None:
@@ -239,18 +250,18 @@ def configure_main_system_2(dwelling):
 
     if dwelling.get('main_heating_2_pcdf_id') is not None:
         main_system = pcdf_heating_system(dwelling,
-                                                  dwelling.main_heating_2_pcdf_id,
-                                                  dwelling.main_sys_2_fuel,
-                                                  dwelling.get('use_immersion_heater_summer', False))
+                                          dwelling.main_heating_2_pcdf_id,
+                                          dwelling.main_sys_2_fuel,
+                                          dwelling.get('use_immersion_heater_summer', False))
 
     # TODO: Might need to enforce a secondary system?
     elif dwelling.get('main_heating_2_type_code') is not None:
         main_system = appendix_a.sap_table_heating_system(
-                dwelling,
-                dwelling.main_heating_2_type_code,
-                dwelling.main_sys_2_fuel,
-                dwelling.get('use_immersion_heater_summer', False),
-                dwelling.get('sys2_hetas_approved', False))
+            dwelling,
+            dwelling.main_heating_2_type_code,
+            dwelling.main_sys_2_fuel,
+            dwelling.get('use_immersion_heater_summer', False),
+            dwelling.get('sys2_hetas_approved', False))
 
     dwelling.main_sys_2 = main_system
 
@@ -402,4 +413,3 @@ def set_regional_properties(dwelling):
     dwelling['external_temperature_summer'] = TABLE_10[region]['external_temperature']
     dwelling['Igh_summer'] = TABLE_10[region]['solar_radiation']
     dwelling['latitude'] = TABLE_10[region]['latitude']
-

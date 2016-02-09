@@ -257,3 +257,42 @@ def ground_floor_U(age_band, exposed_perimeter, wall_thickness, ground_floor_a):
             return lamda_g / (0.457 * B + dt)
 
 
+
+# WORK IN PROGRESS:
+# Idea to replace main_1, main_2 prefixes with list of configuration dicts
+# similarly for hot water and secondary hw_ and secondary_ prefixes
+# Instead have secondary: {conf...}
+
+def system_conf_main_1(dwelling):
+    return dict(heating_type_code=dwelling.get('main_heating_type_code'),
+
+                fuel=dwelling.get('main_sys_fuel'),
+
+                pcdf_id=dwelling.get('main_heating_pcdf_id'),
+
+                sedbuk_range_case_loss_at_full_output=dwelling.get('sys1_sedbuk_range_case_loss_at_full_output'),
+                sedbuk_range=dwelling.get('sys1_sedbuk_range_full_output'),
+                sedbuk_type=dwelling.get('sys1_sedbuk_type'),
+
+                sedbuk_2005_effy=dwelling.get('sys1_sedbuk_2005_effy'),
+                sedbuk_2009_effy=dwelling.get('sys1_sedbuk_2009_effy'),
+                sedbuk_fan_assisted=dwelling.get('sys1_sedbuk_fan_assisted')
+                )
+
+
+def main_1_from_system_conf(conf):
+    return dict(main_heating_type_code=conf.get('conf'),
+
+                main_sys_fuel=conf.get('fuel'),
+
+                main_heating_pcdf_id=conf.get('pcdf_id'),
+
+                sys1_sedbuk_range_case_loss_at_full_output=conf.get('sedbuk_range_case_loss_at_full_output'),
+                sys1_sedbuk_range_full_output=conf.get('sedbuk_range'),
+                sys_1_sedbuk_type=conf.get('sedbuk_type'),
+
+                sys_1_sedbuk_2005_effy=conf.get('sedbuk_2005_effy'),
+                sys_1_sedbuk_2009_effy=conf.get('sedbuk_2009_effy'),
+                sys_1_sedbuk_fan_assisted=conf.get('sedbuk_fan_assisted')
+                )
+

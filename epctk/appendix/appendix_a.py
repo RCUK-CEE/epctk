@@ -171,6 +171,7 @@ def get_4a_main_system(dwelling, system_code, fuel,
         HeatingSystem: heating system configured according to Table 4A
     """
     system_data = get_4a_system(dwelling.electricity_tariff, system_code)
+    hw_cylinder_vol = dwelling.get('hw_cylinder_volume', 0)
 
     if hetas_approved and system_data['effy_hetas'] > 0:
         effy = system_data["effy_hetas"]
@@ -195,7 +196,7 @@ def get_4a_main_system(dwelling, system_code, fuel,
 
     if system.system_type in [HeatingTypes.combi,
                               HeatingTypes.storage_combi]:
-        system.combi_loss = combi_loss_table_3a(dwelling, system)
+        system.combi_loss = combi_loss_table_3a(hw_cylinder_vol, system)
 
     elif system.system_type == HeatingTypes.cpsu:
         system.cpsu_Tw = dwelling.cpsu_Tw
@@ -266,7 +267,7 @@ def get_4b_main_system(dwelling, system_code, fuel, use_immersion_in_summer):
     system.is_condensing = system_data['condensing']
 
     if system.system_type in [HeatingTypes.combi, HeatingTypes.storage_combi]:
-        system.combi_loss = combi_loss_table_3a(dwelling, system)
+        system.combi_loss = combi_loss_table_3a(dwelling.get('hw_cylinder_volume', 0), system)
 
     elif system.system_type == HeatingTypes.cpsu:
         system.cpsu_not_in_airing_cupboard = dwelling.get('cpsu_not_in_airing_cupboard', False)

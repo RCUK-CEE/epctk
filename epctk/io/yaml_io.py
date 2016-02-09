@@ -114,25 +114,66 @@ def from_yaml(fname):
     return dwelling
 
 
+# Work in progres....
 def rejig_heating_for_sanity(dwelling):
-    # system_data = dwelling.get('secondary', {})
-    system_data = dwelling['main'][0]
+    """
+    Idea to put main_1 and main_2 into main_heating = [main_1, main_2]
+    Args:
+        dwelling:
 
-    system_data['type_code'] = dwelling.get('main_heating_type_code')
-    system_data['hetas_approved'] = dwelling.get('main_hetas_approved')
+    Returns:
+
+    """
+    dwelling['main_heating'] = []
+
+    system_data = {}
+
+    system_data['type_code'] = dwelling.pop('main_heating_type_code')
+    system_data['hetas_approved'] = dwelling.pop('sys1_hetas_approved')
     # system_data["effy_hetas"] is loaded from system data
-    system_data['fuel'] = dwelling.main_sys_fuel
-    system_data['manuf_effy'] = dwelling.main_sys_manuf_effy
-    system_data['heating_control_type'] = dwelling.heating_control_type_sys1
+    system_data['fuel'] = dwelling.pop('main_sys_fuel')
+    system_data['manuf_effy'] = dwelling.pop('main_sys_manuf_effy')
+    system_data['heating_control_type'] = dwelling.pop('heating_control_type_sys1')
+
+    system_data['heating_fraction'] = dwelling.pop('main_heating_fraction', 0)
 
     # maybe...
-    system_data['pcdf_id'] = dwelling.get('main_heating_pcdf_id')
-    system_data['sedbuk_2005_effy'] = dwelling.get('sys1_sedbuk_2005_effy')
-    system_data['sedbuk_2009_effy'] = dwelling.get('sys1_sedbuk_2009_effy')
-    system_data['sedbuk_range_case_loss_at_full_output'] = dwelling.get('sys1_sedbuk_range_case_loss_at_full_output')
-    system_data['sedbuk_range_full_output'] = dwelling.get('sys1_sedbuk_range_full_output')
-    system_data['sedbuk_type'] = dwelling.get('sys1_sedbuk_type')
-    system_data['sedbuk_fan_assisted'] = dwelling.get('sys1_sedbuk_fan_assisted')
+    system_data['pcdf_id'] = dwelling.pop('main_heating_pcdf_id')
+    system_data['sedbuk_2005_effy'] = dwelling.pop('sys1_sedbuk_2005_effy')
+    system_data['sedbuk_2009_effy'] = dwelling.pop('sys1_sedbuk_2009_effy')
+    system_data['sedbuk_range_case_loss_at_full_output'] = dwelling.pop('sys1_sedbuk_range_case_loss_at_full_output')
+    system_data['sedbuk_range_full_output'] = dwelling.pop('sys1_sedbuk_range_full_output')
+    system_data['sedbuk_type'] = dwelling.pop('sys1_sedbuk_type')
+    system_data['sedbuk_fan_assisted'] = dwelling.pop('sys1_sedbuk_fan_assisted')
+
+
+    dwelling['main_heating'].append(system_data)
+
+
+
+    system_data = {}
+
+    system_data['type_code'] = dwelling.pop('sys2_heating_type_code')
+    system_data['hetas_approved'] = dwelling.pop('main_hetas_approved')
+    # system_data["effy_hetas"] is loaded from system data
+    system_data['fuel'] = dwelling.pop('main_sys_2_fuel')
+    system_data['manuf_effy'] = dwelling.pop('main_sys_manuf_effy') #doesn't exist though...
+    system_data['heating_control_type'] = dwelling.pop('heating_control_type_sys2')
+
+    system_data['heating_fraction'] = dwelling.pop('main_heating_2_fraction', 0)
+
+    # maybe...
+    system_data['pcdf_id'] = dwelling.pop('main_heating_2_pcdf_id')
+    system_data['sedbuk_2005_effy'] = dwelling.pop('sys2_sedbuk_2005_effy')
+    system_data['sedbuk_2009_effy'] = dwelling.pop('sys2_sedbuk_2009_effy')
+    system_data['sedbuk_range_case_loss_at_full_output'] = dwelling.pop('sys2_sedbuk_range_case_loss_at_full_output')
+    system_data['sedbuk_range_full_output'] = dwelling.pop('sys2_sedbuk_range_full_output')
+    system_data['sedbuk_type'] = dwelling.pop('sys2_sedbuk_type')
+    system_data['sedbuk_fan_assisted'] = dwelling.pop('sys2_sedbuk_fan_assisted')
+
+    dwelling['main_heating'].append(system_data)
+
+
 
 
 

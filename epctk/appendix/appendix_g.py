@@ -52,7 +52,7 @@ def configure_fghr(dwelling):
             dwelling.has_hw_cylinder = True
             dwelling.has_cylinderstat = True
             dwelling.has_hw_time_control = True
-            dwelling.hw_cylinder_volume = dwelling.fghrs['heat_store_total_volume']
+            hw_cylinder_volume = dwelling.fghrs['heat_store_total_volume']
             dwelling.measured_cylinder_loss = dwelling.fghrs['heat_store_loss_rate']
             dwelling.water_sys.table2b_row = 5
 
@@ -65,12 +65,16 @@ def configure_fghr(dwelling):
                                      dwelling.water_sys.pcdf_data)
             else:
                 dwelling.water_sys.combi_loss = combi_loss_table_3a(
-                        dwelling, dwelling.water_sys)
+                        hw_cylinder_volume, dwelling.water_sys)
 
             if dwelling.fghrs["has_pv_module"]:
                 assert "PV_kWp" in dwelling.fghrs
                 appendix_m.configure_pv_system(dwelling.fghrs)
                 dwelling.fghrs['monthly_solar_hw_factors'] = TABLE_H3[dwelling.fghrs['pitch']]
+
+
+            dwelling.hw_cylinder_volume = hw_cylinder_volume
+
         else:
             assert not "PV_kWp" in dwelling.fghrs
 
@@ -100,7 +104,7 @@ def configure_combi_loss(dwelling, sys, pcdf_data):
         sys.combi_loss = combi_loss_table_3b(pcdf_data)
 
     else:
-        sys.combi_loss = combi_loss_table_3a(dwelling, sys)
+        sys.combi_loss = combi_loss_table_3a(dwelling.get('hw_cylinder_volume', 0), sys)
 
     sys.pcdf_data = pcdf_data  # !!! Needed if we later add a store to this boiler
 
