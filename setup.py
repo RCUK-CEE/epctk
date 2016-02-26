@@ -17,8 +17,7 @@ setup(name='epc_tk',
         'Programming Language :: Python :: 3.5',
       ],
       keywords='epc energy uk',
-      # url='http://github.com/storborg/funniest',
-      author='Jonathan Chambesr',
+      author='Jonathan Chambers',
       author_email='jonathan.chambers.13@ucl.ac.uk',
       license='MIT',
       packages=['sap'],
@@ -28,4 +27,5 @@ setup(name='epc_tk',
           'pyparsing'
       ],
       include_package_data=True,
-      zip_safe=False)
+      zip_safe=False
+      )

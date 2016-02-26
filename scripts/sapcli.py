@@ -1,4 +1,11 @@
 import argparse
+import os
+import sys
+
+# Add the epctk module in the parent folder to python paths
+module_path = os.path.join('..', 'epctk')
+sys.path.append(module_path)
+
 
 import epctk.appendix.appendix_t
 from epctk import runner
@@ -10,6 +17,7 @@ def print_header(header):
     print(header)
     print("**********************")
 
+
 def sap_from_yaml(fname):
     dwelling = yaml_io.from_yaml(fname)
     runner.run_sap(dwelling)
@@ -18,16 +26,17 @@ def sap_from_yaml(fname):
     runner.run_fee(dwelling)
 
     print_header("SAP RESULTS")
-    print(dwelling.er_results.report)
+    # print(dwelling.er_results.report)
+    print(dwelling)
 
     print_header("DER RESULTS")
-    print(dwelling.der_results.report)
+    # print(dwelling.der_results.report)
 
     print_header("TER RESULTS")
-    print(dwelling.ter_results.report)
+    # print(dwelling.ter_results.report)
 
     print_header("FEE RESULTS")
-    print(dwelling.fee_results.report)
+    # print(dwelling.fee_results.report)
 
 
 def cli():
