@@ -110,8 +110,8 @@ def add_appendix_n_equations_heat_pumps(dwelling, sys, pcdf_data):
     sys.space_heat_effy = types.MethodType(heat_pump_space_effy, sys)
 
 
-def sch3_calc(dwelling, sch2val, sch3val):
-    Vd = dwelling.daily_hot_water_use
+def sch3_calc(daily_hot_water_use, sch2val, sch3val):
+    Vd = daily_hot_water_use
     return sch2val + (sch3val - sch2val) * (Vd - 100.2) / 99.6
 
 
@@ -202,7 +202,7 @@ def add_appendix_n_equations_microchp(dwelling, sys, pcdf_data):
         # !!! adjustments can apply??
         if not pcdf_data['water_heating_effy_sch3'] is None:
             Vd = dwelling.daily_hot_water_use
-            summereff = sch3_calc(dwelling,
+            summereff = sch3_calc(Vd,
                                   pcdf_data['water_heating_effy_sch2'],
                                   pcdf_data['water_heating_effy_sch3'])
         else:
@@ -259,8 +259,8 @@ def micro_chp_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
         dwelling.secondary_heating_type_code = 693
         dwelling.secondary_sys_fuel = dwelling.electricity_tariff
 
-    if not pcdf_data['net_specific_elec_consumed_sch3'] is None:
-        dwelling.chp_water_elec = sch3_calc(dwelling,
+    if pcdf_data['net_specific_elec_consumed_sch3'] is not None:
+        dwelling.chp_water_elec = sch3_calc(dwelling.daily_hot_water_use,
                                             pcdf_data['net_specific_elec_consumed_sch2'],
                                             pcdf_data['net_specific_elec_consumed_sch3'])
     else:
@@ -271,6 +271,7 @@ def micro_chp_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
 
 
 def heat_pump_from_pcdf(dwelling, pcdf_data, fuel, use_immersion_in_summer):
+    # FIXME: this really messes with the dwelling object, making it hard to track changes to the contents
     # !!! Probably should check provision type in here for consistency
     # !!! with water sys inputs (e.g. summer immersion, etc)
     sys = HeatingSystem(HeatingTypes.pcdf_heat_pump,

@@ -4,12 +4,10 @@ import pickle
 import sys
 import unittest
 
-from epctk import runner
-from epctk.dwelling import Dwelling, log_dwelling
+from epctk.dwelling import Dwelling
 from epctk.io import input_conversion_rules, yaml_io
-from epctk.utils import SAPCalculationError, ALL_PARAMS
-import epctk.appendix.appendix_t
-
+from epctk.runner import run_dwelling
+from epctk.utils import SAPCalculationError
 from tests import output_checker
 from tests import reference_case_parser
 from tests.reference_cases_lists import OFFICIAL_CASES, SKIP
@@ -28,6 +26,11 @@ SAP_REGIONS = {
     '10.rtf': 11,
 }
 
+# @unittest.skip("Fast test by skipping official test cases")
+class TestOfficialCases(unittest.TestCase):
+    def test_run_all_known_working_noparse(self):
+        run_official_cases(
+            OFFICIAL_CASES, reparse=False)
 
 class SingleLevelFilter(logging.Filter):
     def __init__(self, passlevel, reject):
@@ -42,31 +45,19 @@ class SingleLevelFilter(logging.Filter):
             return record.levelno == self.passlevel
 
 
-def dump_param_list():
-    for i in range(len(ALL_PARAMS)):
-        for k in ALL_PARAMS[i]:
-            print((i, k))
-
-    print(("Dumped inputs: ", len(ALL_PARAMS[1])))
-
-
 def create_sap_dwelling(inputs):
     """
     Create a SAP dwelling object from parsed SAP input file
     :param inputs:
     :return:
     """
-    # dwelling = ParamTrackerDwelling()
-
     dwelling = Dwelling()
     input_conversion_rules.process_inputs(dwelling, inputs)
 
     # if not sap_dwelling_validator.validate(dwelling):
     # logging.error("Bad inputs")
     # exit(0)
-    log_dwelling(dwelling)
 
-    # dwelling.next_stage()
     return dwelling
 
 
@@ -107,48 +98,6 @@ def load_reference_case(case_path, parser, force_reparse):
     return case
 
 
-def run_dwelling(fname, dwelling):
-    """
-    Run dwelling that was loaded from fname
-
-    :param fname: file name needed to lookup SAP region
-    :param dwelling: dwelling definition loaded from file
-    :return:
-    """
-
-    # FIXME !!! Bit of a hack here because our tests case files don't include sap region
-    if fname in SAP_REGIONS:
-        dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
-    elif not dwelling.get("sap_region"):
-        dwelling['sap_region'] = 11
-
-    runner.run_sap(dwelling)
-    runner.run_fee(dwelling)
-    runner.run_der(dwelling)
-    epctk.appendix.appendix_t.run_ter(dwelling)
-
-    # FIXME: ongoing problems in applying Appendix T improvements
-    # sap.appendix.appendix_t.run_improvements(dwelling)
-
-
-def run_sap_only(fname, dwelling):
-    """
-    Run dwelling that was loaded from fname
-
-    :param fname: file name needed to lookup SAP region
-    :param dwelling: dwelling definition loaded from file
-    :return:
-    """
-
-    # FIXME !!! Bit of a hack here because our tests case files don't include sap region
-    if fname in SAP_REGIONS:
-        dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
-    elif not dwelling.get("sap_region"):
-        dwelling['sap_region'] = 11
-
-    runner.run_sap(dwelling)
-
-
 def run_case(fname, reparse):
     logging.warning("RUNNING %s" % (fname,))
 
@@ -162,13 +111,19 @@ def run_case(fname, reparse):
             with open(yaml_file, 'w') as f:
                 yaml_io.to_yaml(dwelling, f)
             output_checker.check_results(dwelling, parsed_ref_case)
-        run_dwelling(fname, dwelling)
+
+
+        # FIXME !!! Bit of a hack here because our tests case files don't include sap region
+        if fname in SAP_REGIONS:
+            dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
+        elif not dwelling.get("sap_region"):
+            dwelling['sap_region'] = 11
+
+        run_dwelling(dwelling)
 
     except SAPCalculationError:
-        # if output_checker.is_err_calc(parsed_ref_case):
-        #     return
-        # else:
         raise
+
     logging.info("DONE")
 
 
@@ -218,14 +173,6 @@ def run_official_cases(cases, maxruns=None, reparse=False):
     print(("Ran: ", count))
 
 
-class TestOfficialCases(unittest.TestCase):
-    def test_run_all_known_working_noparse(self):
-        run_official_cases(
-            OFFICIAL_CASES, reparse=False)
-    #
-    # def test_run_all_known_working_parse(self):
-    #     run_official_cases(
-    #         OFFICIAL_CASES_THAT_WORK, reparse=True)
 
 
 if __name__ == '__main__':
@@ -288,3 +235,6 @@ if __name__ == '__main__':
     # run_sample_cases(options.reparse)
 
     # dump_param_list()
+
+if __name__ == "__main__":
+    unittest.main()

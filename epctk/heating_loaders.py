@@ -281,18 +281,12 @@ def immersion_on_peak_fraction(N_occ, elec_tariff, cylinder_volume, immersion_ty
         return 1
 
 
-def sedbuk_2005_heating_system(dwelling,
-                               fuel,
-                               sedbuk_2005_effy,
-                               range_case_loss,
-                               range_full_output,
-                               boiler_type,
-                               fan_assisted_flue,
-                               use_immersion_heater_summer):
+def sedbuk_2005_heating_system(fuel, sedbuk_2005_effy, range_case_loss, range_full_output, boiler_type,
+                               fan_assisted_flue, use_immersion_heater_summer, hw_cylinder_volume=0,
+                               cpsu_not_in_airing_cupboard=False):
     """
 
     Args:
-        dwelling:
         fuel:
         sedbuk_2005_effy: efficiency from the SEDBUK 2005 database
         range_case_loss:
@@ -336,32 +330,20 @@ def sedbuk_2005_heating_system(dwelling,
 
     annual_effy = 0.5 * (nflnet + nplnet) * f + k3
     annual_effy = int(annual_effy * 10 + .5) / 10.
-    return sedbuk_2009_heating_system(
-            dwelling,
-            fuel,
-            annual_effy,
-            range_case_loss,
-            range_full_output,
-            boiler_type,
-            is_condensing,
-            fan_assisted_flue,
-            use_immersion_heater_summer)
+    return sedbuk_2009_heating_system(fuel, annual_effy, range_case_loss, range_full_output, boiler_type, is_condensing,
+                                      fan_assisted_flue, use_immersion_heater_summer,
+                                      hw_cylinder_volume,
+                                      cpsu_not_in_airing_cupboard)
 
 
-def sedbuk_2009_heating_system(dwelling,
-                               fuel,
-                               sedbuk_2009_effy,
-                               range_case_loss,
-                               range_full_output,
-                               boiler_type,
-                               is_condensing,
-                               fan_assisted_flue,
-                               use_immersion_heater_summer):
+def sedbuk_2009_heating_system(fuel, sedbuk_2009_effy, range_case_loss, range_full_output, boiler_type, is_condensing,
+                               fan_assisted_flue, use_immersion_heater_summer, hw_cylinder_volume=0,
+                               cpsu_not_in_airing_cupboard=False):
     # !!! Assumes this boiler is also the HW sytstem!
     winter_offset, summer_offset = get_seasonal_effy_offset(
-            True,  # !!!
-            fuel,
-            boiler_type)
+        True,  # !!!
+        fuel,
+        boiler_type)
 
     effy_winter = sedbuk_2009_effy + winter_offset
     effy_summer = sedbuk_2009_effy + summer_offset
@@ -393,13 +375,11 @@ def sedbuk_2009_heating_system(dwelling,
     system.is_condensing = is_condensing
     if system.system_type in [HeatingTypes.combi,
                               HeatingTypes.storage_combi]:
-        system.combi_loss = combi_loss_table_3a(dwelling, system)
+        system.combi_loss = combi_loss_table_3a(hw_cylinder_volume, system)
 
-        if dwelling.get('hw_cylinder_volume', 0) > 0:
-            dwelling.has_cylinderstat = True  # TODO Does this go here?
     elif system.system_type == HeatingTypes.cpsu:
         # TODO: Might also need to set cpsu_Tw here?
-        system.cpsu_not_in_airing_cupboard = dwelling.get('cpsu_not_in_airing_cupboard', False)
+        system.cpsu_not_in_airing_cupboard = cpsu_not_in_airing_cupboard
 
     if range_case_loss != None:
         system.range_cooker_heat_required_scale_factor = 1 - (

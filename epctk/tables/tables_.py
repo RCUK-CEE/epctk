@@ -3,9 +3,9 @@ import os.path
 
 import numpy
 
+from ..appendix.appendix_f import cpsu_store, elec_cpsu_store
 from ..elements.sap_types import (TerrainTypes, FuelTypes, CylinderInsulationTypes, OvershadingTypes, HeatingTypes,
                                   VentilationTypes, BoilerTypes, FloorTypes)
-from ..appendix.appendix_f import cpsu_store, elec_cpsu_store
 from ..utils import csv_to_dict
 
 _DATA_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'data')
@@ -214,9 +214,7 @@ def combi_loss_storage_combi_less_than_55l(Vc, daily_hot_water_use):
     return (600 - (Vc - 15) * 15) * fn
 
 
-def combi_loss_table_3a(dwelling, system):
-    storage_volume = dwelling.get('hw_cylinder_volume', 0)
-
+def combi_loss_table_3a(storage_volume, system):
     if storage_volume == 0:
         if system.get("table3a_fn"):
             return system.table3a_fn
@@ -224,7 +222,7 @@ def combi_loss_table_3a(dwelling, system):
             # !!! Need other keep hot types
             return combi_loss_instant_without_keep_hot
     elif storage_volume < 55:
-        return lambda hw_use: combi_loss_storage_combi_less_than_55l(dwelling.hw_cylinder_volume, hw_use)
+        return lambda hw_use: combi_loss_storage_combi_less_than_55l(storage_volume, hw_use)
     else:
         return combi_loss_storage_combi_more_than_55l
 

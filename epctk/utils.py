@@ -4,10 +4,6 @@ import numpy
 
 from .constants import DAYS_PER_MONTH
 
-CALC_STAGE = 0
-ALL_PARAMS = [set(), set(), set(), set(), set(), set(), set()]
-
-
 
 def float_or_none(val):
     return float(val) if val.strip() != "" else None
@@ -25,8 +21,9 @@ class SAPCalculationError(RuntimeError):
     pass
 
 
-class SAPInputError(RuntimeError):
+class SAPInputError(ValueError):
     pass
+
 
 def csv_to_dict(filename, translator):
     results = {}
@@ -39,22 +36,6 @@ def csv_to_dict(filename, translator):
     return results
 
 
-def exists_and_true(d, attr):
-    return hasattr(d, attr) and getattr(d, attr)
-
-# class TrackedDict(dict):
-#     def __init__(self, data, prefix):
-#         super(TrackedDict, self).__init__(data)
-#         self.prefix = prefix + "."
-#
-#         for key in list(data.keys()):
-#             ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
-#
-#     def __setitem__(self, key, value):
-#         dict.__setitem__(self, key, value)
-#         ALL_PARAMS[CALC_STAGE].add(self.prefix + key)
-#
-
 def monthly_to_annual(var):
     return sum(var * DAYS_PER_MONTH) / 365.
 
@@ -66,23 +47,26 @@ def sum_(x):
         return x
 
 
-def weighted_effy(Q_space, Q_water, wintereff, summereff):
+def weighted_effy(q_space, q_water, wintereff, summereff):
     """
     Calculate monthly efficiencies given the space and water heating requirements
     and the winter and summer efficiencies
 
-    :param Q_space: space heating demand
-    :param Q_water: water heating demand
-    :param wintereff: winter efficiency
-    :param summereff: summer efficiency
-    :return: array with 12 monthly efficiences
+    Args:
+        q_space: space heating demand
+        q_water: water heating demand
+        wintereff: winter efficiency
+        summereff: summer efficiency
+
+    Returns:
+         array with 12 monthly efficiences
     """
     # If there is no space or water demand then divisor will be zero
     water_effy = numpy.zeros(12)
-    divisor = Q_space / wintereff + Q_water / summereff
+    divisor = q_space / wintereff + q_water / summereff
     for i in range(12):
         if divisor[i] != 0:
-            water_effy[i] = (Q_space[i] + Q_water[i]) / divisor[i]
+            water_effy[i] = (q_space[i] + q_water[i]) / divisor[i]
         else:
             water_effy[i] = 100
     return water_effy

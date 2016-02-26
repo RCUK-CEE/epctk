@@ -205,8 +205,6 @@ def apply_4c4(dwelling, sys):
 
 
 
-
-
 # Table 4a
 # FIXME Electric storage systems - offpeak and 24 hour tariff systems have same type codes!
 
@@ -242,6 +240,7 @@ def translate_4a_row(systems, row):
 
 
 TABLE_4A = csv_to_dict(os.path.join(_DATA_FOLDER, 'table_4a.csv'), translate_4a_row)
+
 
 def get_4a_system(electricity_tariff, code):
     matches = TABLE_4A[code]

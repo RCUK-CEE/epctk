@@ -8,10 +8,14 @@ Input conversion rules for converting from parsed input file
 import copy
 import logging
 
-from epctk.elements.sap_types import (WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes, GlazingTypes,
-                                      ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes, PVOvershading,
-                                      OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes, DuctTypes,
-                                      CommunityDistributionTypes, HeatLossElementTypes, OpeningType, HeatLossElement, Opening,
+from epctk.elements.sap_types import (WallTypes, FloorTypes, ImmersionTypes, TerrainTypes, CylinderInsulationTypes,
+                                      GlazingTypes,
+                                      ThermalStoreTypes, OvershadingTypes, SHWCollectorTypes, HeatingTypes,
+                                      PVOvershading,
+                                      OpeningTypeDataSource, HeatEmitters, LoadCompensators, VentilationTypes,
+                                      DuctTypes,
+                                      CommunityDistributionTypes, HeatLossElementTypes, OpeningType, HeatLossElement,
+                                      Opening,
                                       ThermalMassElement)
 from ..fuels import ELECTRICITY_STANDARD, ELECTRICITY_7HR, ELECTRICITY_10HR, fuel_from_code
 
@@ -35,17 +39,21 @@ class subtoken_mapping:
     def apply(self, d, r):
         if len(r.vals) <= self.inputId:
             logging.warning(
-                    "Not enough values for subtoken mapping of %s\n", self.attr)
+                "Not enough values for subtoken mapping of %s\n", self.attr)
             return
 
         tokens = r.vals[self.inputId].value.split()
         if len(tokens) <= self.tokenId:
             logging.warning(
-                    "Not enough tokens for subtoken mapping of %s\n", self.attr)
+                "Not enough tokens for subtoken mapping of %s\n", self.attr)
             return
 
         val = self.converter(tokens[self.tokenId])
         d[self.attr] = val
+
+
+def enum_mapping(attr, enum_):
+    return LambdaMapping(attr, lambda x: enum_(x.vals[0].value))
 
 
 # Mapping functions for primary inputs
@@ -217,7 +225,7 @@ class FixedValueRule:
         if len(r.vals[0]) > 1:
             if len(r.vals[0]) != len(self.expected_val):
                 logging.warning(
-                        "Unexpected input value (mismatched length): %s", r)
+                    "Unexpected input value (mismatched length): %s", r)
                 return
             for i in range(len(r.vals[0])):
                 if r.vals[0][i] != self.expected_val[i]:
@@ -241,8 +249,7 @@ class ThermalMassRule:
 
 class ThermalBridgingRule:
     def apply(self, d, r):
-        if r.vals[0].value.split() == 'User-defined'.split() and r.vals[
-            0].note.split() == 'individual Y -values'.split():
+        if r.vals[0].value.split() == 'User-defined'.split() and r.vals[0].note.split() == 'individual Y -values'.split():
             y_table = r.vals[1]
             if y_table.column_headings[1] != "Length" or y_table.column_headings[2] != "Y -value":
                 logging.warning("Invalid thermal bridging table: %s", y_table)
@@ -270,8 +277,8 @@ def process_y_value_table(d, y_table):
         toks = row[1].split()
         y_val = float(toks[0])
         y_values.append(dict(
-                length=length,
-                y=y_val))
+            length=length,
+            y=y_val))
 
     d.y_values = y_values
 
@@ -523,7 +530,7 @@ def parse_community_heating_sources(r):
 
         elif v.label == "Fuel":
             current_heat_source['fuel'] = copy.deepcopy(
-                    COMMUNITY_FUELS[v.vals[0].value])
+                COMMUNITY_FUELS[v.vals[0].value])
 
         else:
             tokens = [x.split() for x in v.value.split(',')]
@@ -727,7 +734,7 @@ class SecondaryHeatingSystemRule:
                 elif is_using_manufacturer_data and "efficiency" in v.value:
                     tokens = v.value.split()
                     effy_idx = [i for i, x in enumerate(
-                            tokens) if x == "efficiency"][0] + 1
+                        tokens) if x == "efficiency"][0] + 1
                     d.secondary_sys_manuf_effy = 100 * \
                                                  percent_to_float(tokens[effy_idx])
                 else:
@@ -798,8 +805,8 @@ class CPSUVolumeRule:
 
 
 IMMERSION_TYPES = dict(
-        Dual=ImmersionTypes.DUAL,
-        Single=ImmersionTypes.SINGLE,
+    Dual=ImmersionTypes.DUAL,
+    Single=ImmersionTypes.SINGLE,
 )
 
 
@@ -858,7 +865,7 @@ class WaterHeatingSystemRule:
 
                 if type == 950:
                     d.community_heat_sources_dhw, d.sap_community_distribution_type_dhw = parse_community_heating_sources(
-                            r)
+                        r)
 
                 if toks[-2] == "summer" and toks[-1] == "immersion":
                     d.use_immersion_heater_summer = True
@@ -949,7 +956,7 @@ class WaterHeatingSystemRule:
             if inp.label == "Waste Water Heat Recovery System":
                 if inp.vals[0].label == "Total rooms with shower and/or bath":
                     d.wwhr_total_rooms_with_shower_or_bath = int(
-                            inp.vals[0].vals[0].value)
+                        inp.vals[0].vals[0].value)
                 else:
                     logging.warning("Unknown WWHRS input %s", inp)
             elif len(tokens) > 2 and tokens[0] == "Product" and tokens[1] == "index":
@@ -1372,7 +1379,7 @@ def process_elements_table(dwelling, table):
                 try:
                     t.append(ThermalMassElement(area=float(areaStr),
                                                 kvalue=float(
-                                                        kvalueStr),
+                                                    kvalueStr),
                                                 name=row[0]))
                 except ValueError:
                     # Original tests cases don't have kvalues in their sap_tables
@@ -1418,9 +1425,9 @@ def process_elements_table(dwelling, table):
                                                               name=row[0]))
 
                     dwelling.openings.append(Opening(
-                            area=area,
-                            orientation_degrees=90,
-                            opening_type=dwelling.opening_types["Windows (2)"]))
+                        area=area,
+                        orientation_degrees=90,
+                        opening_type=dwelling.opening_types["Windows (2)"]))
 
             elif row[0] == 'Conservatory roof':
                 # Note glazing U-value correction!
@@ -1436,9 +1443,9 @@ def process_elements_table(dwelling, table):
                     window_type = copy.deepcopy(dwelling.opening_types["Windows (2)"])
                     window_type.roof_window = True
                     dwelling.openings.append(Opening(
-                            area=area,
-                            orientation_degrees=90,
-                            opening_type=window_type))
+                        area=area,
+                        orientation_degrees=90,
+                        opening_type=window_type))
 
             else:
                 U = float(row[4])
@@ -1480,11 +1487,11 @@ def process_opening_types_part1_table(d, r):
             window_type = row[2]
 
             types[row[0]] = OpeningType(
-                    glazing_type=glazing_type,
-                    gvalue=0,  # Filled in from next table
-                    frame_factor=0,
-                    Uvalue=0,
-                    roof_window=(window_type == "Roof window"))
+                glazing_type=glazing_type,
+                gvalue=0,  # Filled in from next table
+                frame_factor=0,
+                Uvalue=0,
+                roof_window=(window_type == "Roof window"))
         else:
             logging.warning("unknown element type %s", row[0])
 
@@ -1525,10 +1532,10 @@ def process_openings_table(dwelling, r):
             orientationStr = row[3]
             orientation = ORIENTATIONS[row[3]] if orientationStr != '' else 90
             openings.append(Opening(
-                    area=float(row[4]) * float(row[5]),
-                    orientation_degrees=orientation,
-                    opening_type=types[row[1]],
-                    name=row[1]))
+                area=float(row[4]) * float(row[5]),
+                orientation_degrees=orientation,
+                opening_type=types[row[1]],
+                name=row[1]))
         else:
             logging.warning("Unrecognised opening type: %s", row[1])
 

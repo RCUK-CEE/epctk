@@ -1,5 +1,5 @@
-from .utils import ALL_PARAMS, CALC_STAGE
-from .constants import IGH_HEATING, T_EXTERNAL_HEATING, WIND_SPEED, LIVING_AREA_T_HEATING, COOLING_BASE_TEMPERATURE
+from .constants import (IGH_HEATING, T_EXTERNAL_HEATING, WIND_SPEED,
+                        LIVING_AREA_T_HEATING, COOLING_BASE_TEMPERATURE)
 from .fuels import Fuel, ElectricityTariff
 
 
@@ -75,7 +75,7 @@ class DwellingResults(Dwelling):
     """
     Dwelling Results allows you to "freeze" a dwelling configuration.
     Any changes made, such as setting new attributes, will be stored in the
-    "results" dict making it easy to retreive only the changes values later
+    "results" dict making it easy to retreive only the changed values later
     in the process.
 
     This is used to perform different variations of
@@ -132,7 +132,7 @@ class DwellingResults(Dwelling):
 
     def get(self, key, default=None):
         """
-        Override get to also return from results first.
+        Override get to return from results first.
         Important since otherwise if you overwrite an existing key from Dwelling
         in Dwelling Results, only the original will be returned with get()
 
@@ -423,22 +423,6 @@ def log_dwelling_params(param_set, prefix, k, v):
         return
     except AttributeError:
         pass
-
-
-def log_dwelling(dwelling, prefix=""):
-    """
-    Log all the dwelling parameters
-    :param dwelling:
-    :param prefix:
-    :return:
-    """
-    # FIXME dodgy use of global Calc_stage
-    param_set = ALL_PARAMS[CALC_STAGE]
-
-    for k, v in dwelling.items():
-        # if k != "_attrs":
-        pass
-        # log_sap_obj(param_set, prefix, k, v)
 
 
 class ParamTrackerDwelling(Dwelling):

@@ -24,12 +24,12 @@ from .tables_ import (TABLE_3, TABLE_6D, TABLE_10, TABLE_10C, TABLE_D7,TABLE_M1,
                          combi_loss_instant_with_untimed_heat_hot, get_seasonal_effy_offset,
                          system_efficiency, system_type_from_sap_code,
                          )
-from .tables_appendix_h import TABLE_H1, TABLE_H2, TABLE_H3, TABLE_H4, TABLE_H5
-from .tables_appendix_n import table_n4_heating_days, table_n8_secondary_fraction, interpolate_psr_table, interpolate_efficiency
 
 from .tables_part_four import (TABLE_4A, TABLE_4B, get_4a_system, TABLE_4D, TABLE_4E,
                                get_4a_system, table_4f_fans_pumps_keep_hot, apply_table_4e,
                                mech_vent_default_in_use_factor, mech_vent_default_hr_effy_factor,
                                mech_vent_in_use_factor, mech_vent_in_use_factor_hr)
 
-_DATA_FOLDER = os.path.join(os.path.dirname(__file__), 'data')
+from .tables_appendix_h import TABLE_H1, TABLE_H2, TABLE_H3, TABLE_H4, TABLE_H5
+from .tables_appendix_n import table_n4_heating_days, table_n8_secondary_fraction, interpolate_psr_table, interpolate_efficiency
+from .tables_appendix_s import table_s1_age_band
