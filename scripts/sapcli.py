@@ -20,23 +20,27 @@ def print_header(header):
 
 def sap_from_yaml(fname):
     dwelling = yaml_io.from_yaml(fname)
-    runner.run_sap(dwelling)
-    runner.run_der(dwelling)
-    epctk.appendix.appendix_t.run_ter(dwelling)
-    runner.run_fee(dwelling)
 
     print_header("SAP RESULTS")
-    # print(dwelling.er_results.report)
-    print(dwelling)
+
+    sap_out = runner.run_sap(dwelling)
+
+    print(sap_out.results)
 
     print_header("DER RESULTS")
-    # print(dwelling.der_results.report)
+
+    der_out = runner.run_der(dwelling)
+    print(der_out.results)
 
     print_header("TER RESULTS")
-    # print(dwelling.ter_results.report)
+    ter_out = epctk.appendix.appendix_t.run_ter(dwelling)
+    print(ter_out.results)
 
     print_header("FEE RESULTS")
-    # print(dwelling.fee_results.report)
+    fee_out = runner.run_fee(dwelling)
+
+    print(fee_out.results)
+
 
 
 def cli():

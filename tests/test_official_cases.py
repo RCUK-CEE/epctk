@@ -1,12 +1,12 @@
 import logging
 import os
 import pickle
-import sys
 import unittest
 
+from epctk.appendix import appendix_t
 from epctk.dwelling import Dwelling
 from epctk.io import input_conversion_rules, yaml_io
-from epctk.runner import run_dwelling
+from epctk.runner import run_sap, run_fee, run_der
 from epctk.utils import SAPCalculationError
 from tests import output_checker
 from tests import reference_case_parser
@@ -26,39 +26,87 @@ SAP_REGIONS = {
     '10.rtf': 11,
 }
 
-# @unittest.skip("Fast test by skipping official test cases")
-class TestOfficialCases(unittest.TestCase):
-    def test_run_all_known_working_noparse(self):
-        run_official_cases(
-            OFFICIAL_CASES, reparse=False)
 
-class SingleLevelFilter(logging.Filter):
-    def __init__(self, passlevel, reject):
-        super().__init__()
-        self.passlevel = passlevel
-        self.reject = reject
+class TestOfficial(unittest.TestCase):
+    def __init__(self, methodName='runTest', fname=None):
+        super().__init__(methodName)
+        self.param = fname
 
-    def filter(self, record):
-        if self.reject:
-            return record.levelno != self.passlevel
-        else:
-            return record.levelno == self.passlevel
+    def setUp(self):
+        self.dwelling = dwelling_from_file(self.param, False)
+
+    # TODO: check the actual SAP results...
+    def test_sap(self):
+        out = run_sap(self.dwelling)
+
+    def test_fee(self):
+        out = run_fee(self.dwelling)
+
+    def test_der(self):
+        out = run_der(self.dwelling)
+
+    def test_ter(self):
+        out = appendix_t.run_ter(self.dwelling)
+
+        logging.warning('TER improvements not run, file {}'.format(os.path.basename(self.param)))
+        # FIXME: ongoing problems in applying Appendix T improvements
+        # sap.appendix.appendix_t.run_improvements(dwelling)
 
 
-def create_sap_dwelling(inputs):
+def load_tests(loader, tests, pattern):
     """
-    Create a SAP dwelling object from parsed SAP input file
-    :param inputs:
-    :return:
+    Dynamically generate test cases for all the test input files,
+    so that instead of having one big test for everything, we end up
+    with on set of tests for each test input
+
+    Args:
+        loader:
+        tests:
+        pattern:
+
+    Returns:
+
     """
-    dwelling = Dwelling()
-    input_conversion_rules.process_inputs(dwelling, inputs)
+    suite = unittest.TestSuite()
+    for casenum, filename in enumerate(OFFICIAL_CASES):
+        if filename in SKIP:
+            continue
 
-    # if not sap_dwelling_validator.validate(dwelling):
-    # logging.error("Bad inputs")
-    # exit(0)
+        fname = os.path.join(_FOLDER, 'official_reference_cases', filename)
+        suite.addTest(set_up(loader, fname))
+    return suite
 
-    return dwelling
+
+def set_up(loader, fname):
+    """
+    Dynamically set up a new test case suite for each input file.
+    Creates a copy of the TestOfficial class and appends the test
+    case code (EW_xx) to the name. This makes it easy to identify
+    the test when running the test suite, for example in PyCharm
+    this will result in a nice readable output from the test runner.
+
+    Args:
+        loader:
+        fname:
+
+    Returns:
+
+    """
+    testnames = loader.getTestCaseNames(TestOfficial)
+    suite = unittest.TestSuite()
+
+    class NewClass(TestOfficial): pass
+
+    s = os.path.basename(fname)
+    s = s.replace('(','')
+    s = s.replace(')','')
+    s_parts = s.split('-')
+    s = '_'.join(s_parts[1])
+
+    NewClass.__name__ = "{}_{}".format(TestOfficial.__name__, s)
+    for name in testnames:
+        suite.addTest(NewClass(name, fname=fname))
+    return suite
 
 
 def parse_file(fname, parser):
@@ -91,150 +139,106 @@ def load_reference_case(case_path, parser, force_reparse):
     if os.path.exists(pickled_file) and not force_reparse:
         case = pickle.load(open(pickled_file, "rb"))
     else:
-        print("Reparsing ", case_path)
+        # print("Reparsing ", case_path)
         case = parse_file(case_path, parser)
         pickle.dump(case, open(pickled_file, "w"))
 
     return case
 
 
-def run_case(fname, reparse):
-    logging.warning("RUNNING %s" % (fname,))
+def create_sap_dwelling(inputs):
+    """
+    Create a SAP dwelling object from parsed SAP input file
+    :param inputs:
+    :return:
+    """
+    dwelling = Dwelling()
+    input_conversion_rules.process_inputs(dwelling, inputs)
 
-    try:
-        yaml_file = os.path.join(_FOLDER, "yaml_test_cases", os.path.basename(fname) + ".yml")
-        if os.path.exists(yaml_file) and not reparse:
-            dwelling = yaml_io.from_yaml(yaml_file)
-        else:
-            parsed_ref_case = load_reference_case(fname, reference_case_parser.whole_file, reparse)
-            dwelling = create_sap_dwelling(parsed_ref_case.inputs)
-            with open(yaml_file, 'w') as f:
-                yaml_io.to_yaml(dwelling, f)
-            output_checker.check_results(dwelling, parsed_ref_case)
+    # TODO validate inputs
+    # if not sap_dwelling_validator.validate(dwelling):
+    # logging.error("Bad inputs")
 
-
-        # FIXME !!! Bit of a hack here because our tests case files don't include sap region
-        if fname in SAP_REGIONS:
-            dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
-        elif not dwelling.get("sap_region"):
-            dwelling['sap_region'] = 11
-
-        run_dwelling(dwelling)
-
-    except SAPCalculationError:
-        raise
-
-    logging.info("DONE")
+    return dwelling
 
 
-def run_sample_cases(force_reparse):
-    for i in range(29):
-        # What about 1?
-        id = i + 2
-        # if id<11: continue
-        if id == 16:
-            continue  # Community heating
-
-        # Don't know what to do
-        # if id==15: continue # Adjustments in table 4c2 also apply to solid
-        # fuel boilers?
-        if id == 20:
-            continue  # two systems and sedbuk - uses made up
-            # PCDF boiler and custom secondary system
-            # type (625), also for some reason a 5%
-            # effy penalty is applied to PCDF boiler
-            # and 2 oil pumps are counted
-        # if id==28: continue # secondary system assumed for some reason
-        if id == 30:
-            # two main systems, one reassigned as secondary.  Why?  FSAP
-            # doesn't do the reassignment
-            continue
-
-        # Cases 8 & 9 - cooling.  Looks like you don't include heat
-        # gain from central heating pumps in the summer cooling demand
-        # calc?
-
-        run_case(os.path.join("reference_dwellings", "%d.rtf" % id), force_reparse)
+def dwelling_from_file(fname, reparse):
+    yaml_file = os.path.join(_FOLDER, "yaml_test_cases", os.path.basename(fname) + ".yml")
+    if os.path.exists(yaml_file) and not reparse:
+        dwelling = yaml_io.from_yaml(yaml_file)
+    else:
+        parsed_ref_case = load_reference_case(fname, reference_case_parser.whole_file, reparse)
+        dwelling = create_sap_dwelling(parsed_ref_case.inputs)
+        with open(yaml_file, 'w') as f:
+            yaml_io.to_yaml(dwelling, f)
+        output_checker.check_results(dwelling, parsed_ref_case)
 
 
-def run_official_cases(cases, maxruns=None, reparse=False):
-    count = 0
-    for filename in cases:
-        if filename in SKIP:
-            continue
+    # FIXME Bit of a hack here because some of our tests case files don't include sap region
+    if fname in SAP_REGIONS:
+        dwelling['sap_region'] = SAP_REGIONS[os.path.basename(fname)]
+    elif not dwelling.get("sap_region"):
+        dwelling['sap_region'] = 11
 
-        fname = os.path.join(_FOLDER, 'official_reference_cases', filename)
-        # print "RUNNING: ",fname
-        run_case(fname, reparse)
-        count += 1
-        if maxruns != None and count == maxruns:
-            break
-
-    print(("Ran: ", count))
+    return dwelling
 
 
+# @unittest.skip("Fast test by skipping official test cases")
+# class TestOfficialCases(unittest.TestCase):
+#
+#     def test_all(self):
+#
+#         for casenum, filename in enumerate(OFFICIAL_CASES):
+#             if filename in SKIP:
+#                 continue
+#
+#             fname = os.path.join(_FOLDER, 'official_reference_cases', filename)
+#             dwelling = dwelling_from_file(fname, False)
+#
+#             run_all_calculation_varieties(dwelling)
+#
+# def run_all_calculation_varieties(dwelling):
+#     run_sap(dwelling)
+#     run_fee(dwelling)
+#     run_der(dwelling)
+#     appendix_t.run_ter(dwelling)
+#
+#     logging.warning('TER improvements not run')
+#     # FIXME: ongoing problems in applying Appendix T improvements
+#     # sap.appendix.appendix_t.run_improvements(dwelling)
+#
 
+#
+#
+# def run_sample_cases(force_reparse):
+#     for i in range(29):
+#         # What about 1?
+#         id = i + 2
+#         # if id<11: continue
+#         if id == 16:
+#             continue  # Community heating
+#
+#         # Don't know what to do
+#         # if id==15: continue # Adjustments in table 4c2 also apply to solid
+#         # fuel boilers?
+#         if id == 20:
+#             continue  # two systems and sedbuk - uses made up
+#             # PCDF boiler and custom secondary system
+#             # type (625), also for some reason a 5%
+#             # effy penalty is applied to PCDF boiler
+#             # and 2 oil pumps are counted
+#         # if id==28: continue # secondary system assumed for some reason
+#         if id == 30:
+#             # two main systems, one reassigned as secondary.  Why?  FSAP
+#             # doesn't do the reassignment
+#             continue
+#
+#         # Cases 8 & 9 - cooling.  Looks like you don't include heat
+#         # gain from central heating pumps in the summer cooling demand
+#         # calc?
+#
+#         run_case(os.path.join("reference_dwellings", "%d.rtf" % id), force_reparse)
+#
 
 if __name__ == '__main__':
-    from optparse import OptionParser
-
-    parser = OptionParser()
-
-    parser.add_option("--reparse",
-                      action="store_true",
-                      dest="reparse",
-                      default=False)
-    parser.add_option("--show_warnings",
-                      action="store_true",
-                      dest="show_warnings",
-                      default=False)
-    parser.add_option("--show_case",
-                      action="store_true",
-                      dest="show_case",
-                      default=False)
-
-    (options, args) = parser.parse_args()
-
-    if options.show_warnings:
-        logging.basicConfig(level=logging.INFO)
-    elif options.show_case:
-        # Shows info and errors
-        h1 = logging.StreamHandler(sys.stdout)
-        h1.addFilter(SingleLevelFilter(logging.WARNING, True))
-        logger = logging.getLogger()
-        logger.addHandler(h1)
-        logger.setLevel(logging.INFO)
-    else:
-        logging.basicConfig(level=logging.ERROR)
-
-    # h1 = logging.StreamHandler(sys.stdout)
-    # h1.addFilter(SingleLevelFilter(logging.WARNING,True))
-    # logger=logging.getLogger()
-    # logger.addHandler(h1)
-    # logger.setLevel(logging.INFO)
-
-
-    run_official_cases(
-        OFFICIAL_CASES, reparse=options.reparse)
-
-
-    # pv_cases = [11, 14, 15, ]
-    # wind_cases = [18, 6, 9]
-    # hydro_cases = [10, ]
-    # for case in pv_cases:
-    #    run_case("./reference_dwellings/%d.rtf" % (case,))
-    # run_case(11)
-
-    # run_case("./reference_dwellings/19.rtf",False)
-    # run_case("./official_reference_cases/EW-2s-semi - Electricaire - water by Range with solar panel.rtf")
-    # exit(0)
-
-    # run_official_cases([
-    #        "EW-1a-detached.rtf", ],options.reparse)
-
-    # run_sample_cases(options.reparse)
-
-    # dump_param_list()
-
-if __name__ == "__main__":
     unittest.main()

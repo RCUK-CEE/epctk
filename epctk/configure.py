@@ -53,7 +53,10 @@ def lookup_sap_tables(dwelling):
     if dwelling.get('secondary_sys_fuel') == ELECTRICITY_STANDARD:
         dwelling.secondary_sys_fuel = dwelling.electricity_tariff
 
+    # Calulate the number of occupants
+    # FIXME: shouldn't this by Total floor area not Ground floor area??
     dwelling.Nocc = table_1b_occupancy(dwelling.GFA)
+
     dwelling.daily_hot_water_use = table_1b_daily_hot_water(dwelling.Nocc, dwelling.low_water_use)
 
     set_regional_properties(dwelling)
