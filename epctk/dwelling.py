@@ -30,7 +30,7 @@ class Dwelling(dict):
         # TODO: allow attributes to be sorted. Could be done by subclassing ordereddict
         # IMPORTANT: best to only set values explicitly as dict values here
         self['use_pcdf_fuel_prices'] = True
-        self['results'] = dict()
+        self['results'] = dict() #needs to be defined here to avoid circular issues between getatte and getitem
         self['report'] = CalculationReport(self)
 
     def __setattr__(self, key, value):
@@ -122,10 +122,22 @@ class DwellingResults(Dwelling):
                     raise AttributeError(item)
 
     def __getitem__(self, item):
-        if item in super().__getitem__('results'):
+        if item == 'results':
+            return super().__getitem__('results')
+
+        # if item in super().__getitem__('results'):
+        #     return super().__getitem__('results')[item]
+        # else:
+        #     return super().__getitem__(item)
+
+        try:
             return super().__getitem__('results')[item]
-        else:
-            return super().__getitem__(item)
+        except KeyError:
+            try:
+                return super().__getitem__(item)
+            except KeyError:
+                return self.__dict__[item]
+
 
     def __setitem__(self, key, value):
         self['results'][key] = value

@@ -288,11 +288,11 @@ def run_ter(input_dwelling):
 
     Returns:
           COPY of the dwelling with the TER results
-          Assigns the .results to the input_dwelling.ter_results
 
     """
     # Note this previously wrapped dwelling in Dwelling Wrapper
     dwelling = DwellingResults(input_dwelling)
+
 
     dwelling.reduced_gains = True
 
@@ -306,7 +306,7 @@ def run_ter(input_dwelling):
     roof_window_area = sum(o.area for o in dwelling.openings if o.opening_type.roof_window is True)
     gross_wall_area = net_wall_area + window_area + opaque_door_area
 
-    new_opening_area = min(dwelling.GFA * .25, gross_wall_area)
+    new_opening_area = min(dwelling.GFA * 0.25, gross_wall_area)
     new_window_area = max(new_opening_area - 1.85, 0)
 
     floor_area = element_type_area(HeatLossElementTypes.EXTERNAL_FLOOR,
@@ -318,7 +318,7 @@ def run_ter(input_dwelling):
     heat_loss_elements = [
         HeatLossElement(
             area=gross_wall_area - new_window_area - 1.85,
-            Uvalue=.35,
+            Uvalue=0.35,
             is_external=True,
             element_type=HeatLossElementTypes.EXTERNAL_WALL
         ),
@@ -330,19 +330,19 @@ def run_ter(input_dwelling):
         ),
         HeatLossElement(
             area=floor_area,
-            Uvalue=.25,
+            Uvalue=0.25,
             is_external=True,
             element_type=HeatLossElementTypes.EXTERNAL_FLOOR
         ),
         HeatLossElement(
             area=roof_area,
-            Uvalue=.16,
+            Uvalue=0.16,
             is_external=True,
             element_type=HeatLossElementTypes.EXTERNAL_ROOF
         ),
         HeatLossElement(
             area=new_window_area,
-            Uvalue=1. / (1. / 2 + .04),
+            Uvalue=1.0 / (1.0 / 2 + 0.04),
             is_external=True,
             element_type=HeatLossElementTypes.GLAZING)
     ]
@@ -422,11 +422,22 @@ def run_ter(input_dwelling):
     dwelling.secondary_sys_fuel = dwelling.electricity_tariff
     dwelling.secondary_heating_type_code = 691
     dwelling.secondary_hetas_approved = False
-    dwelling.low_energy_bulb_ratio = .3
+    dwelling.low_energy_bulb_ratio = 0.3
 
     dwelling.cooled_area = 0
 
-    # Need to make sure no summer immersion and no renewables
+    if (dwelling.main_sys_fuel.is_mains_gas or
+        (dwelling.get('main_sys_2_fuel') and dwelling.main_sys_2_fuel.is_mains_gas)):
+        dwelling.ter_fuel = fuel_from_code(1)
+
+    elif sum(dwelling.Q_main_1) >= sum(dwelling.Q_main_2):
+        dwelling.ter_fuel = dwelling.main_sys_fuel
+
+    else:
+        dwelling.ter_fuel = dwelling.main_sys_2_fuel
+
+
+    #TODO Need to make sure no summer immersion and no renewables
 
     lookup_sap_tables(dwelling)
 
@@ -435,10 +446,6 @@ def run_ter(input_dwelling):
 
     worksheet.perform_full_calc(dwelling)
 
-    worksheet.ter(dwelling, input_dwelling.ter_fuel)
+    worksheet.ter(dwelling, dwelling.ter_fuel)
 
-    dwelling.report.build_report()
-
-    # Assign the TER results to the original dwelling
-    input_dwelling.ter_results = dwelling.results
-    return input_dwelling
+    return dwelling

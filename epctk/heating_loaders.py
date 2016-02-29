@@ -243,15 +243,15 @@ def dhw_on_peak_fraction(water_sys, dwelling):
     :param dwelling:
     :return:
     """
-    # !!! Need to complete this table
+    # TODO Need to complete this table
     if water_sys.system_type == HeatingTypes.cpsu:
-        return appendix_f.cpsu_on_peak(water_sys, dwelling)
+        return appendix_f.cpsu_on_peak(water_sys.cpsu_Tw, dwelling.heat_calc_results, dwelling.hw_cylinder_volume, dwelling.hw_energy_content, dwelling.h)
     elif water_sys.system_type == HeatingTypes.heat_pump:
-        # !!! Need off-peak immersion option
-        return .7
+        # TODO Need off-peak immersion option
+        return 0.7
     elif water_sys.system_type in [HeatingTypes.pcdf_heat_pump,
                                    HeatingTypes.microchp]:
-        return .7
+        return 0.7
     else:
         return water_sys.fuel.general_elec_on_peak_fraction
 

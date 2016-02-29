@@ -14,7 +14,8 @@ def run_sap(input_dwelling):
         input_dwelling:
 
     """
-    dwelling = input_dwelling
+    dwelling = DwellingResults(input_dwelling)
+
     dwelling.reduced_gains = False
 
     lookup_sap_tables(dwelling)
@@ -26,10 +27,32 @@ def run_sap(input_dwelling):
     dwelling.sap_energy_cost_factor = sap_energy_cost_factor
     dwelling.sap_value = sap_value
 
-    input_dwelling.er_results = dwelling.results
+    return dwelling
+
+
+def run_der(input_dwelling):
+    """
+
+    Args:
+        input_dwelling:
+
+    Returns:
+
+    """
+    dwelling = DwellingResults(input_dwelling)
+    dwelling.reduced_gains = True
+
+    if dwelling.overshading == OvershadingTypes.VERY_LITTLE:
+        dwelling.overshading = OvershadingTypes.AVERAGE
+
+    lookup_sap_tables(dwelling)
+
+    worksheet.perform_full_calc(dwelling)
+    dwelling.der_rating = worksheet.der(dwelling.GFA, dwelling.emissions)
+
+
 
     return dwelling
-    # dwelling.report.build_report()
 
 
 def run_fee(input_dwelling):
@@ -88,63 +111,25 @@ def run_fee(input_dwelling):
     dwelling = worksheet.perform_demand_calc(dwelling)
     dwelling.fee_rating = worksheet.fee(dwelling.GFA, dwelling.Q_required, dwelling.Q_cooling_required)
 
-
-    dwelling.report.build_report()
-
-    # Assign the results of the FEE calculation to the original dwelling, with a prefix...
-    input_dwelling.fee_results = dwelling.results
+    return dwelling
 
 
-def run_der(input_dwelling):
-    """
-
-    Args:
-        input_dwelling:
-
-    Returns:
-
-    """
-    dwelling = DwellingResults(input_dwelling)
-    dwelling.reduced_gains = True
-
-    if dwelling.overshading == OvershadingTypes.VERY_LITTLE:
-        dwelling.overshading = OvershadingTypes.AVERAGE
-
-    lookup_sap_tables(dwelling)
-
-    worksheet.perform_full_calc(dwelling)
-    dwelling.der_rating = worksheet.der(dwelling.GFA, dwelling.emissions)
-
-    dwelling.report.build_report()
-
-    # Assign the results of the DER calculation to the original dwelling, with a prefix...
-    input_dwelling.der_results = dwelling.results
-
-    if (dwelling.main_sys_fuel.is_mains_gas or
-            (dwelling.get('main_sys_2_fuel') and
-                 dwelling.main_sys_2_fuel.is_mains_gas)):
-        input_dwelling.ter_fuel = fuel_from_code(1)
-
-    elif sum(dwelling.Q_main_1) >= sum(dwelling.Q_main_2):
-        input_dwelling.ter_fuel = dwelling.main_sys_fuel
-
-    else:
-        input_dwelling.ter_fuel = dwelling.main_sys_2_fuel
-
-
-def run_dwelling(dwelling):
-    """
-    Run dwelling that was loaded from fname
-
-    :param fname: file name needed to lookup SAP region
-    :param dwelling: dwelling definition loaded from file
-    :return:
-    """
-
-    run_sap(dwelling)
-    run_fee(dwelling)
-    run_der(dwelling)
-    appendix_t.run_ter(dwelling)
-
-    # FIXME: ongoing problems in applying Appendix T improvements
-    # sap.appendix.appendix_t.run_improvements(dwelling)
+#
+# def run_dwelling(dwelling):
+#     """
+#     Probably don't want to use this!
+#     Run dwelling that was loaded
+#
+#     :param dwelling: dwelling definition loaded from file
+#     :return:
+#     """
+#
+#     run_sap(dwelling)
+#     run_fee(dwelling)
+#     run_der(dwelling)
+#     appendix_t.run_ter(dwelling)
+#
+#     # FIXME: ongoing problems in applying Appendix T improvements
+#     # sap.appendix.appendix_t.run_improvements(dwelling)
+#
+#     return dwelling

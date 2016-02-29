@@ -13,10 +13,10 @@ periods per day. It is not valid for other tariffs.
 """
 import numpy
 
-from ..constants import DAYS_PER_MONTH, SUMMER_MONTHS
+from ..constants import DAYS_PER_MONTH, SUMMER_MONTHS, T_EXTERNAL_HEATING
 
 
-def cpsu_on_peak(system, dwelling):
+def cpsu_on_peak(cpsu_Tw, heat_calc_results, hw_cylinder_volume, hw_energy_content, h):
     """
     39m=dwelling.h
     45m=hw_energy_content
@@ -28,22 +28,24 @@ def cpsu_on_peak(system, dwelling):
     :param system:
     """
 
-    Vcs = dwelling.hw_cylinder_volume
-    Tw = dwelling.water_sys.cpsu_Tw
-    Cmax = .1456 * Vcs * (Tw - 48)
+    Vcs = hw_cylinder_volume
+    Tw = cpsu_Tw
+    Text = T_EXTERNAL_HEATING
+    Cmax = 0.1456 * Vcs * (Tw - 48)
     nm = DAYS_PER_MONTH
 
-    Tmin = ((dwelling.h * dwelling.heat_calc_results['Tmean']) - Cmax + (
-        1000 * dwelling.hw_energy_content / (24 * nm)) -
-            dwelling.heat_calc_results['useful_gain']) / dwelling.h
+    Tmin = ((h * heat_calc_results['Tmean']) - Cmax + (
+        1000 * hw_energy_content / (24 * nm)) -
+            heat_calc_results['useful_gain']) / h
 
-    Text = dwelling.Texternal_heating
     Eonpeak = numpy.where(
             Tmin - Text == 0,
-            0.024 * dwelling.h * nm,
-            (0.024 * dwelling.h * nm * (Tmin - Text)) / (1 - numpy.exp(-(Tmin - Text))))
+            0.024 * h * nm,
+            (0.024 * h * nm * (Tmin - Text)) / (1 - numpy.exp(-(Tmin - Text))))
 
-    F = Eonpeak / (dwelling.hw_energy_content + dwelling.Q_required)
+    q_required = heat_calc_results['heat_required']
+
+    F = Eonpeak / (hw_energy_content + q_required)
     for i in SUMMER_MONTHS:
         F[i] = 0
     return F

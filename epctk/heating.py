@@ -1,7 +1,7 @@
 import numpy
 
 from .appendix import appendix_b
-from .constants import SUMMER_MONTHS, DAYS_PER_MONTH
+from .constants import SUMMER_MONTHS, DAYS_PER_MONTH, T_EXTERNAL_HEATING
 
 
 def heat_utilisation_factor(a, heat_gains, heat_loss):
@@ -29,18 +29,18 @@ def heat_utilisation_factor(a, heat_gains, heat_loss):
 
 def heating_requirement(dwelling):
 
-    dwelling.heat_calc_results = calc_heat_required(
-        dwelling, dwelling.Texternal_heating, dwelling.winter_heat_gains)
+    heat_calc_results = calc_heat_required(
+        dwelling, T_EXTERNAL_HEATING, dwelling.winter_heat_gains)
 
-    q_required = dwelling.heat_calc_results['heat_required']
+    q_required = heat_calc_results['heat_required']
 
     for i in SUMMER_MONTHS:
         q_required[i] = 0
-        dwelling.heat_calc_results['loss'][i] = 0
-        dwelling.heat_calc_results['utilisation'][i] = 0
-        dwelling.heat_calc_results['useful_gain'][i] = 0
+        heat_calc_results['loss'][i] = 0
+        heat_calc_results['utilisation'][i] = 0
+        heat_calc_results['useful_gain'][i] = 0
 
-    return q_required
+    return heat_calc_results
 
 
 def calc_heat_required(dwelling, Texternal, heat_gains):
