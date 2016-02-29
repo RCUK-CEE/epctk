@@ -70,7 +70,8 @@ def apply_solar_hot_water(base, dwelling):
     if dwelling.is_flat:
         return False
 
-    if dwelling.get('solar_collector_aperture', 0) > 0:
+    solar_collector_a = dwelling.get('solar_collector_aperture', 0)
+    if solar_collector_a is not None and solar_collector_a > 0:
         return False
 
     dwelling.solar_collector_aperture = 3
@@ -177,20 +178,24 @@ def run_improvements(dwelling):
     :return:
     """
 
-    base_dwelling_pcdf_prices = DwellingResults(dwelling)
+    unimproved_dwelling_pcdf_prices = DwellingResults(dwelling)
     # print('478: ', dwelling.get('hw_cylinder_volume'))
-    # print('479: ', base_dwelling_pcdf_prices.get('hw_cylinder_volume'))
+    # print('479: ', unimproved_dwelling_pcdf_prices.get('hw_cylinder_volume'))
 
-    base_dwelling_pcdf_prices.reduced_gains = False
-    base_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
-    lookup_sap_tables(base_dwelling_pcdf_prices)
+    unimproved_dwelling_pcdf_prices.reduced_gains = False
+    unimproved_dwelling_pcdf_prices.use_pcdf_fuel_prices = True
+    lookup_sap_tables(unimproved_dwelling_pcdf_prices)
 
-    worksheet.perform_full_calc(base_dwelling_pcdf_prices)
-    worksheet.sap(base_dwelling_pcdf_prices)
+    worksheet.perform_full_calc(unimproved_dwelling_pcdf_prices)
+
+    sap_value, sap_energy_cost_factor = worksheet.sap(unimproved_dwelling_pcdf_prices.GFA, unimproved_dwelling_pcdf_prices.fuel_cost)
+
+    unimproved_dwelling_pcdf_prices.sap_energy_cost_factor = sap_energy_cost_factor
+    unimproved_dwelling_pcdf_prices.sap_value = sap_value
 
     dwelling.improvement_results = ImprovementResults()
 
-    base_cost = base_dwelling_pcdf_prices.fuel_cost
+    base_cost = unimproved_dwelling_pcdf_prices.fuel_cost
     base_sap = dwelling.sap_value
     base_co2 = dwelling.emissions
 
@@ -205,27 +210,35 @@ def run_improvements(dwelling):
         dwelling_regular_prices.use_pcdf_fuel_prices = False
 
         apply_previous_improvements(
-                base_dwelling_pcdf_prices,
+                unimproved_dwelling_pcdf_prices,
                 dwelling_regular_prices,
                 dwelling.improvement_results.improvement_effects)
 
         apply_previous_improvements(
-                base_dwelling_pcdf_prices,
+                unimproved_dwelling_pcdf_prices,
                 dwelling_pcdf_prices,
                 dwelling.improvement_results.improvement_effects)
 
-        if not improve(base_dwelling_pcdf_prices, dwelling_pcdf_prices):
+        if not improve(unimproved_dwelling_pcdf_prices, dwelling_pcdf_prices):
             continue
 
-        improve(base_dwelling_pcdf_prices, dwelling_regular_prices)
+        improve(unimproved_dwelling_pcdf_prices, dwelling_regular_prices)
 
         lookup_sap_tables(dwelling_pcdf_prices)
-        worksheet.perform_full_calc(dwelling_pcdf_prices)
-        worksheet.sap(dwelling_pcdf_prices)
+        dwelling_pcdf_prices = worksheet.perform_full_calc(dwelling_pcdf_prices)
 
-        lookup_sap_tables(dwelling_regular_prices)
-        worksheet.perform_full_calc(dwelling_regular_prices)
-        worksheet.sap(dwelling_regular_prices)
+        sap_value, sap_energy_cost_factor = worksheet.sap(dwelling_pcdf_prices.GFA, dwelling_pcdf_prices.fuel_cost)
+
+        dwelling_pcdf_prices.sap_energy_cost_factor = sap_energy_cost_factor
+        dwelling_pcdf_prices.sap_value = sap_value
+
+        dwelling_regular_prices = lookup_sap_tables(dwelling_regular_prices)
+        dwelling_regular_prices = worksheet.perform_full_calc(dwelling_regular_prices)
+
+        sap_value, sap_energy_cost_factor = worksheet.sap(dwelling_regular_prices.GFA, dwelling_regular_prices.fuel_cost)
+
+        dwelling_regular_prices.sap_energy_cost_factor = sap_energy_cost_factor
+        dwelling_regular_prices.sap_value = sap_value
 
         sap_improvement = dwelling_regular_prices.sap_value - base_sap
 
@@ -246,15 +259,17 @@ def run_improvements(dwelling):
 
     for improvement in dwelling.improvement_results.improvement_effects:
         name, min_val, improve = [x for x in IMPROVEMENTS if x[0] == improvement.tag][0]
-        improve(base_dwelling_pcdf_prices, improved_dwelling)
+        improve(unimproved_dwelling_pcdf_prices, improved_dwelling)
 
-    lookup_sap_tables(improved_dwelling)
+    improved_dwelling = lookup_sap_tables(improved_dwelling)
 
-    worksheet.perform_full_calc(improved_dwelling)
-    worksheet.sap(improved_dwelling)
+    improved_dwelling = worksheet.perform_full_calc(improved_dwelling)
 
-    dwelling.report.build_report()
-    # print improved_dwelling.report.print_report()
+    sap_value, sap_energy_cost_factor = worksheet.sap(improved_dwelling.GFA, improved_dwelling.fuel_cost)
+
+    improved_dwelling.sap_energy_cost_factor = sap_energy_cost_factor
+    improved_dwelling.sap_value = sap_value
+    # dwelling.report.build_report()
 
     dwelling.improved_results = improved_dwelling.results
 
