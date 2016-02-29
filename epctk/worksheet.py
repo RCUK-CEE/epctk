@@ -269,7 +269,9 @@ def perform_demand_calc(dwelling):
 
     dwelling.update(solar(dwelling))
 
-    dwelling.Q_required = heating_requirement(dwelling)
+    # Need to copy the Q_required from the heat calc results to it's own attribute for compatibility
+    dwelling.heat_calc_results = heating_requirement(dwelling)
+    dwelling.Q_required = dwelling.heat_calc_results['heat_required']
 
     dwelling.Q_cooling_required = cooling_requirement(dwelling)
 
@@ -296,6 +298,6 @@ def perform_full_calc(dwelling):
     dwelling.update(appendix_m.hydro(dwelling))
     dwelling.update(appendix_c.chp(dwelling))
 
-    fuel_use(dwelling)
+    dwelling.update(fuel_use(dwelling))
 
     return dwelling

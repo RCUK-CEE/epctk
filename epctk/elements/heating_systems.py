@@ -10,7 +10,7 @@ import numpy
 from ..constants import SUMMER_MONTHS
 from .sap_types import FuelTypes, HeatingTypes
 from ..fuels import ELECTRICITY_7HR, ELECTRICITY_10HR
-from ..utils import weighted_effy
+from ..utils import weighted_effy, SAPInputError
 
 
 class HeatingSystem:
@@ -139,7 +139,7 @@ class HeatingSystem:
         else:
             return default
 
-    def _space_heat_on_peak_fraction(self, dwelling):
+    def _space_heat_on_peak_fraction(self, dwelling=None):
         """
         Determine the fraction of heating which is on peak tariff
         These values are constants for different kinds of heating types,
@@ -154,11 +154,13 @@ class HeatingSystem:
         """
 
         if self.system_type == HeatingTypes.cpsu:
+            if dwelling is None:
+                raise SAPInputError('If the system is CPSU, must supply the dwelling object to '
+                                    'get the space heating on peak fraction')
             # Import locally to avoid circular reference problems when importing main module
             # FIXME: it should be possible to avoid this by better modularising the code.
             from ..appendix import appendix_f
-
-            return appendix_f.cpsu_on_peak(self, dwelling)
+            return appendix_f.cpsu_on_peak(dwelling.water_sys.cpsu_Tw, dwelling.heat_calc_results, dwelling.hw_cylinder_volume, dwelling.hw_energy_content, dwelling.h)
 
         elif self.system_type == HeatingTypes.off_peak_only:
             return 0

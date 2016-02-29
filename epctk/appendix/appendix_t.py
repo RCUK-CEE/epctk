@@ -448,6 +448,4 @@ def run_ter(input_dwelling):
 
     worksheet.ter(dwelling, dwelling.ter_fuel)
 
-    dwelling.report.build_report()
-
     return dwelling
