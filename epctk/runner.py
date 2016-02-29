@@ -18,7 +18,7 @@ def run_sap(input_dwelling):
 
     dwelling.reduced_gains = False
 
-    lookup_sap_tables(dwelling)
+    dwelling = lookup_sap_tables(dwelling)
 
     dwelling = worksheet.perform_full_calc(dwelling)
 
@@ -45,7 +45,7 @@ def run_der(input_dwelling):
     if dwelling.overshading == OvershadingTypes.VERY_LITTLE:
         dwelling.overshading = OvershadingTypes.AVERAGE
 
-    lookup_sap_tables(dwelling)
+    dwelling = lookup_sap_tables(dwelling)
 
     worksheet.perform_full_calc(dwelling)
     dwelling.der_rating = worksheet.der(dwelling.GFA, dwelling.emissions)
@@ -103,7 +103,7 @@ def run_fee(input_dwelling):
     dwelling.main_heating_fraction = 1
     dwelling.main_heating_2_fraction = 0
 
-    lookup_sap_tables(dwelling)
+    dwelling = lookup_sap_tables(dwelling)
 
     dwelling.pump_gain = 0
     dwelling.heating_system_pump_gain = 0
@@ -127,9 +127,7 @@ def run_fee(input_dwelling):
 #     run_sap(dwelling)
 #     run_fee(dwelling)
 #     run_der(dwelling)
-#     appendix_t.run_ter(dwelling)
-#
-#     # FIXME: ongoing problems in applying Appendix T improvements
-#     # sap.appendix.appendix_t.run_improvements(dwelling)
+#     out = appendix_t.run_ter(dwelling)
+#     appendix_t.run_improvements(out)
 #
 #     return dwelling
