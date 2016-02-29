@@ -48,9 +48,9 @@ class TestOfficial(unittest.TestCase):
     def test_ter(self):
         out = appendix_t.run_ter(self.dwelling)
 
-        logging.warning('TER improvements not run, file {}'.format(os.path.basename(self.param)))
+        # logging.warning('TER improvements not run, file {}'.format(os.path.basename(self.param)))
         # FIXME: ongoing problems in applying Appendix T improvements
-        # sap.appendix.appendix_t.run_improvements(dwelling)
+        appendix_t.run_improvements(out)
 
 
 def load_tests(loader, tests, pattern):
