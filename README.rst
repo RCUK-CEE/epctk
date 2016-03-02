@@ -25,6 +25,27 @@ with large datasets. To acheive this goal a number of features are required
 - Reusable, documented and unit-tested code
 
 
+Installation
+============
+
+This project requires the `numpy` and `yaml` libraries, optionally the `pyparsing` library.
+It does not yet support installation as a Python library, instead clone, fork, or download the project
+and work in the source code folder.
+
+
+Usage
+=====
+
+General data loading and validation is work in progress. Currently, epctk is able
+to load SAP dwelling definitions from Yaml files. For example code, see the
+ `sapcli.py` script in the `scripts` folder.
+
+
+
+Example Yaml files exist but are not yet authorised to be shared publicly.
+Contact the authors for details.
+
+
 License
 =======
 
