@@ -11,15 +11,24 @@ is readable, documented, tested, and reusable.
 Steps for contributing to epctk
 -------------------------------
 
+We follow the common fork->pull request workflow for accepting contributions.
+We require contributions to be accompanied by documentation and unit tests and
+for changes to be tracked using github issues.
+
+The process roughly goes like this:
+
+
 1. Choose a github issue to work on. If none exists which describes the changes 
    you want to make, please write one detailing the problem you aim to solve or
    the feature you want to add.
-2. Checkout the code from github
-3. Create a new branch to work on. This will help with organisation.
-4. Make your changes, following the coding guidelines for style and testing described below.
-5. Create a pull request. See the Github documentation.
+2. Fork the project
+3. Checkout the code from github
+4. Create a new branch to work on. This will help with organisation.
+5. Make your changes, following the coding guidelines for style and testing described below.
+6. Create a pull request. See the Github documentation.
 
 We will review pull requests and aim to ensure that all tests pass.
+
 
 Important note on tests
 -----------------------
@@ -92,9 +101,16 @@ Notes:
 - Do not delete the ``.nojekyll`` file.
 
 
+Code editors and IDEs
+---------------------
+
+This project is developed using PyCharm community edition. Using this editor will make it easier
+for us to troubleshoot problems in getting set up.
+
+
 Contributors
 ============
 
-Andy Stone
+Andy Stone (original author)
 
-Jonathan Chambers
+Jonathan Chambers (current maintainer) jonathan.chambers.13 AT ucl.ac.uk
