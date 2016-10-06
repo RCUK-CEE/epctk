@@ -167,6 +167,7 @@ def dwelling_from_file(fname, reparse):
     if os.path.exists(yaml_file) and not reparse:
         dwelling = yaml_io.from_yaml(yaml_file)
     else:
+        # Reparse...
         parsed_ref_case = load_reference_case(fname, reference_case_parser.whole_file, reparse)
         dwelling = create_sap_dwelling(parsed_ref_case.inputs)
         with open(yaml_file, 'w') as f:

@@ -41,6 +41,15 @@ def monthly_to_annual(var):
 
 
 def sum_(x):
+    """
+
+
+    Args:
+        x: scalar or iterable
+
+    Returns:
+        Sum of elements of x if x is iterable, otherwise return x
+    """
     try:
         return sum(x)
     except TypeError:

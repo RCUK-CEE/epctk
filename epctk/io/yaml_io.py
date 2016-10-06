@@ -124,7 +124,8 @@ def rejig_heating_for_sanity(dwelling):
     Returns:
 
     """
-    dwelling['main_heating'] = []
+
+    main_heating = []
 
     system_data = {}
 
@@ -147,7 +148,7 @@ def rejig_heating_for_sanity(dwelling):
     system_data['sedbuk_fan_assisted'] = dwelling.pop('sys1_sedbuk_fan_assisted')
 
 
-    dwelling['main_heating'].append(system_data)
+    main_heating.append(system_data)
 
 
 
@@ -171,7 +172,10 @@ def rejig_heating_for_sanity(dwelling):
     system_data['sedbuk_type'] = dwelling.pop('sys2_sedbuk_type')
     system_data['sedbuk_fan_assisted'] = dwelling.pop('sys2_sedbuk_fan_assisted')
 
-    dwelling['main_heating'].append(system_data)
+    main_heating.append(system_data)
+    # dwelling['main_heating'] = mean_heating
+
+    return main_heating
 
 
 

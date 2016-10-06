@@ -16,10 +16,13 @@ from .appendix import appendix_m, appendix_g, appendix_c
 
 def heat_loss(dwelling):
     """
-    Return the attributes `h` (Total heat loss),
+    Return the attributes
+    `h` (Total heat loss),
     `hlp` (Heat Loss Parameter per square meter),
-    `h_fabric`, `h_bridging`, `h_vent`, `h_vent_annual`
-    on the given dwelling object
+    `h_fabric`,
+    `h_bridging`,
+    `h_vent`,
+    `h_vent_annual`
 
     Args:
         dwelling:
@@ -44,25 +47,51 @@ def heat_loss(dwelling):
     h = UA + h_bridging + h_vent
     return dict(
         h=h,
-        hlp=h / dwelling.GFA,
+        hlp=h / dwelling.GFA,  # TODO shouldn't this be Total floor area?
         h_fabric=UA,
         h_bridging=h_bridging,
         h_vent=h_vent,
         h_vent_annual=monthly_to_annual(h_vent))
 
 
-def water_heater_output(dwelling):
+def calculate_savings_from_fghrs(dwelling):
+    # Calculate flue gas heat recovery savings
     if dwelling.get('fghrs') is not None:
-        dwelling.savings_from_fghrs = appendix_g.fghr_savings(dwelling)
+        return appendix_g.fghr_savings(dwelling)
     else:
-        dwelling.savings_from_fghrs = 0
+        return 0
 
-    return numpy.maximum(0,
-                         dwelling.total_water_heating +
-                         dwelling.input_from_solar +
-                         dwelling.fghrs_input_from_solar -
-                         dwelling.savings_from_wwhrs -
-                         dwelling.savings_from_fghrs)
+
+def water_heater_output(dwelling):
+    """
+    Calculate the water heater output
+
+    Note: requires that total_water_heating, input_from_solar,fghrs_input_from_solar,
+    savings_from_wwhrs, savings_from_fghrs have been calculated and assigned on dwelling object
+
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
+
+    return max(0,
+               dwelling.total_water_heating +
+               dwelling.input_from_solar +
+               dwelling.fghrs_input_from_solar -
+               dwelling.savings_from_wwhrs -
+               dwelling.savings_from_fghrs)
+
+
+    # return dict(output_from_water_heater = max(0,
+    #                      dwelling.total_water_heating +
+    #                      dwelling.input_from_solar +
+    #                      dwelling.fghrs_input_from_solar -
+    #                      dwelling.savings_from_wwhrs -
+    #                      dwelling.savings_from_fghrs),
+    #             savings_from_fghrs=
+    #             )
 
 
 def internal_heat_gain(dwelling):
@@ -249,7 +278,8 @@ def ter(dwelling, heating_fuel):
 
 def perform_demand_calc(dwelling):
     """
-    Calculate the SAP energy demand for a dwelling
+    Calculate the SAP energy demand for a dwelling, adding the result to
+    the dwelling object
 
     Args:
         dwelling (Dwelling):
@@ -274,6 +304,8 @@ def perform_demand_calc(dwelling):
     dwelling.Q_required = dwelling.heat_calc_results['heat_required']
 
     dwelling.Q_cooling_required = cooling_requirement(dwelling)
+
+    dwelling.savings_from_fghrs = calculate_savings_from_fghrs(dwelling)
 
     dwelling.output_from_water_heater = water_heater_output(dwelling)
 

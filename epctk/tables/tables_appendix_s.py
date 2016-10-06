@@ -467,6 +467,7 @@ def table_s17_water_cylinder(descriptor, fuel_type=None):
         if off-peak electric dual immersion: 210 litres
         if from solid fuel boiler: 160 litres
         otherwise: 110 litre
+
     Args:
         descriptor: cylinder access descriptor
         fuel_type:
@@ -561,6 +562,7 @@ def fan_assist(boiler_data):
 
     """
     raise NotImplementedError("Fan assist logic not implemented")
+
 
 def boiler_hetas_approved(boiler_fuel):
     if boiler_fuel == FuelTypes.SOLID:

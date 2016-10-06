@@ -187,7 +187,7 @@ class OpeningType(dict):
     To maintain compatiblity with original code, add getattr override
     as for dwelling object
     """
-    def __init__(self, glazing_type, gvalue, frame_factor, Uvalue, roof_window, bfrc_data=False):
+    def __init__(self, glazing_type=None, gvalue=None, frame_factor=None, Uvalue=None, roof_window=None, bfrc_data=False):
         super().__init__(glazing_type=glazing_type, gvalue=gvalue,
                          light_transmittance=_light_transmittance[glazing_type], frame_factor=frame_factor,
                          Uvalue=Uvalue, roof_window=roof_window, bfrc_data=bfrc_data)

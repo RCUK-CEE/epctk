@@ -27,8 +27,16 @@ class FuelData:
         self.fuel_type = fuel_type
 
 
-class Fuel(object):
+class Fuel:
+
     def __init__(self, fuel_id):
+        """
+        Base class for a fuel type
+
+        Args:
+            fuel_id: Fuel ID used to look up data e.g. in PCDF file
+        """
+
         self.fuel_id = fuel_id
         self._fuel_data = None
         self.is_electric = False
