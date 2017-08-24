@@ -8,6 +8,9 @@ def heat_utilisation_factor(a, heat_gains, heat_loss):
     """
     Based on Table 9a
 
+    This is normaly done for each month, so we expect the gains
+    and losses functions to be numpy arrays
+
     Args:
         a:
         heat_gains:
@@ -17,6 +20,20 @@ def heat_utilisation_factor(a, heat_gains, heat_loss):
 
     """
     gamma = heat_gains / heat_loss
+
+    # eta = numpy.ones_like(gamma, dtype=float)
+    # eta = numpy.where(gamma <= 0,
+    #                     numpy.ones_like(gamma),
+    #                   eta)
+    #
+    # eta = numpy.where(0 < gamma < 1,
+    #                  (1 - gamma ** a) / (1 - gamma ** (a + 1)),
+    #                   eta)
+    #
+    # eta = numpy.where(gamma == 1,
+    #                     numpy.ones_like(gamma) * (a / (1 + a)),
+    #                     eta)
+    # return eta
     if 1 in gamma:
         # !!! Is this really right??
         raise Exception("Do we ever get here?")
@@ -28,12 +45,21 @@ def heat_utilisation_factor(a, heat_gains, heat_loss):
 
 
 def heating_requirement(dwelling):
+    """
+    Calculate the heating requirement in W for the winter months
 
+    Args:
+        dwelling:
+
+    Returns:
+
+    """
     heat_calc_results = calc_heat_required(
         dwelling, T_EXTERNAL_HEATING, dwelling.winter_heat_gains)
 
     q_required = heat_calc_results['heat_required']
 
+    # Ensure that there is no heating required during the summer months
     for i in SUMMER_MONTHS:
         q_required[i] = 0
         heat_calc_results['loss'][i] = 0
@@ -44,7 +70,23 @@ def heating_requirement(dwelling):
 
 
 def calc_heat_required(dwelling, Texternal, heat_gains):
+    """
+    Calculate heating requirements.
+
+    This mostly corresponds to the instructions in table 9c which
+    in turn use results from 9a and 9b.
+
+
+    Args:
+        dwelling:
+        Texternal:
+        heat_gains:
+
+    Returns:
+
+    """
     tau = dwelling.thermal_mass_parameter / (3.6 * dwelling.hlp)
+    # 'a' is used in table 9a but without information about what it is.
     a = 1 + tau / 15.
 
     # These are for pcdf heat pumps - when heat pump is undersized it
@@ -57,6 +99,7 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
     living_area_Theating = dwelling.living_area_Theating
     living_area_fraction = dwelling.living_area_fraction
 
+    # Table 9a and 9b
     L = dwelling.h * (living_area_Theating - Texternal)
     util_living = heat_utilisation_factor(a, heat_gains, L)
     Tno_heat_living = temperature_no_heat(Texternal,
@@ -66,9 +109,8 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
                                           heat_gains,
                                           dwelling.h)
 
-    Tmean_living_area = Tmean(
-        Texternal, living_area_Theating, Tno_heat_living,
-        tau, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m, N16_9_m, living_space=True)
+    Tmean_living_area = T_mean(living_area_Theating, Tno_heat_living, tau, dwelling.heating_control_type_sys1, N24_16_m,
+                               N24_9_m, N16_9_m, living_space=True)
 
     if dwelling.main_heating_fraction < 1 and dwelling.get('heating_systems_heat_separate_areas'):
         if dwelling.main_heating_fraction > living_area_fraction:
@@ -94,16 +136,8 @@ def calc_heat_required(dwelling, Texternal, heat_gains):
             dwelling, Texternal, tau, a, L, heat_gains, dwelling.heating_control_type_sys1, N24_16_m, N24_9_m,
             N16_9_m)
 
-    # if not dwelling.get('living_area_fraction'):
-    #     # TODO: this should probably be verified right at the start!
-    #     living_area_fraction = dwelling.living_area / dwelling.GFA
-    #
-    #     dwelling.living_area_fraction = living_area_fraction
-    # else:
-    #     living_area_fraction = dwelling.living_area_fraction
-
     mean_T = living_area_fraction * Tmean_living_area + (1 - living_area_fraction) * \
-                                                       Tmean_other + dwelling.temperature_adjustment
+                                                        Tmean_other + dwelling.temperature_adjustment
     L = dwelling.h * (mean_T - Texternal)
     utilisation = heat_utilisation_factor(a, heat_gains, L)
 
@@ -134,15 +168,13 @@ def temperature_rest_of_dwelling(dwelling, Texternal, tau, a, L, heat_gains, con
                                              a, heat_gains, L),
                                          heat_gains,
                                          dwelling.h)
-    return Tmean(Texternal, Theat_other, Tno_heat_other, tau, control_type, N24_16_m, N24_9_m, N16_9_m,
-                 living_space=False)
+    return T_mean(Theat_other, Tno_heat_other, tau, control_type, N24_16_m, N24_9_m, N16_9_m, living_space=False)
 
 
-def Tmean(Texternal, T_heat, T_no_heat, tau, control_type, N24_16_m, N24_9_m, N16_9_m, living_space):
+def T_mean(T_heat, T_no_heat, tau, control_type, N24_16_m, N24_9_m, N16_9_m, living_space):
     """
 
     Args:
-        Texternal:
         T_heat:
         T_no_heat:
         tau:
@@ -184,7 +216,7 @@ def Tmean(Texternal, T_heat, T_no_heat, tau, control_type, N24_16_m, N24_9_m, N1
         Tweekend = Tweekday
 
     if N24_16_m is None:
-        return (5. / 7.) * Tweekday + (2. / 7.) * Tweekend
+        return (5.0 * Tweekday + 2.0 * Tweekend) / 7
     else:
         WEm = numpy.array([9, 8, 9, 8, 9, 9, 9, 9, 8, 9, 8, 9])
         WDm = numpy.array([22, 20, 22, 22, 22, 21, 22, 22, 22, 22, 22, 22])
@@ -209,5 +241,3 @@ def heating_temperature_other_space(hlp, control_type):
         return 21. - 0.5 * hlp
     else:
         return 21. - hlp + 0.085 * hlp ** 2
-
-

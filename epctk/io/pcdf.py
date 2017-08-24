@@ -117,6 +117,16 @@ def get_product(table, product_id):
 
 
 def get_boiler(boiler_id):
+    """
+    Get boiler information for the given boiler ID
+    Builds a dict with keys being the boiler properties
+
+    Args:
+        boiler_id: PCDF boiler ID
+
+    Returns:
+
+    """
     try:
         fields = get_product('104', boiler_id)
     except KeyError:
@@ -398,8 +408,13 @@ def get_fghr_system(fghr_id):
 def pcdf_mech_vent_in_use_factors():
     """
     Construct tables for mechanical ventilation in use factors
+    by mapping the table fields from the PCDF mechanical ventilation systems
+    to outputs.
 
-    :return:
+    Returns:
+        four tables - SFP factor table, approved SDP factor table, HR factor table, approvied HR factor
+
+        (HR = heat recovery?)
     """
     factors_table = get_table("329")
     sfp_factor_table = dict()
